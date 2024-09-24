@@ -1,4 +1,4 @@
-- 🔓closed #issue number
+🔓closed #issue number
 
 ## #️⃣연관된 이슈
 
