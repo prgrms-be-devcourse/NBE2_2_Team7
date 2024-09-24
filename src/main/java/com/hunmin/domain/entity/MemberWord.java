@@ -16,12 +16,10 @@ public class MemberWord extends BaseTimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="word_id")
-    @Column(nullable = false)
     private Word word;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    @Column(nullable = false)
     private Member member;
 
 

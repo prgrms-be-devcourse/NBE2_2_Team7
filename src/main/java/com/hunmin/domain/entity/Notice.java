@@ -16,7 +16,6 @@ public class Notice extends BaseTimeEntity {
     private Long noticeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(nullable = false)
     @JoinColumn(name = "member_id")
     private Member member;
 
