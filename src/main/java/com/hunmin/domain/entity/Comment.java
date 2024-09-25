@@ -3,6 +3,9 @@ package com.hunmin.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -21,6 +24,16 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name="member_id")
     private Member member;
 
-    private String comment;
+    private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    private List<Comment> children = new ArrayList<>();
+
+    public void changeContent(String content) {
+        this.content = content;
+    }
 }

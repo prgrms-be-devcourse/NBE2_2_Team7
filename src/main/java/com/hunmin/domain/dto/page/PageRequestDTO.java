@@ -1,26 +1,25 @@
 package com.hunmin.domain.dto.page;
 
-
-import lombok.Getter;
-
+import jakarta.validation.constraints.Min;
+import lombok.Builder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 
-
-@Getter
+@Builder
 public class PageRequestDTO {
-
+    @Builder.Default
     @Min(1)
     private int page = 1;
 
-    @Min(20)
-    @Max(100)
-    private int size = 20;
+    @Builder.Default
+    @Min(5)
+    private int size = 5;
 
     public Pageable getPageable(Sort sort) {
-        return PageRequest.of(page - 1, size, sort);
+        int pageNum = page < 0 ? 1 : page - 1;
+        int sizeNum = size < 5 ? 5 : size;
+
+        return PageRequest.of(pageNum, sizeNum, sort);
     }
 }

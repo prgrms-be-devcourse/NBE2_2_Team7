@@ -28,7 +28,6 @@ public class Board extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-
     private String location;
 
     private Double latitude;
