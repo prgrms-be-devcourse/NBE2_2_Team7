@@ -1,11 +1,14 @@
 package com.hunmin.domain.dto.page;
 
-import jakarta.validation.constraints.Min;
+
+import lombok.Getter;
 import lombok.Builder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import jakarta.validation.constraints.Min;
 
+@Getter
 @Builder
 public class PageRequestDTO {
     @Builder.Default
