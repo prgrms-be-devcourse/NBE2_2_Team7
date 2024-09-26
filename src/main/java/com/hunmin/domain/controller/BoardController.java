@@ -3,7 +3,6 @@ package com.hunmin.domain.controller;
 import com.hunmin.domain.dto.board.BoardRequestDTO;
 import com.hunmin.domain.dto.board.BoardResponseDTO;
 import com.hunmin.domain.dto.page.PageRequestDTO;
-import com.hunmin.domain.entity.Board;
 import com.hunmin.domain.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,11 +51,20 @@ public class BoardController {
 
     //게시글 목록 조회
     @GetMapping
-    @Operation(summary = "댓글 목록", description = "댓글 목록을 조회할 때 사용하는 API")
+    @Operation(summary = "게시글 목록", description = "게시글 목록을 조회할 때 사용하는 API")
     public ResponseEntity<Page<BoardResponseDTO>> readBoardList(@RequestParam(value = "page", defaultValue = "1") int page,
                                                                 @RequestParam(value = "size", defaultValue = "5") int size) {
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
         return ResponseEntity.ok(boardService.readBoardList(pageRequestDTO));
     }
 
+    //회원 별 작성글 목록 조회
+    @GetMapping("/member/{memberId}")
+    @Operation(summary = "회원 별 작성글 목록", description = "회원별 작성글 목록을 조회할 때 사용하는 API")
+    public ResponseEntity<Page<BoardResponseDTO>> readBoardList(@PathVariable Long memberId,
+                                                                @RequestParam(value = "page", defaultValue = "1") int page,
+                                                                @RequestParam(value = "size", defaultValue = "5") int size) {
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
+        return ResponseEntity.ok(boardService.readBoardListByMember(memberId, pageRequestDTO));
+    }
 }

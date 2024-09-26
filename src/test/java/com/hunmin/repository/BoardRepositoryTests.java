@@ -88,4 +88,16 @@ public class BoardRepositoryTests {
 
         assertNotNull(boards);
     }
+
+    //회원 별 작성글 목록 조회
+    @Test
+    public void testReadBoardListByMember() {
+        Member member = memberRepository.findById(1L).get();
+
+        Pageable pageable = PageRequest.of(0, 20);
+
+        Page<Board> boards = boardRepository.findByMemberId(member.getMemberId(), pageable);
+
+        assertNotNull(boards);
+    }
 }
