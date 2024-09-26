@@ -37,7 +37,8 @@ const CreateBoardPage = () => {
 
     return (
         <div>
-            <h1>Create New Board</h1>
+            <h1>게시글 작성</h1>
+            제목
             <input
                 type="text"
                 placeholder="Title"
@@ -45,13 +46,16 @@ const CreateBoardPage = () => {
                 onChange={(e) => setTitle(e.target.value)}
             />
             <div></div>
+            내용
             <textarea
                 placeholder="Content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
             />
+            <div></div>
+            장소
             <KakaoMapSearch onLocationSelect={handleLocationSelect} />
-            <button onClick={handleSubmit}>Create</button>
+            <button onClick={handleSubmit}>저장</button>
         </div>
     );
 };

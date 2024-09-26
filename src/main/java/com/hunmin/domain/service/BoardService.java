@@ -54,6 +54,11 @@ public class BoardService {
         try {
             board.changeTitle(boardRequestDTO.getTitle());
             board.changeContent(boardRequestDTO.getContent());
+            board.changeLocation(boardRequestDTO.getLocation());
+            board.changeLatitude(boardRequestDTO.getLatitude());
+            board.changeLongitude(boardRequestDTO.getLongitude());
+
+            boardRepository.save(board);
 
             return new BoardResponseDTO(board);
         } catch (Exception e) {
