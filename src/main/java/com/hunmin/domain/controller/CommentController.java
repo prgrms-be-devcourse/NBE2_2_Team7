@@ -46,7 +46,6 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "댓글을 삭제할 때 사용하는 API")
     public ResponseEntity<Map<String, String>> deleteComment(@PathVariable Long boardId, @PathVariable Long commentId) {
         commentService.deleteComment(commentId);
-
         return ResponseEntity.ok(Map.of("result", "success"));
     }
 
@@ -57,7 +56,6 @@ public class CommentController {
                                                                     @RequestParam(value = "page", defaultValue = "1") int page,
                                                                     @RequestParam(value = "size", defaultValue = "5") int size) {
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
-
         return ResponseEntity.ok(commentService.readCommentList(boardId, pageRequestDTO));
     }
 }
