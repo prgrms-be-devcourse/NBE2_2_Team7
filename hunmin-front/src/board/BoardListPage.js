@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Map from './KakaoMap'; // Map 컴포넌트 임포트
 
 const BoardListPage = () => {
     const [boards, setBoards] = useState([]);
+    const [filteredBoards, setFilteredBoards] = useState([]);
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
+    const [searchLocation, setSearchLocation] = useState('');
+    const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 }); // 초기 지도 중심 설정
+    const [mapLevel, setMapLevel] = useState(9); // 지도 레벨 상태 추가
 
     useEffect(() => {
         fetchBoards();
     }, [page, size]);
+
+    useEffect(() => {
+        setFilteredBoards(boards);
+    }, [boards]);
 
     const fetchBoards = async () => {
         try {
@@ -22,44 +31,100 @@ const BoardListPage = () => {
         }
     };
 
+    const handleSearch = async () => {
+        const kakao = window.kakao;
+        const ps = new kakao.maps.services.Places();
+
+        ps.keywordSearch(searchLocation, (data, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                // 첫 번째 장소를 중심으로 설정
+                const firstPlace = data[0];
+                const center = { lat: firstPlace.y, lng: firstPlace.x };
+
+                // 5km 이내의 보드 필터링
+                const nearbyBoards = boards.filter(board => {
+                    const distance = getDistance(board.latitude, board.longitude, center.lat, center.lng);
+                    return distance <= 5000; // 5km 이내
+                });
+
+                setFilteredBoards(nearbyBoards);
+                setMapCenter(center); // 검색 결과의 중심으로 지도 이동
+                setMapLevel(5); // 검색 후 지도 확대
+            } else {
+                setFilteredBoards([]);
+                setMapLevel(9); // 초기 레벨로 설정
+            }
+        });
+    };
+
+    const getDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; // 지구 반지름 (미터)
+        const φ1 = lat1 * Math.PI / 180; // 위도
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        return R * c; // 미터 단위 거리
+    };
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     };
 
     return (
-        <div>
-            <h1>게시판</h1>
-            <Link to="/create-board">
-                <button>게시글 작성</button>
-            </Link>
-            <ul>
-                {boards.map((board) => (
-                    <li key={board.boardId}>
-                        <Link to={`/board/${board.boardId}`}>
-                            <strong>{board.title}</strong> - {board.nickname} <br />
-                            {board.updatedAt ? (
-                                <>
-                                    <span>수정일: {formatDate(board.updatedAt)}</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>작성일: {formatDate(board.createdAt)}</span>
-                                </>
-                            )}
-                            <br />
-                            {board.location && (
-                                <span>Location: {board.location}</span>
-                            )}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-            <div>
-                <button disabled={page === 1} onClick={() => setPage(page - 1)}>
-                    이전
-                </button>
-                <button onClick={() => setPage(page + 1)}>다음</button>
+        <div style={{ display: 'flex'}}>
+            {/* 게시글 리스트 */}
+            <div style={{ flex: 1, marginRight: '-900px' }}>
+                <h1>게시판</h1>
+                <Link to="/create-board">
+                    <button>게시글 작성</button>
+                </Link>
+                <ul>
+                    {filteredBoards.map((board) => (
+                        <li key={board.boardId}>
+                            <Link to={`/board/${board.boardId}`}>
+                                <strong>{board.title}</strong> - {board.nickname} <br />
+                                {board.updatedAt ? (
+                                    <>
+                                        <span>수정일: {formatDate(board.updatedAt)}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>작성일: {formatDate(board.createdAt)}</span>
+                                    </>
+                                )}
+                                <br />
+                                {board.location && (
+                                    <span> 장소: {board.location}</span>
+                                )}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+                <div>
+                    <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+                        이전
+                    </button>
+                    <button onClick={() => setPage(page + 1)}>다음</button>
+                </div>
+            </div>
+            <div style={{ flex: 1 }}>
+                <div>
+                    <input
+                        type="text"
+                        placeholder="위치를 입력하세요"
+                        value={searchLocation}
+                        onChange={(e) => setSearchLocation(e.target.value)}
+                    />
+                    <button onClick={handleSearch}>검색</button>
+                </div>
+                <Map boards={filteredBoards} mapLevel={mapLevel} mapCenter={mapCenter} /> {/* mapCenter를 props로 전달 */}
             </div>
         </div>
     );
