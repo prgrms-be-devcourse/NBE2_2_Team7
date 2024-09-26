@@ -34,5 +34,8 @@ public class Member extends BaseTimeEntity{
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
-
+    public Member(Long memberId, String nickname) {
+        this.memberId = memberId;
+        this.nickname = nickname;
+    }
 }

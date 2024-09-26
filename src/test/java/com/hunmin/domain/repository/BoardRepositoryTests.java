@@ -1,9 +1,7 @@
-package com.hunmin.repository;
+package com.hunmin.domain.repository;
 
 import com.hunmin.domain.entity.Board;
 import com.hunmin.domain.entity.Member;
-import com.hunmin.domain.repository.BoardRepository;
-import com.hunmin.domain.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -85,6 +83,18 @@ public class BoardRepositoryTests {
         Pageable pageable = PageRequest.of(0, 20);
 
         Page<Board> boards = boardRepository.findAll(pageable);
+
+        assertNotNull(boards);
+    }
+
+    //회원 별 작성글 목록 조회
+    @Test
+    public void testReadBoardListByMember() {
+        Member member = memberRepository.findById(1L).get();
+
+        Pageable pageable = PageRequest.of(0, 20);
+
+        Page<Board> boards = boardRepository.findByMemberId(member.getMemberId(), pageable);
 
         assertNotNull(boards);
     }

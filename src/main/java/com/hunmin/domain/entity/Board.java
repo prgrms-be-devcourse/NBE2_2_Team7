@@ -45,4 +45,23 @@ public class Board extends BaseTimeEntity {
     public void changeContent(String content) {
         this.content = content;
     }
+
+    public void changeLocation(String location) {
+        this.location = location;
+    }
+
+    public void changeLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void changeLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Board(Long boardId, Member member, String title, String content) {
+        this.boardId = boardId;
+        this.member = member;
+        this.title = title;
+        this.content = content;
+    }
 }
