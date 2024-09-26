@@ -1,9 +1,7 @@
-package com.hunmin.repository;
+package com.hunmin.domain.repository;
 
 import com.hunmin.domain.entity.Board;
 import com.hunmin.domain.entity.Member;
-import com.hunmin.domain.repository.BoardRepository;
-import com.hunmin.domain.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
