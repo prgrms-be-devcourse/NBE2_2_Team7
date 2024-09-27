@@ -1,14 +1,19 @@
 import React from 'react';
-import CommentPage from './comment/CommentPage';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import BoardListPage from './board/BoardListPage';
+import BoardDetailPage from './board/BoardDetailPage';
+import CreateBoardPage from './board/CreateBoardPage';
 
 const App = () => {
-  const boardId = 2; // Replace with the actual boardId
-
-  return (
-      <div>
-        <CommentPage boardId={boardId} />
-      </div>
-  );
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<BoardListPage />} />
+                <Route path="/board/:boardId" element={<BoardDetailPage />} />
+                <Route path="/create-board" element={<CreateBoardPage />} />
+            </Routes>
+        </Router>
+    );
 };
 
 export default App;

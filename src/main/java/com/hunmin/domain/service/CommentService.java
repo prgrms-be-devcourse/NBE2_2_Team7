@@ -39,7 +39,7 @@ public class CommentService {
 
             return new CommentResponseDTO(comment);
         } catch (Exception e) {
-            log.error("Error during comment creation: ", e);
+            log.error(e);
             throw CommentException.NOT_CREATED.get();
         }
     }
@@ -57,6 +57,7 @@ public class CommentService {
 
             return new CommentResponseDTO(children);
         } catch (Exception e) {
+            log.error(e);
             throw CommentException.NOT_CREATED.get();
         }
     }
@@ -70,6 +71,7 @@ public class CommentService {
 
             return new CommentResponseDTO(comment);
         } catch (Exception e) {
+            log.error(e);
             throw CommentException.NOT_UPDATED.get();
         }
     }
@@ -83,6 +85,7 @@ public class CommentService {
 
             return new CommentResponseDTO(comment);
         } catch (Exception e) {
+            log.error(e);
             throw CommentException.NOT_DELETED.get();
         }
     }
@@ -91,9 +94,7 @@ public class CommentService {
     public Page<CommentResponseDTO> readCommentList(Long boardId, PageRequestDTO pageRequestDTO) {
         Sort sort = Sort.by(Sort.Direction.ASC, "commentId");
         Pageable pageable = pageRequestDTO.getPageable(sort);
-
         Page<Comment> comments = commentRepository.findByBoardId(boardId, pageable);
-
         return comments.map(CommentResponseDTO::new);
     }
 }

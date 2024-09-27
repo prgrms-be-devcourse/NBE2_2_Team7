@@ -1,4 +1,4 @@
-package com.hunmin.domain.dto.comment;
+package com.hunmin.domain.dto.board;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -11,10 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CommentRequestDTO {
-    @NotBlank
-    private Long commentId;
-
+public class BoardRequestDTO {
     @NotBlank
     private Long boardId;
 
@@ -22,5 +19,12 @@ public class CommentRequestDTO {
     private Long memberId;
 
     @NotEmpty
+    private String title;
+
+    @NotEmpty
     private String content;
+
+    private String location;
+    private Double latitude;
+    private Double longitude;
 }

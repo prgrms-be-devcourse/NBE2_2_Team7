@@ -70,41 +70,51 @@ const CommentPage = ({ boardId }) => {
         }
     };
 
-    // 댓글과 대댓글을 렌더링하는 함수 (재귀적으로 처리)
     const renderComments = (comments) => {
-        return comments.map((comment) => (
-            <li key={comment.commentId}>
-                <div>
-                    <span>{comment.nickname}:</span>
-                    <span>{comment.content}</span>
-                    <button onClick={() => setEditCommentId(comment.commentId)}>Edit</button>
-                    <button onClick={() => handleDelete(comment.commentId)}>Delete</button>
-                    <button onClick={() => setReplyCommentId(comment.commentId)}>Reply</button>
-                </div>
+        return comments.map((comment) => {
+            const displayDate = comment.updatedAt
+                ? new Date(comment.updatedAt).toLocaleString()
+                : new Date(comment.createdAt).toLocaleString();
 
-                {replyCommentId === comment.commentId && (
-                    <div style={{ marginLeft: '20px' }}>
+            return (
+                <li key={comment.commentId}>
+                    <div>
+                        <span>{comment.nickname}:</span>
+                        <span>{comment.content}</span>
+                        <div>
+                            <small>{`작성일: ${displayDate}`}</small> {/* 조건에 따라 작성일 또는 수정일 표시 */}
+                        </div>
+                        <button onClick={() => setEditCommentId(comment.commentId)}>수정</button>
+                        <button onClick={() => handleDelete(comment.commentId)}>삭제</button>
+                        <button onClick={() => setReplyCommentId(comment.commentId)}>댓글</button>
+                    </div>
+
+                    {replyCommentId === comment.commentId && (
+                        <div style={{ marginLeft: '20px' }}>
                         <textarea
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                         />
-                        <button onClick={() => handleReply(comment.commentId)}>Reply</button>
-                    </div>
-                )}
+                            <button onClick={() => handleReply(comment.commentId)}>Reply</button>
+                        </div>
+                    )}
 
-                {/* 대댓글이 있는 경우 재귀적으로 렌더링 */}
-                {comment.children && comment.children.length > 0 && (
-                    <ul style={{ marginLeft: '20px' }}>
-                        {renderComments(comment.children)}
-                    </ul>
-                )}
-            </li>
-        ));
+                    {/* 대댓글이 있는 경우 재귀적으로 렌더링 */}
+                    {comment.children && comment.children.length > 0 && (
+                        <ul style={{ marginLeft: '20px' }}>
+                            {renderComments(comment.children)}
+                        </ul>
+                    )}
+                </li>
+            );
+        });
     };
+
 
     return (
         <div>
-            <h2>Comments</h2>
+            <hr />
+            <h3>댓글 목록</h3>
             <ul>
                 {renderComments(comments)}
             </ul>
