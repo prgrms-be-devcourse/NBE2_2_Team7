@@ -54,4 +54,8 @@ public class Member extends BaseTimeEntity {
     public void changeImage(String image) {
         this.image = image;
     }
+    public Member(Long memberId, String nickname) {
+        this.memberId = memberId;
+        this.nickname = nickname;
+    }
 }

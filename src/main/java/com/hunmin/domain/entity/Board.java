@@ -1,8 +1,9 @@
 package com.hunmin.domain.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -13,7 +14,7 @@ public class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long BoardId;
+    private Long boardId;
 
     @JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,12 +29,39 @@ public class Board extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-
     private String location;
 
     private Double latitude;
 
     private Double longitude;
 
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+
+    public void changeContent(String content) {
+        this.content = content;
+    }
+
+    public void changeLocation(String location) {
+        this.location = location;
+    }
+
+    public void changeLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void changeLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Board(Long boardId, Member member, String title, String content) {
+        this.boardId = boardId;
+        this.member = member;
+        this.title = title;
+        this.content = content;
+    }
 }
