@@ -12,6 +12,6 @@ import java.util.List;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
-    @Query("SELECT n FROM Notice n ")
+    @Query("SELECT n FROM Notice n LEFT JOIN FETCH n.member ")
     List<Notice> findAllNoticesResponse(Pageable pageable);
 }
