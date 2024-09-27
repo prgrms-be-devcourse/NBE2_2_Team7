@@ -21,6 +21,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
+
+/*
+    테스트 코드는 수정 임시보류.
+ */
 @SpringBootTest
 @Transactional
 class NoticeServiceTest {
@@ -101,14 +105,13 @@ class NoticeServiceTest {
     @DisplayName("관리자가 공지사항 등록")
     void createNotice() {
         //given
-        Member findAdmin = savedMembers.get(1);
+        Long adminId = savedMembers.get(40).getMemberId();
         NoticeRequestDTO noticeRequestDTO = new NoticeRequestDTO();
         noticeRequestDTO.setTitle("Test Notice");
         noticeRequestDTO.setContent("This is a test notice.");
-        noticeRequestDTO.setMember(findAdmin);
 
         //when
-        NoticeResponseDTO noticeResponse = noticeService.createNotice(noticeRequestDTO);
+        NoticeResponseDTO noticeResponse = noticeService.createNotice(noticeRequestDTO,adminId);
 
         //then
         assertThat(noticeResponse).isNotNull();
@@ -124,14 +127,14 @@ class NoticeServiceTest {
     @DisplayName("유저가 공지사항 등록(예외발생)")
     void createNoticeFail() {
         //when
-        Member findUser = savedMembers.get(40);
+        Long userId = savedMembers.get(40).getMemberId();
         NoticeRequestDTO noticeRequestDTO = new NoticeRequestDTO();
         noticeRequestDTO.setTitle("공지제목");
         noticeRequestDTO.setContent("공지내용");
-        noticeRequestDTO.setMember(findUser);
 
 
-        assertThatThrownBy(() -> noticeService.createNotice(noticeRequestDTO))
+
+        assertThatThrownBy(() -> noticeService.createNotice(noticeRequestDTO,userId))
                 .isInstanceOf(NoticeTaskException.class)
                 .hasMessage(NoticeException.MEMBER_NOT_VALID.get().getMessage());
     }
@@ -140,17 +143,17 @@ class NoticeServiceTest {
     @DisplayName("공지사항 수정")
     void updateNotice() {
         //given
-        Member findAdmin = savedMembers.get(1);
-        Notice findNotice = savedNotices.get(10);
-        Long noticeId = findNotice.getNoticeId();
+        Long adminId = savedMembers.get(1).getMemberId();
+        Long noticeId = savedNotices.get(10).getNoticeId();
+
         NoticeUpdateDTO noticeUpdateDTO = new NoticeUpdateDTO();
         noticeUpdateDTO.setNoticeId(noticeId);
         noticeUpdateDTO.setTitle("제목수정");
         noticeUpdateDTO.setContent("내용수정");
-        noticeUpdateDTO.setMember(findAdmin);
+
 
         //when
-        NoticeResponseDTO noticeUpdateResponse = noticeService.updateNotice(noticeUpdateDTO);
+        NoticeResponseDTO noticeUpdateResponse = noticeService.updateNotice(noticeUpdateDTO,adminId);
 
         //then
         assertThat(noticeUpdateResponse).isNotNull();
@@ -169,16 +172,17 @@ class NoticeServiceTest {
     @DisplayName("유저가 공지사항 수정 (예외발생)")
     void updateNoticeFail() {
         //given
-        Member findUser = savedMembers.get(40);
-        Notice findNotice = savedNotices.get(10);
-        Long noticeId = findNotice.getNoticeId();
+        Long userId = savedMembers.get(1).getMemberId();
+        Long noticeId = savedNotices.get(10).getNoticeId();
+
+
         NoticeUpdateDTO noticeUpdateDTO = new NoticeUpdateDTO();
         noticeUpdateDTO.setNoticeId(noticeId);
         noticeUpdateDTO.setTitle("제목수정");
         noticeUpdateDTO.setContent("내용수정");
-        noticeUpdateDTO.setMember(findUser);
 
-        assertThatThrownBy(() -> noticeService.updateNotice(noticeUpdateDTO))
+
+        assertThatThrownBy(() -> noticeService.updateNotice(noticeUpdateDTO)
                 .isInstanceOf(NoticeTaskException.class)
                 .hasMessage(NoticeException.MEMBER_NOT_VALID.get().getMessage());
     }
