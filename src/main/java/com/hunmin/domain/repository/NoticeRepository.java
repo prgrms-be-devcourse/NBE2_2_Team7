@@ -12,6 +12,6 @@ import java.util.List;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
-    @Query("SELECT Notice FROM Notice")
-    List<NoticeResponseDTO>getAllNoticesResponse(Pageable pageable);
+    @Query("SELECT n FROM Notice n ")
+    List<Notice> findAllNoticesResponse(Pageable pageable);
 }
