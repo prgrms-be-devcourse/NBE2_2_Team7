@@ -14,8 +14,12 @@ import lombok.Setter;
 public class NoticeUpdateDTO {
 
     private Long noticeId;
-    private Member member;
+    private Long memberId;
+    @NotEmpty(message = "제목을 입력하세요")
     private String title;
+    @NotEmpty(message = "내용을 입력하세요")
     private String content;
+
+
 
 }

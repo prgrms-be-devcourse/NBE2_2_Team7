@@ -16,13 +16,20 @@ import lombok.Setter;
 public class NoticeRequestDTO {
 
     @NotNull
-    private Member member;
+    private Long memberId;
     @NotEmpty(message = "제목을 입력하세요")
     private String title;
     @NotEmpty(message = "내용을 입력하세요")
     private String content;
 
     public Notice toEntity(){
+        return Notice.builder()
+                .title(title)
+                .content(content)
+                .build();
+    }
+
+    public Notice toEntity(Member member){
         return Notice.builder()
                 .member(member)
                 .title(title)
