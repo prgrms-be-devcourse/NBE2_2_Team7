@@ -1,8 +1,6 @@
 package com.hunmin.domain.service;
 
-import com.hunmin.domain.dto.notice.NoticeRequestDTO;
-import com.hunmin.domain.dto.notice.NoticeResponseDTO;
-import com.hunmin.domain.dto.notice.NoticeUpdateDTO;
+import com.hunmin.domain.dto.notice.*;
 import com.hunmin.domain.dto.page.PageRequestDTO;
 import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.entity.Notice;
@@ -15,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,12 +24,16 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
 
     //공지사항 리스트 조회
-    public List<NoticeResponseDTO> getAllNotices(PageRequestDTO pageRequestDTO, Long noticeId){
-            Notice notice = noticeRepository.findById(noticeId).orElseThrow(NoticeException.NOTICE_NOT_FOUND::get);
+    public List<NoticeResponseDTO> getAllNotices(NoticePageRequestDTO pageRequestDTO){
         try {
             Sort sort = Sort.by("noticeId").descending();
-            Pageable pageable = pageRequestDTO.getPageable(sort);;
-            return noticeRepository.getAllNoticesResponse(pageable);
+            Pageable pageable = pageRequestDTO.getPageable(sort);
+            List<Notice> notices = noticeRepository.findAllNoticesResponse(pageable);
+            List<NoticeResponseDTO> responseDTOs = new ArrayList<>();
+            for (Notice notice : notices) {
+                responseDTOs.add(new NoticeResponseDTO(notice));
+            }
+            return responseDTOs;
         }catch (Exception e){
             log.error("getAllNotices error: {}",  e);
             throw NoticeException.NOTICE_NOT_FOUND.get();
@@ -79,7 +82,7 @@ public class NoticeService {
     }
 
     //공지사항 삭제
-    public NoticeResponseDTO deleteNotice(Notice noticeDeleteDTO){
+    public NoticeResponseDTO deleteNotice(NoticeDeleteDTO noticeDeleteDTO){
         //관리자 아닐경우 예외 발생
         if (!noticeDeleteDTO.getMember().getMemberRole().equals(MemberRole.ADMIN)) {
             throw NoticeException.MEMBER_NOT_VALID.get();
