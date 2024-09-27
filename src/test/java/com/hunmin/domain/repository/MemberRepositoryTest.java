@@ -21,16 +21,13 @@ class MemberRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @Test
     public void testDataInsert() {
         IntStream.rangeClosed(1, 10).forEach(i -> {
             Member member = Member
                     .builder()
                     .memberId((long) i)
-                    .password(passwordEncoder.encode("1234"))
+                    .password("1234")
                     .email("USER" + i + "@email.com")
                     .nickname("USER" + i)
                     .country("USER_COUNTRY" + i)
