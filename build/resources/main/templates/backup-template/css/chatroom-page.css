@@ -1,0 +1,50 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f7f7f7;
+}
+.chatroom-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 10px;
+    width: 600px; /* 가로 길이를 더 넓게 설정 */
+    position: relative;
+    cursor: pointer; /* 마우스를 올렸을 때 클릭할 수 있는 포인터로 변경 */
+}
+.chatroom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chatroom-header h2 {
+    margin-top: 0;
+    text-align: left; /* 채팅방 이름을 왼쪽으로 정렬 */
+}
+.chatroom-body {
+    margin-top: 10px;
+}
+.recent-chat {
+    color: #666;
+    margin-top: 5px;
+}
+.chatroom-footer {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    color: #888;
+    font-size: 0.9em;
+}
+.chatroom-card:hover {
+    background-color: #f1f1f1; /* 마우스를 올렸을 때 색상 변화 */
+}
+.chatroom-card:active {
+    transform: scale(0.99); /* 버튼을 살짝 줄여 눌리는 효과 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 그림자를 줄여 눌림 느낌을 강조 */
+}

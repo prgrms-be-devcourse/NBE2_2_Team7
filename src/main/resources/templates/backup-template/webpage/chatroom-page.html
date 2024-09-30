@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>채팅방 목록</title>
+    <link rel="stylesheet" th:href="@{/css/chatroom-page.css}"/>
+</head>
+<body>
+<h1>채팅방 목록</h1>
+
+<!-- 채팅방 카드 -->
+<div class="chatroom-card" th:onclick="|window.location.href='@{/chat-page}'|">
+    <div class="chatroom-header">
+        <h2 th:text="${member.nickname}">#대화 상대 이름</h2>
+        <!-- 대화 상대 이름을 여기에 넣으세요 -->
+    </div>
+    <div class="chatroom-body">
+        <p class="recent-chat" th:text="${chatMessages.message}">
+            #가장 최근 채팅 내용
+        </p>
+        <!-- 가장 최근 채팅 내용을 여기에 넣으세요 -->
+    </div>
+    <div class="chatroom-footer">
+        <p th:text="${chatMessages.createTime}">#최근 채팅 시간</p>
+        <!-- 최근 채팅 시간을 여기에 넣으세요 -->
+    </div>
+</div>
+
+<!-- 채팅방 추가 버튼 -->
+<button id="add-chatroom-button" onclick="addChatroom()">채팅방 추가</button>
+
+<!-- 다른 채팅방도 같은 형식으로 추가할 수 있습니다 -->
+</body>
+<!--<script th:src="@{/js/chat-page2.js}"></script>-->
+</html>

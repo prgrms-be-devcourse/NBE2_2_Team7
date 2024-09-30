@@ -1,0 +1,108 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 400px;
+    height: 80vh;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.chat-header {
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+    text-align: center;
+    font-size: 18px;
+    position: relative; /* 자식 요소의 절대 위치를 위한 상대적 위치 설정 */
+}
+.chat-messages {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.message {
+    padding: 8px 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    max-width: 70%;
+}
+.message.user {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+}
+.message.partner {
+    background-color: #f1f0f0;
+    align-self: flex-start;
+}
+.chat-input-container {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+    margin-left: 10px;
+}
+.chat-input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+.send-button {
+    background-image: url('../../../static/images/pressicon.png'); /* 업로드된 이미지 경로 */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 30px; /* 버튼 크기 */
+    height: 30px;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+.send-button:hover {
+    background-color: rgb(228, 226, 226);
+}
+.send-button:active {
+    transform: scale(0.95); /* 버튼을 살짝 줄여 눌리는 효과 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 그림자를 줄여 눌림 느낌을 강조 */
+}
+.exit-button {
+    background-color: #4caf50;
+    background-image: url('../../../static/images/exiticon.png'); /* 업로드된 이미지 경로 */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 40px; /* 버튼 크기 */
+    height: 40px;
+    position: absolute;
+    top: 5px;
+    right: 7px; /* 오른쪽 끝으로 이동 */
+    border: none;
+    cursor: pointer;
+    color: white;
+}
+.exit-button:hover {
+    transform: scale(0.98); /* 마우스 올렸을 때 살짝 안으로 들어가는 효과 */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* 살짝 더 강한 그림자 */
+}
+.exit-button:active {
+    transform: scale(0.95); /* 버튼을 살짝 줄여 눌리는 효과 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 그림자를 줄여 눌림 느낌을 강조 */
+}

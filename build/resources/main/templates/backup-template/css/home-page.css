@@ -1,0 +1,50 @@
+/* 간단한 스타일 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+.sidebar {
+    width: 200px;
+    background-color: #f4f4f4;
+    padding: 20px;
+    height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+/* 둥글게 스타일링한 채팅방 목록 링크 */
+.chatroom-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4caf50; /* 배경색 */
+    color: white; /* 텍스트 색 */
+    text-decoration: none; /* 밑줄 제거 */
+    border-radius: 20px; /* 둥근 모서리 */
+    font-size: 16px; /* 글자 크기 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 */
+    transition: background-color 0.3s; /* 호버 시 부드러운 색상 전환 */
+    margin-left: 40px;
+    margin-top: 30px;
+}
+
+/* 링크에 마우스를 올렸을 때 색상 변화 */
+.chatroom-link:hover {
+    background-color: #45a049;
+}
+.chatroom-link:active {
+    transform: scale(0.97); /* 버튼을 살짝 줄여 눌리는 효과 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 그림자를 줄여 눌림 느낌을 강조 */
+}
+
+.content {
+    padding: 20px;
+    flex-grow: 1;
+}
