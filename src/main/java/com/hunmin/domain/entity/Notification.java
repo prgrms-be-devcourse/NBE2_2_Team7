@@ -2,9 +2,6 @@ package com.hunmin.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -27,4 +24,13 @@ public class Notification extends BaseTimeEntity {
     @Column(nullable = false)
     private NotificationType notificationType;
 
+    @Column(nullable = false)
+    private Boolean isRead;
+
+    @Column(nullable = false)
+    private String url;
+
+    public void changeIsRead(Boolean isRead) {
+        this.isRead = isRead;
+    }
 }
