@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CommentPage from '../comment/CommentPage';
-import KakaoMapSearch from './KakaoMapSearch';
+import KakaoMapSearch from './map/KakaoMapSearch';
 import { Typography, Button, TextField, Grid, Paper } from '@mui/material';
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 

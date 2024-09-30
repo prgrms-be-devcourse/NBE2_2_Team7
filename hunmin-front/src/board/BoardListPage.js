@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Map from './KakaoMap'; // Map 컴포넌트 임포트
+import Map from './map/KakaoMap'; // Map 컴포넌트 임포트
 import { FaUserCircle } from 'react-icons/fa'; // 프로필 아이콘 임포트
 import {
     Box,
