@@ -114,14 +114,14 @@ const BoardListPage = ({ memberName }) => {
     return (
         <Container>
             <AppBar position="static">
-                <Toolbar>
+                <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <IconButton edge="start" color="inherit" aria-label="logo">
                         <FaUserCircle size={30} />
                     </IconButton>
-                    <Typography variant="h6" style={{ flexGrow: 1 }}>
+                    <Typography variant="h6" style={{ marginLeft: '10px' }}>
                         {memberName}
                     </Typography>
-                    <Button color="inherit" onClick={() => setShowMyBoards(!showMyBoards)}>
+                    <Button color="inherit" onClick={() => setShowMyBoards(!showMyBoards)} style={{ marginLeft: '10px' }}>
                         {showMyBoards ? '전체 글 보기' : '내 글 보기'}
                     </Button>
                 </Toolbar>

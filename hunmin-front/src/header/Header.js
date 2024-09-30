@@ -84,7 +84,12 @@ const Header = () => {
                 <Grid container justifyContent="space-between" alignItems="center">
                     <Grid item>
                         <Link to="/" style={{ marginRight: '20px', textDecoration: 'none', color: 'white' }}>
-                            <Typography variant="h6">홈</Typography>
+                            <Typography variant="h6" style={{ fontSize: '1.25rem' }}>훈민정음 2.0</Typography> {/* 홈 버튼 폰트 사이즈 */}
+                        </Link>
+                    </Grid>
+                    <Grid item>
+                        <Link to="/notices" style={{ marginRight: '20px', textDecoration: 'none', color: 'white' }}>
+                            <Button color="inherit" style={{ fontSize: '1.25rem' }}>공지사항</Button> {/* 공지사항 버튼 폰트 사이즈 통일 */}
                         </Link>
                     </Grid>
                     <Grid item style={{ position: 'relative' }}>
