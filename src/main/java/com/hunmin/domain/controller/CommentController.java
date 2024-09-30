@@ -54,7 +54,7 @@ public class CommentController {
     @Operation(summary = "댓글 목록", description = "댓글 목록을 조회할 때 사용하는 API")
     public ResponseEntity<Page<CommentResponseDTO>> readCommentList(@PathVariable Long boardId,
                                                                     @RequestParam(value = "page", defaultValue = "1") int page,
-                                                                    @RequestParam(value = "size", defaultValue = "5") int size) {
+                                                                    @RequestParam(value = "size", defaultValue = "10") int size) {
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
         return ResponseEntity.ok(commentService.readCommentList(boardId, pageRequestDTO));
     }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import KakaoMapSearch from './KakaoMapSearch';
+import { TextField, Button, Typography, Container, Box, Paper } from '@mui/material';
 
 const CreateBoardPage = () => {
     const [title, setTitle] = useState('');
@@ -36,27 +37,46 @@ const CreateBoardPage = () => {
     };
 
     return (
-        <div>
-            <h1>게시글 작성</h1>
-            제목
-            <input
-                type="text"
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-            />
-            <div></div>
-            내용
-            <textarea
-                placeholder="Content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-            />
-            <div></div>
-            장소
-            <KakaoMapSearch onLocationSelect={handleLocationSelect} />
-            <button onClick={handleSubmit}>저장</button>
-        </div>
+        <Container maxWidth="sm">
+            <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
+                <Typography variant="h4" gutterBottom>
+                    게시글 작성
+                </Typography>
+                <Box component="form" noValidate autoComplete="off">
+                    <TextField
+                        fullWidth
+                        label="제목"
+                        variant="outlined"
+                        margin="normal"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                    <TextField
+                        fullWidth
+                        label="내용"
+                        variant="outlined"
+                        margin="normal"
+                        multiline
+                        rows={4}
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                    />
+                    <Typography variant="subtitle1" gutterBottom>
+                        장소
+                    </Typography>
+                    <KakaoMapSearch onLocationSelect={handleLocationSelect} />
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        style={{ marginTop: '20px' }}
+                        onClick={handleSubmit}
+                    >
+                        저장
+                    </Button>
+                </Box>
+            </Paper>
+        </Container>
     );
 };
 
