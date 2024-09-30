@@ -63,7 +63,7 @@ public class BoardController {
     @Operation(summary = "회원 별 작성글 목록", description = "회원별 작성글 목록을 조회할 때 사용하는 API")
     public ResponseEntity<Page<BoardResponseDTO>> readBoardList(@PathVariable Long memberId,
                                                                 @RequestParam(value = "page", defaultValue = "1") int page,
-                                                                @RequestParam(value = "size", defaultValue = "5") int size) {
+                                                                @RequestParam(value = "size", defaultValue = "10") int size) {
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
         return ResponseEntity.ok(boardService.readBoardListByMember(memberId, pageRequestDTO));
     }
