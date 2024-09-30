@@ -1,18 +1,12 @@
 package com.hunmin.domain.dto.member;
 
-import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.MemberRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Setter
+@Getter
 public class MemberDTO {
-
     private Long memberId;
     private String password;
     private String email;
@@ -22,15 +16,16 @@ public class MemberDTO {
     private String image;
     private MemberRole memberRole;
 
-
-    public MemberDTO(Member member) {
-        this.memberId = member.getMemberId();
-        this.email = member.getEmail();
-        this.password = member.getPassword();
-        this.nickname = member.getNickname();
-        this.country = member.getCountry();
-        this.level = member.getLevel();
-        this.image = member.getImage();
-        this.memberRole = member.getMemberRole();
-    }
+//    public MemberDTO() {}
+//
+//    public MemberDTO(Member member) {
+//        this.memberId = member.getMemberId();
+//        this.email = member.getEmail();
+//        this.password = member.getPassword();
+//        this.nickname = member.getNickname();
+//        this.country = member.getCountry();
+//        this.level = member.getLevel();
+//        this.image = member.getImage();
+//        this.memberRole = member.getMemberRole();
+//    }
 }

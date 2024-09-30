@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Setter
 @Getter
 @ToString
 @Builder
@@ -35,6 +36,11 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
+    public Member(Long memberId, String nickname) {
+        this.memberId = memberId;
+        this.nickname = nickname;
+    }
+
     public void changePassword(String encode) {
         this.password = encode;
     }
@@ -53,9 +59,5 @@ public class Member extends BaseTimeEntity {
 
     public void changeImage(String image) {
         this.image = image;
-    }
-    public Member(Long memberId, String nickname) {
-        this.memberId = memberId;
-        this.nickname = nickname;
     }
 }
