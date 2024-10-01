@@ -35,6 +35,9 @@ public class Board extends BaseTimeEntity {
 
     private Double longitude;
 
+    @ElementCollection
+    private List<String> imageUrls;
+
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
@@ -56,6 +59,10 @@ public class Board extends BaseTimeEntity {
 
     public void changeLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public void changeImgUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public Board(Long boardId, Member member, String title, String content) {

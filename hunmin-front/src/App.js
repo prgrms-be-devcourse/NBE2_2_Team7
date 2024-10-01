@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import NavBar from './components/NavBar';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Header from './header/Header'; // 새로 만든 Header 컴포넌트 추가
 import BoardListPage from './board/BoardListPage';
 import BoardDetailPage from './board/BoardDetailPage';
 import CreateBoardPage from './board/CreateBoardPage';
@@ -10,6 +10,9 @@ import MainComponent from './member/MainComponent';
 import AdminComponent from './member/AdminComponent';
 import LoginForm from './member/LoginForm';
 import axios from 'axios';
+import NoticeListPage from './notice/NoticeListPage';
+import NoticeDetailPage from './notice/NoticeDetailPage';
+import CreateNoticePage from './notice/CreateNoticePage';
 import NoticeListPage from './notice/NoticeListPage';
 import NoticeDetailPage from './notice/NoticeDetailPage';
 import CreateNoticePage from './notice/CreateNoticePage';
@@ -25,6 +28,7 @@ const App = () => {
     return (
         <Router>
             <NavBar />
+            <Header /> {/* 헤더 추가 */}
             <Routes>
                 {/* 게시판 라우트 */}
                 <Route path="/" element={<BoardListPage />} />
@@ -42,10 +46,8 @@ const App = () => {
                 <Route path="/notices/:id" element={<NoticeDetailPage />} />
                 <Route path="/create-notice" element={<CreateNoticePage />} />
                 <Route path="/edit-notice/:id" element={<CreateNoticePage />} />
-
             </Routes>
         </Router>
-
     );
 };
 

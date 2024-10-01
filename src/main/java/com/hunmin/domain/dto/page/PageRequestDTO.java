@@ -16,12 +16,12 @@ public class PageRequestDTO {
     private int page = 1;
 
     @Builder.Default
-    @Min(5)
-    private int size = 5;
+    @Min(10)
+    private int size = 10;
 
     public Pageable getPageable(Sort sort) {
         int pageNum = page < 0 ? 1 : page - 1;
-        int sizeNum = size < 5 ? 5 : size;
+        int sizeNum = size < 10 ? 10 : size;
 
         return PageRequest.of(pageNum, sizeNum, sort);
     }
