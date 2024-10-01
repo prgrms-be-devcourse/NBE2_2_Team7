@@ -1,5 +1,6 @@
 package com.hunmin.domain.controller.websocket;
 
+import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
 import com.hunmin.domain.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,11 @@ public class ChatRoomController {
     @ResponseBody
     public ChatRoomDTO createRoom(@RequestParam("memberId") String memberId) {
         return chatRoomService.createChatRoom(memberId);
+    }
+    @PostMapping("/room2")
+    @ResponseBody
+    public ChatMessageRequestDTO createRoomByNickName(@RequestParam("nickName") String nickName) {
+        return chatRoomService.createChatRoomByNickName(nickName);
     }
 
     @GetMapping("/room/enter/{chatRoomId}")

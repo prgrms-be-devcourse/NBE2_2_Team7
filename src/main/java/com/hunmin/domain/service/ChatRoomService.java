@@ -1,6 +1,7 @@
 package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.chat.ChatMessageDTO;
+import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
@@ -65,6 +66,21 @@ public class ChatRoomService {
         return new ChatRoomDTO(savedChatRoom);
     }
 
+    // 채팅방 생성 : 이름으로 상대방 검색 후 채팅방 개설
+    public ChatMessageRequestDTO createChatRoomByNickName(String nickName) {
+        Member member = memberRepository.findByNickname(nickName)
+                .orElseThrow(() -> new RuntimeException("없는 사용자 불러오기"));
+        ChatRoom chatRoom = ChatRoom.builder().member(member).userCount(1).build();
+        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+
+        return ChatMessageRequestDTO.builder()
+                .chatRoomId(savedChatRoom.getChatRoomId())
+                .userCount(savedChatRoom.getUserCount())
+                .createdAt(savedChatRoom.getCreatedAt())
+                .nickName(member.getNickname())
+                .MemberId(member.getMemberId()).build();
+    }
+
     // 유저가 입장한 채팅방ID와 유저 세션ID 맵핑 정보 저장
     public void setUserEnterInfo(String sessionId, Long roomId) {
         hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
@@ -94,7 +110,7 @@ public class ChatRoomService {
     // 채팅방에 입장한 유저수 +1
     public long plusUserCount(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(ChatRoomException.NOT_FOUND::get);
-        chatRoom.setUserCount(chatRoom.getUserCount()+1);
+        chatRoom.setUserCount(chatRoom.getUserCount() + 1);
         chatRoomRepository.save(chatRoom);
         return chatRoom.getUserCount();
     }
@@ -102,9 +118,9 @@ public class ChatRoomService {
     // 채팅방에 입장한 유저수 -1
     public long minusUserCount(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(ChatRoomException.NOT_FOUND::get);
-        chatRoom.setUserCount(chatRoom.getUserCount()-1);
+        chatRoom.setUserCount(chatRoom.getUserCount() - 1);
         chatRoomRepository.save(chatRoom);
-        if (chatRoom.getUserCount()<1) {
+        if (chatRoom.getUserCount() < 1) {
             chatRoomRepository.delete(chatRoom);
             return 0;
         }

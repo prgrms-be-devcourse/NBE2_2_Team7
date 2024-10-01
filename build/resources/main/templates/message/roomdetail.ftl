@@ -55,14 +55,26 @@
             max-width: 70%;
         }
 
-        .message.user {
+        .user {
+            align-self: flex-end; /* 오른쪽에 배치 (본인 메시지) */
             background-color: #dcf8c6;
-            align-self: flex-end;
+            border-radius: 10px 10px 10px 0;
+            padding: 10px;
         }
 
-        .message.partner {
+        .partner {
             background-color: #f1f0f0;
-            align-self: flex-start;
+            align-self: flex-start; /* 왼쪽에 배치 (상대방 메시지) */
+            border-radius: 10px 10px 10px 0;
+            padding: 10px;
+        }
+        .message-sender {
+            font-size: 12px;
+            color: gray;
+        }
+
+        .message-content {
+            font-size: 14px;
         }
 
         .chat-input-container {
@@ -82,8 +94,12 @@
             border-radius: 4px;
             border: 1px solid #ccc;
             box-sizing: border-box;
+            transition: border-color 0.3s ease;
         }
-
+        .chat-input:focus {
+            border-color: rgba(0, 0, 0, 0.4); /* 포커스 시 테두리 색을 연하게 변경 */
+            outline: none; /* 기본 outline 제거 */
+        }
         .send-button {
             background-image: url('/images/pressicon.png');
             background-size: contain;
@@ -146,18 +162,19 @@
 <div class="chat-container" id="app" v-cloak>
     <!-- 채팅방 상단 제목 -->
     <div class="chat-header">
-        {{ memberId }}
+        {{ roomName }}
         <button class="exit-button" @click="exitChat"></button>
     </div>
-
-    <!-- 채팅 메시지 목록 -->
+    <!-- 채팅 메시지 목록 /id나 이름으로 구분하여 채팅 표기가능-->
     <div class="chat-messages">
         <div v-for="message in messages"
-             :class="{'message': true, 'user': message.sender === memberId, 'partner': message.sender !== memberId}">
-            <div>
-                <strong>{{ message.sender }}</strong>
+             :class="{'message': true, 'user': message.memberId == roomName, 'partner': message.memberId != roomName}">
+            <div class="message-sender">
+                <strong>{{ message.memberId==roomName ? '나':'상대방' }}</strong>
             </div>
-            <div>{{ message.message }}</div>
+            <div class="message-content">
+                {{ message.message }}
+            </div>
         </div>
     </div>
 
@@ -168,7 +185,8 @@
                 class="chat-input"
                 v-model="message"
                 @keypress.enter="sendMessage('TALK')"
-                placeholder="메시지를 입력하세요..."
+                placeholder="메시지를 입력하세요."
+                ref="chatInput"
         />
         <button class="send-button" @click="sendMessage('TALK')"></button>
     </div>
@@ -188,35 +206,43 @@
         el: '#app',
         data: {
             roomId: '',
-            memberId: '',
+            roomName: '',
             message: '',
             messages: [],
+            nickName: '',
             userCount: 0
         },
         created() {
             this.roomId = localStorage.getItem('wschat.roomId');
-            this.memberId = localStorage.getItem('wschat.memberId');
+            this.roomName = localStorage.getItem('wschat.memberId');
+            this.nickName = localStorage.getItem('wschat.nickName');
             console.log('Room ID:', this.roomId);
-            console.log('Member ID:', this.memberId);
+            console.log('roomName:', this.roomName);
             var _this = this;
 
             // 이전 메시지 가져오기
             axios.get('/chat/messages/' + this.roomId).then(response => {
                 _this.messages = response.data.map(function (recv) {
                     return {
-                        "type": recv.type,
-                        "sender": recv.memberId,
-                        "message": recv.message,
+                        chatRoomId: recv.roomId,
+                        type: recv.type,
+                        memberId: recv.memberId,
+                        message: recv.message
                     };
-                    console.log('response.data=',response.data);
+                    console.log('이전메세지 가져오기 완료=', this.messages);
+                });
+                this.$nextTick(() => {
+                    const chatMessages = this.$el.querySelector('.chat-messages');
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
                 });
             }).catch(error => {
                 console.error('이전메세지 가져오기 에러:', error);
             });
+            //socket 연결
             ws.connect({}, function (frame) {
                 ws.subscribe("/sub/chat/room/" + _this.roomId, function (message) {
                     var recv = JSON.parse(message.body);
-                    console.log('recv:',recv)
+                    console.log(' ws 연결성공 =',recv);
                     _this.recvMessage(recv);
                 });
             }, function (error) {
@@ -227,32 +253,40 @@
         },
         methods: {
             sendMessage(type) {
-                const messageData = {
+                if (this.message.trim() === '') {
+                    return;  // 빈 메시지 전송 방지
+                }
+                var messageData = {
                     type: type,
                     chatRoomId: this.roomId,
                     message: this.message,
-                    memberId: this.memberId,
+                    memberId: this.roomName,
                 };
-                console.log('Sending message:', messageData);
+                console.log('메세지 전송:', messageData);
                 ws.send("/pub/chat/message", {}, JSON.stringify(messageData));
                 this.message = '';
+                this.$refs.chatInput.focus();
+
             },
             recvMessage(recv) {
-                console.log('Received message:', recv);
-                this.messages.push({
-                    "chatRoomId":recv.roomId,
-                    "type": recv.type,
-                    "sender": recv.memberId,
-                    "message": recv.message,
+                console.log('recvMessage :', recv);
+                this.messages.unshift({
+                    chatRoomId: recv.chatRoomId,
+                    type: recv.type,
+                    memberId: recv.memberId,
+                    message: recv.message
                 });
                 this.$nextTick(() => {
-                    const chatMessagesElement = document.querySelector('.chat-messages');
-                    chatMessagesElement.scrollTop = chatMessagesElement.scrollHeight;
+                    const chatMessages = this.$el.querySelector('.chat-messages');
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
                 });
             },
             exitChat() {
+                ws.disconnect(() => {
+                    console.log('WebSocket 연결 해제됨');
+                });
                 location.href = "/chat/room";
-            }
+            },
         }
     });
 </script>

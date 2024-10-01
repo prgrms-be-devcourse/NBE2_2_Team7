@@ -81,7 +81,7 @@
 
     <div class="input-group">
         <div class="input-group-prepend">
-            <label class="input-group-text">사용자 번호</label>
+            <label class="input-group-text">사용자 닉네임</label>
         </div>
         <input type="text" class="form-control" v-model="room_name" v-on:keyup.enter="createRoom">
         <div class="input-group-append">
@@ -130,11 +130,12 @@
                     return;
                 } else {
                     var params = new URLSearchParams();
-                    params.append("memberId", this.room_name);
-                    axios.post('/chat/room', params)
+                    params.append("nickName", this.room_name);
+                    axios.post('/chat/room2', params)
                         .then(response => {
                             console.log(response.data);
-                            alert("방 번호는 " + response.data.chatRoomId + " 입니다.");
+                            alert("["+response.data.nickName+"]방이 개설 되었습니다.");
+                            localStorage.setItem('wschat.nickName', response.data.nickName);
                             this.room_name = '';
                             this.findAllRoom();
                         })

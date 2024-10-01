@@ -17,7 +17,7 @@ public class ChatRoomDTO {
     private Long chatRoomId;
     private Long memberId; //nickname = 채팅방 이름
     private long userCount;
-    private List<Long> chatMessageIds = new ArrayList<>();;
+    private List<Long> chatMessageIds = new ArrayList<>();
 
     public ChatRoomDTO(ChatRoom chatRoom) {
         this.chatRoomId = chatRoom.getChatRoomId();
