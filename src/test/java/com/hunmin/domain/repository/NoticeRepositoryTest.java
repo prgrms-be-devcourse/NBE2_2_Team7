@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+//@TestMethodOrder(MethodOrderer.class)
 class NoticeRepositoryTest {
     @Autowired
     private NoticeRepository noticeRepository;
@@ -167,6 +168,7 @@ class NoticeRepositoryTest {
         //when
         noticeRepository.deleteById(noticeId);
         //then
-        assertThat(noticeRepository.findById(noticeId)).isEmpty();
+        assertThatThrownBy(()-> noticeRepository.findById(noticeId))
+                .isInstanceOf(NoSuchElementException.class);
         }
     }
