@@ -8,9 +8,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -19,6 +24,23 @@ import java.util.Map;
 @Tag(name = "게시글", description = "게시글 CRUD")
 public class BoardController {
     private final BoardService boardService;
+
+    //게시글 이미지 첨부
+    @PostMapping("/uploadImage")
+    @Operation(summary = "게시글 이미지 등록", description = "게시글에 여러 이미지를 등록할 때 사용하는 API")
+    public ResponseEntity<List<String>> uploadImages(@RequestParam("files") MultipartFile[] files) {
+        List<String> imageUrls = new ArrayList<>();
+
+        try {
+            for (MultipartFile file : files) {
+                String imageUrl = boardService.uploadImage(file);
+                imageUrls.add(imageUrl);
+            }
+            return ResponseEntity.ok(imageUrls);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of("Image upload failed"));
+        }
+    }
 
     //게시글 등록
     @PostMapping
