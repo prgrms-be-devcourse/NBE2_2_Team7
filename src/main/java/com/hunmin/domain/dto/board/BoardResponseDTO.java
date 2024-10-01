@@ -19,6 +19,7 @@ public class BoardResponseDTO {
     private String location;
     private Double latitude;
     private Double longitude;
+    private List<String> imageUrls;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CommentResponseDTO> comments;
@@ -31,6 +32,7 @@ public class BoardResponseDTO {
         this.location = board.getLocation();
         this.latitude = board.getLatitude();
         this.longitude = board.getLongitude();
+        this.imageUrls = board.getImageUrls();
         this.createdAt = board.getCreatedAt();
         this.updatedAt = board.getUpdatedAt();
         if (board.getComments() != null) {
