@@ -2,6 +2,7 @@ package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.notification.NotificationResponseDTO;
 import com.hunmin.domain.dto.notification.NotificationSendDTO;
+import com.hunmin.domain.exception.MemberException;
 import com.hunmin.domain.exception.NotificationException;
 import com.hunmin.domain.handler.SseEmitters;
 import com.hunmin.domain.entity.Member;
@@ -86,7 +87,7 @@ public class NotificationService {
     @Transactional
     public void send(NotificationSendDTO notificationSendDTO) {
         try {
-            Member member = memberRepository.findById(notificationSendDTO.getMemberId()).orElseThrow();
+            Member member = memberRepository.findById(notificationSendDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
 
             Notification notification = Notification.builder()
                     .member(member)
