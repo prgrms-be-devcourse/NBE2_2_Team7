@@ -1,14 +1,16 @@
 package com.hunmin.domain.entity;
 
+import com.hunmin.domain.dto.chat.MessageType;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
 @Builder
+@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatMessages extends BaseTimeEntity{
+public class ChatMessage extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +24,8 @@ public class ChatMessages extends BaseTimeEntity{
     @JoinColumn(name="member_id")
     private Member member;
 
-    @Column(nullable = false)
     private String message;
 
-    @Column(nullable = false)
-    private Boolean isRead;
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
 }

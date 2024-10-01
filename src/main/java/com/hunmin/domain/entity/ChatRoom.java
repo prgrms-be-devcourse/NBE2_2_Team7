@@ -8,6 +8,7 @@ import java.util.List;
 @Entity
 @Getter
 @Builder
+@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom extends BaseTimeEntity{
@@ -20,5 +21,12 @@ public class ChatRoom extends BaseTimeEntity{
     private Member member;
 
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY) // @JoinColumn 제거
-    private List<ChatMessages> chatMessages;
+    private List<ChatMessage> chatMessage;
+
+    private long userCount;
+
+    public void add(ChatMessage chatMessage){
+        this.chatMessage.add(chatMessage);
+        chatMessage.setChatRoom(this);
+    }
 }
