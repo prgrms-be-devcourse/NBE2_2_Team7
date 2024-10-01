@@ -34,4 +34,12 @@ public class APIControllerAdvice {
 
         return ResponseEntity.status(e.getCode()).body(map);
     }
+
+    //알림 예외 처리
+    @ExceptionHandler(NotificationTaskException.class)
+    public ResponseEntity<Map<String, String>> handleNotificationTaskException(NotificationTaskException e) {
+        Map<String, String> map = Map.of("error", e.getMessage());
+
+        return ResponseEntity.status(e.getCode()).body(map);
+    }
 }
