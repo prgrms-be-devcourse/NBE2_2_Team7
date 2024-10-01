@@ -1,35 +1,54 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import KakaoMapSearch from './KakaoMapSearch';
+import KakaoMapSearch from '../board/map/KakaoMapSearch';
+import BoardWrite from '../board/write/BoardWrite';
 import { TextField, Button, Typography, Container, Box, Paper } from '@mui/material';
 
 const CreateBoardPage = () => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [location, setLocation] = useState(null); // 추가: 위치 정보 상태
+    const [location, setLocation] = useState(null);
+    const [imageUrls, setImageUrls] = useState([]);
     const navigate = useNavigate();
 
     const handleLocationSelect = (selectedLocation) => {
-        setLocation(selectedLocation); // 위치 정보를 상태에 저장
+        setLocation(selectedLocation);
+    };
+
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append('files', file);
+
+        try {
+            const response = await axios.post('http://localhost:8080/api/board/uploadImage', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            const imageUrl = response.data[0];
+            setImageUrls((prev) => [...prev, imageUrl]);
+            return imageUrl;
+        } catch (error) {
+            console.error('Image upload failed:', error);
+            return null;
+        }
     };
 
     const handleSubmit = async () => {
-        if (!location) {
-            alert('위치를 선택해 주세요!');
-            return;
-        }
-
         try {
             const boardData = {
                 title,
                 content,
-                location: location.name, // 위치 이름
-                latitude: location.latitude, // 위도
-                longitude: location.longitude, // 경도
-                memberId: 1, // Replace with actual userId
+                location: location ? location.name : '',
+                latitude: location ? location.latitude : null,
+                longitude: location ? location.longitude : null,
+                imageUrls: imageUrls.length > 0 ? imageUrls : null,
+                memberId: 1,
             };
-            await axios.post('http://localhost:8080/api/board', boardData);
+            console.log('Sending board data:', boardData);
+            const response = await axios.post('http://localhost:8080/api/board', boardData);
+            console.log(response.data);
             navigate('/');
         } catch (error) {
             console.error('Error creating board:', error);
@@ -37,7 +56,7 @@ const CreateBoardPage = () => {
     };
 
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="lg"> {/* 화면 전체를 사용하기 위해 maxWidth="lg" 설정 */}
             <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
                 <Typography variant="h4" gutterBottom>
                     게시글 작성
@@ -51,18 +70,15 @@ const CreateBoardPage = () => {
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
-                    <TextField
-                        fullWidth
-                        label="내용"
-                        variant="outlined"
-                        margin="normal"
-                        multiline
-                        rows={4}
+                    <BoardWrite
                         value={content}
-                        onChange={(e) => setContent(e.target.value)}
+                        onChange={setContent}
+                        uploadImage={uploadImage}
+                        setImageUrls={setImageUrls}
                     />
+                    <Box mt={3}></Box>
                     <Typography variant="subtitle1" gutterBottom>
-                        장소
+                        장소 (선택 사항)
                     </Typography>
                     <KakaoMapSearch onLocationSelect={handleLocationSelect} />
                     <Button

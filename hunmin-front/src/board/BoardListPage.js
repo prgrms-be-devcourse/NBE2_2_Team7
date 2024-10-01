@@ -139,21 +139,51 @@ const BoardListPage = ({ memberName }) => {
                     <List>
                         {filteredBoards.map((board) => (
                             <ListItem key={board.boardId}>
-                                <ListItemText
-                                    primary={<Link to={`/board/${board.boardId}`} style={{ textDecoration: 'none', color: 'inherit' }}><strong>{board.title}</strong> - {board.nickname}</Link>}
-                                    secondary={
-                                        <>
-                                            {board.updatedAt ? (
-                                                <span>수정일: {formatDate(board.updatedAt)}</span>
-                                            ) : (
-                                                <span>작성일: {formatDate(board.createdAt)}</span>
-                                            )}
-                                            {board.location && (
-                                                <span> 장소: {board.location}</span>
-                                            )}
-                                        </>
-                                    }
-                                />
+                                <Grid container alignItems="center">
+                                    <Grid item xs={10}>
+                                        <ListItemText
+                                            primary={
+                                                <Link to={`/board/${board.boardId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                    <strong>{board.title}</strong> - {board.nickname}
+                                                </Link>
+                                            }
+                                            secondary={
+                                                <>
+                                                    {board.updatedAt ? (
+                                                        <span>수정일: {formatDate(board.updatedAt)}</span>
+                                                    ) : (
+                                                        <span>작성일: {formatDate(board.createdAt)}</span>
+                                                    )}
+                                                    {board.location && (
+                                                        <span> 장소: {board.location}</span>
+                                                    )}
+                                                </>
+                                            }
+                                        />
+                                    </Grid>
+
+                                    {/* 썸네일 이미지가 있을 경우 오른쪽에 표시 */}
+                                    {board.imageUrls && board.imageUrls.length > 0 ? (
+                                        <Grid item xs={2}>
+                                            <img
+                                                src={board.imageUrls[0]} // 첫 번째 이미지를 썸네일로 사용
+                                                alt={board.title}
+                                                style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+                                            />
+                                        </Grid>
+                                    ) : (
+                                        <Grid item xs={2}>
+                                            {/* 이미지가 없는 경우 빈 공간으로 유지 */}
+                                            <div style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                backgroundColor: '#f0f0f0',
+                                                borderRadius: '8px',
+                                            }}>
+                                            </div>
+                                        </Grid>
+                                    )}
+                                </Grid>
                             </ListItem>
                         ))}
                     </List>
