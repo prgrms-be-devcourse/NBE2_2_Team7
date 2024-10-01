@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CommentPage from '../comment/CommentPage';
-import KakaoMapSearch from './KakaoMapSearch';
+import KakaoMapSearch from './map/KakaoMapSearch';
 import { Typography, Button, TextField, Grid, Paper } from '@mui/material';
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import BoardWrite from '../board/write/BoardWrite'; // BoardWrite 컴포넌트 추가
 
 const BoardDetailPage = () => {
     const { boardId } = useParams();
@@ -15,6 +16,7 @@ const BoardDetailPage = () => {
     const [content, setContent] = useState('');
     const [location, setLocation] = useState(null);
     const [originalLocation, setOriginalLocation] = useState(null);
+    const [imageUrls, setImageUrls] = useState([]); // 이미지 URL 상태 추가
 
     useEffect(() => {
         fetchBoard();
@@ -36,6 +38,7 @@ const BoardDetailPage = () => {
                 latitude: response.data.latitude,
                 longitude: response.data.longitude,
             });
+            setImageUrls(response.data.imageUrls || []); // 이미지 URL 초기화
         } catch (error) {
             console.error('Error fetching board:', error);
         }
@@ -63,6 +66,7 @@ const BoardDetailPage = () => {
                 location: location.name,
                 latitude: location.latitude,
                 longitude: location.longitude,
+                imageUrls: imageUrls.length > 0 ? imageUrls : null, // 이미지 URL 추가
             };
             await axios.put(`http://localhost:8080/api/board/${boardId}`, updatedBoard);
             setIsEditMode(false);
@@ -79,6 +83,24 @@ const BoardDetailPage = () => {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    };
+
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append('files', file);
+
+        try {
+            const response = await axios.post('http://localhost:8080/api/board/uploadImage', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('Uploaded image URL:', response.data[0]); // URL을 배열에서 가져옴
+            return response.data[0]; // 첫 번째 URL 반환
+        } catch (error) {
+            console.error('Image upload failed:', error);
+            return null;
+        }
     };
 
     if (!board) {
@@ -102,14 +124,11 @@ const BoardDetailPage = () => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    label="내용"
-                                    variant="outlined"
-                                    fullWidth
-                                    multiline
-                                    rows={4}
+                                <BoardWrite
                                     value={content}
-                                    onChange={(e) => setContent(e.target.value)}
+                                    onChange={setContent}
+                                    uploadImage={uploadImage} // 이미지 업로드 함수 전달
+                                    setImageUrls={setImageUrls} // 이미지 URL 상태 변경 함수 전달
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -138,8 +157,8 @@ const BoardDetailPage = () => {
                                 </>
                             )}
                         </Typography>
-                        <hr/>
-                        <Typography variant="body1">{board.content}</Typography>
+                        <hr />
+                        <Typography variant="body1" dangerouslySetInnerHTML={{ __html: board.content }} />
                         <Grid item xs={12}>
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                                 <Button variant="contained" color="primary" onClick={() => setIsEditMode(true)}>수정</Button>

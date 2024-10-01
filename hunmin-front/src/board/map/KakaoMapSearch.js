@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TextField, Paper, Box } from '@mui/material';
+import { TextField, Paper, Box, Typography } from '@mui/material';
 
 const KakaoMapSearch = ({ onLocationSelect }) => {
     const mapContainer = useRef(null);
@@ -123,6 +123,12 @@ const KakaoMapSearch = ({ onLocationSelect }) => {
                 style={{ marginBottom: '20px' }}
             />
             <Box ref={mapContainer} style={{ width: '100%', height: '300px' }} />
+            {/* 선택된 장소 이름 표시 */}
+            {selectedPlace && (
+                <Typography variant="h6" style={{ marginTop: '10px' }}>
+                    선택된 장소: {selectedPlace.name}
+                </Typography>
+            )}
         </Paper>
     );
 };

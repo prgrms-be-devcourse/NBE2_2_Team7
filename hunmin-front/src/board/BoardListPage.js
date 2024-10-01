@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Map from './KakaoMap'; // Map 컴포넌트 임포트
+import Map from './map/KakaoMap'; // Map 컴포넌트 임포트
 import { FaUserCircle } from 'react-icons/fa'; // 프로필 아이콘 임포트
 import {
     Box,
@@ -114,14 +114,14 @@ const BoardListPage = ({ memberName }) => {
     return (
         <Container>
             <AppBar position="static">
-                <Toolbar>
+                <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <IconButton edge="start" color="inherit" aria-label="logo">
                         <FaUserCircle size={30} />
                     </IconButton>
-                    <Typography variant="h6" style={{ flexGrow: 1 }}>
+                    <Typography variant="h6" style={{ marginLeft: '10px' }}>
                         {memberName}
                     </Typography>
-                    <Button color="inherit" onClick={() => setShowMyBoards(!showMyBoards)}>
+                    <Button color="inherit" onClick={() => setShowMyBoards(!showMyBoards)} style={{ marginLeft: '10px' }}>
                         {showMyBoards ? '전체 글 보기' : '내 글 보기'}
                     </Button>
                 </Toolbar>
@@ -139,21 +139,51 @@ const BoardListPage = ({ memberName }) => {
                     <List>
                         {filteredBoards.map((board) => (
                             <ListItem key={board.boardId}>
-                                <ListItemText
-                                    primary={<Link to={`/board/${board.boardId}`} style={{ textDecoration: 'none', color: 'inherit' }}><strong>{board.title}</strong> - {board.nickname}</Link>}
-                                    secondary={
-                                        <>
-                                            {board.updatedAt ? (
-                                                <span>수정일: {formatDate(board.updatedAt)}</span>
-                                            ) : (
-                                                <span>작성일: {formatDate(board.createdAt)}</span>
-                                            )}
-                                            {board.location && (
-                                                <span> 장소: {board.location}</span>
-                                            )}
-                                        </>
-                                    }
-                                />
+                                <Grid container alignItems="center">
+                                    <Grid item xs={10}>
+                                        <ListItemText
+                                            primary={
+                                                <Link to={`/board/${board.boardId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                    <strong>{board.title}</strong> - {board.nickname}
+                                                </Link>
+                                            }
+                                            secondary={
+                                                <>
+                                                    {board.updatedAt ? (
+                                                        <span>수정일: {formatDate(board.updatedAt)}</span>
+                                                    ) : (
+                                                        <span>작성일: {formatDate(board.createdAt)}</span>
+                                                    )}
+                                                    {board.location && (
+                                                        <span> 장소: {board.location}</span>
+                                                    )}
+                                                </>
+                                            }
+                                        />
+                                    </Grid>
+
+                                    {/* 썸네일 이미지가 있을 경우 오른쪽에 표시 */}
+                                    {board.imageUrls && board.imageUrls.length > 0 ? (
+                                        <Grid item xs={2}>
+                                            <img
+                                                src={board.imageUrls[0]} // 첫 번째 이미지를 썸네일로 사용
+                                                alt={board.title}
+                                                style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+                                            />
+                                        </Grid>
+                                    ) : (
+                                        <Grid item xs={2}>
+                                            {/* 이미지가 없는 경우 빈 공간으로 유지 */}
+                                            <div style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                backgroundColor: '#f0f0f0',
+                                                borderRadius: '8px',
+                                            }}>
+                                            </div>
+                                        </Grid>
+                                    )}
+                                </Grid>
                             </ListItem>
                         ))}
                     </List>

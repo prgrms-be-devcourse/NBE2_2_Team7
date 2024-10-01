@@ -3,9 +3,6 @@ import { Map, MapMarker } from "react-kakao-maps-sdk";
 import React from 'react';
 
 const KakaoMap = ({ boards = [], mapLevel, mapCenter = { lat: 37.5665, lng: 126.978 } }) => {
-    console.log('Boards:', boards); // boards 확인
-    console.log('Map Center:', mapCenter); // mapCenter 확인
-    console.log('Map Level:', mapLevel); // mapLevel 확인
 
     return (
         <div>
