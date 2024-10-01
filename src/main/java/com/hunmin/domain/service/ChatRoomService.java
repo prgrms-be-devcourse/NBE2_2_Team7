@@ -34,10 +34,9 @@ public class ChatRoomService {
     private HashOperations<String, String, Long> hashOpsEnterInfo;
     @Resource(name = "redisTemplate")
     private ValueOperations<String, String> valueOps;
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
-    @Autowired
-    private MemberRepository memberRepository;
+
+    private final ChatRoomRepository chatRoomRepository;
+    private final MemberRepository memberRepository;
 
     // 모든 채팅방 조회
     public List<ChatRoomDTO> findAllRoom() {
@@ -62,7 +61,6 @@ public class ChatRoomService {
                 .orElseThrow(ChatRoomException.NOT_FOUND::get);
         ChatRoom chatRoom = ChatRoom.builder().member(member).build();
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-
         return new ChatRoomDTO(savedChatRoom);
     }
 

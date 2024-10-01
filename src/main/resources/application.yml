@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 spring:
   profiles:
     active: local
@@ -9,3 +10,18 @@ spring:
     add-properties: false
   freemarker:
     cache: false
+=======
+#spring:
+#  profiles:
+#    active: local
+#  devtools:
+#    livereload:
+#      enabled: true
+#    restart:
+#      enabled: false
+#    add-properties: false
+#  freemarker:
+#    cache: false
+#  jwt:
+#    secret: govlepel@$&
+>>>>>>> 971e15678cc1d7417a7bde3d67b5840a5e3e0017

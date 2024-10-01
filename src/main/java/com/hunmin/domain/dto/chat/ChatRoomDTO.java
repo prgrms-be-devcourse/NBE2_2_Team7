@@ -5,6 +5,7 @@ import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,13 +17,27 @@ import java.util.List;
 public class ChatRoomDTO {
     private Long chatRoomId;
     private Long memberId; //nickname = 채팅방 이름
+    private Long memberId; //nickname = 채팅방 이름(대화상대 닉네임)
+    private String nickname;
     private long userCount;
     private List<Long> chatMessageIds = new ArrayList<>();
+<<<<<<< HEAD
+=======
+    private String latestMessageContent;
+    private LocalDateTime latestMessageDate;
+
+
+>>>>>>> 971e15678cc1d7417a7bde3d67b5840a5e3e0017
 
     public ChatRoomDTO(ChatRoom chatRoom) {
         this.chatRoomId = chatRoom.getChatRoomId();
         this.memberId = chatRoom.getMember().getMemberId();
         this.userCount = chatRoom.getUserCount();
+        this.nickname = chatRoom.getMember().getNickname();
+        if (chatRoom.getChatMessage() != null && !chatRoom.getChatMessage().isEmpty()) {
+            this.latestMessageContent = chatRoom.getChatMessage().get(chatRoom.getChatMessage().size() - 1).getMessage();
+            this.latestMessageDate = chatRoom.getChatMessage().get(chatRoom.getChatMessage().size() - 1).getCreatedAt();
+        }
         if (chatRoom.getChatMessage() != null) {
             chatRoom.getChatMessage().forEach(i -> chatMessageIds.add(i.getChatMessageId()));
         }
