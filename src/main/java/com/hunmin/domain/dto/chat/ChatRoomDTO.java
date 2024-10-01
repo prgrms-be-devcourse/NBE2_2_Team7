@@ -17,17 +17,16 @@ import java.util.List;
 public class ChatRoomDTO {
     private Long chatRoomId;
     private Long memberId; //nickname = 채팅방 이름
-    private Long memberId; //nickname = 채팅방 이름(대화상대 닉네임)
+
     private String nickname;
     private long userCount;
     private List<Long> chatMessageIds = new ArrayList<>();
-<<<<<<< HEAD
-=======
+
     private String latestMessageContent;
     private LocalDateTime latestMessageDate;
 
 
->>>>>>> 971e15678cc1d7417a7bde3d67b5840a5e3e0017
+
 
     public ChatRoomDTO(ChatRoom chatRoom) {
         this.chatRoomId = chatRoom.getChatRoomId();

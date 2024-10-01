@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Query("SELECT c FROM ChatRoom c JOIN Member m WHERE m.nickname= :nickName")
     Optional<List<ChatRoom>> findByNickname(@Param("nickName") String nickName);
+
+    @Query("SELECT c FROM ChatRoom c LEFT JOIN c.chatMessage m ORDER BY m.createdAt DESC")
+    List<ChatRoom> findAllOrderByLatestMessageDateDesc();
 }

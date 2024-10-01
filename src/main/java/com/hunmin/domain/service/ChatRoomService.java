@@ -41,7 +41,7 @@ public class ChatRoomService {
     // 모든 채팅방 조회
     public List<ChatRoomDTO> findAllRoom() {
         List<ChatRoomDTO> chatRoomDTOList = new ArrayList<>();
-        List<ChatRoom> chatRoomList = chatRoomRepository.findAll();
+        List<ChatRoom> chatRoomList = chatRoomRepository.findAllOrderByLatestMessageDateDesc();
         for (ChatRoom chatRoom : chatRoomList) {
             chatRoomDTOList.add(new ChatRoomDTO(chatRoom));
         }
@@ -77,6 +77,12 @@ public class ChatRoomService {
                 .createdAt(savedChatRoom.getCreatedAt())
                 .nickName(member.getNickname())
                 .MemberId(member.getMemberId()).build();
+    }
+    // 채팅방 삭제
+    public void deleteChatRoom(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(ChatRoomException.NOT_FOUND::get);
+        chatRoomRepository.delete(chatRoom);
     }
 
     // 유저가 입장한 채팅방ID와 유저 세션ID 맵핑 정보 저장

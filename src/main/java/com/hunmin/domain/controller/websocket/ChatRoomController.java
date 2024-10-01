@@ -5,6 +5,7 @@ import com.hunmin.domain.dto.chat.ChatRoomDTO;
 import com.hunmin.domain.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -56,5 +57,11 @@ public class ChatRoomController {
     @ResponseBody
     public ChatRoomDTO roomInfo1() {
         return chatRoomService.findRoomById(1L);
+    }
+    // 채팅방 삭제 엔드포인트
+    @DeleteMapping("/room/{chatRoomId}")
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long chatRoomId) {
+        chatRoomService.deleteChatRoom(chatRoomId);
+        return ResponseEntity.noContent().build();
     }
 }
