@@ -4,6 +4,7 @@ import com.hunmin.domain.dto.notice.*;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.entity.Notice;
+import com.hunmin.domain.exception.MemberException;
 import com.hunmin.domain.exception.NoticeException;
 import com.hunmin.domain.repository.MemberRepository;
 import com.hunmin.domain.repository.NoticeRepository;
@@ -49,8 +50,8 @@ public class NoticeService {
     }
 
     //공지사항 등록
-    public NoticeResponseDTO createNotice(NoticeRequestDTO noticeRequestDTO){
-        Member member = getMember(noticeRequestDTO.getMemberId());
+    public NoticeResponseDTO createNotice(NoticeRequestDTO noticeRequestDTO, String username){
+        Member member = getMember(username);
 
         //관리자 아닐경우 예외 발생
         if (!member.getMemberRole().equals(MemberRole.ADMIN)) {
@@ -68,13 +69,13 @@ public class NoticeService {
     }
 
     //공지사항 수정
-    public NoticeResponseDTO updateNotice(NoticeUpdateDTO noticeUpdateDTO){
-        Member member = getMember(noticeUpdateDTO.getMemberId());
+    public NoticeResponseDTO updateNotice(NoticeUpdateDTO noticeUpdateDTO, String username, Long noticeId){
+        Member member = getMember(username);
         //관리자 아닐경우 예외 발생
         if (!member.getMemberRole().equals(MemberRole.ADMIN)) {
             throw NoticeException.MEMBER_NOT_VALID.get();
         }
-        Notice notice = noticeRepository.findById(noticeUpdateDTO.getNoticeId()).orElseThrow(NoticeException.NOTICE_NOT_FOUND::get);
+        Notice notice = noticeRepository.findById(noticeId).orElseThrow(NoticeException.NOTICE_NOT_FOUND::get);
 
         try{
             notice.changeTitle(noticeUpdateDTO.getTitle());
@@ -89,8 +90,8 @@ public class NoticeService {
 
 
     //공지사항 삭제
-    public boolean deleteNotice(NoticeDeleteDTO noticeDeleteDTO){
-        Member member = getMember(noticeDeleteDTO.getMemberId());
+    public boolean deleteNotice(NoticeDeleteDTO noticeDeleteDTO, String username){
+        Member member = getMember(username);
         //관리자 아닐경우 예외 발생
         if (!member.getMemberRole().equals(MemberRole.ADMIN)) {
             throw NoticeException.MEMBER_NOT_VALID.get();
@@ -105,7 +106,11 @@ public class NoticeService {
         }
     }
 
-    private Member getMember(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("Member not found"));
+    private Member getMember(String username) {
+        Member member = memberRepository.findByEmail(username);
+        if (member == null) {
+            throw MemberException.NOT_FOUND.get();
+        }
+        return member;
     }
 }
