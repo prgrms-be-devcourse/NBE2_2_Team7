@@ -1,5 +1,8 @@
 package com.hunmin.domain.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum MemberLevel {
     BEGINNER("초급"),
     INTERMEDIATE("중급"),
@@ -11,7 +14,4 @@ public enum MemberLevel {
         this.dispalyName = deispalyName;
     }
 
-    public String getDispalyName() {
-        return dispalyName;
-    }
 }

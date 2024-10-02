@@ -2,7 +2,6 @@ package com.hunmin.domain.jwt;
 
 import com.hunmin.domain.dto.member.CustomUserDetails;
 import com.hunmin.domain.entity.Member;
-import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.service.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
 @Log4j2
 public class JWTFilter extends OncePerRequestFilter {
