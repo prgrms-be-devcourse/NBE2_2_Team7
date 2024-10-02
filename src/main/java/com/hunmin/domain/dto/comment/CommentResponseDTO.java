@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class CommentResponseDTO {
     private Long commentId;
     private Long boardId;
+    private Long memberId;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -24,6 +25,7 @@ public class CommentResponseDTO {
     public CommentResponseDTO(Comment comment) {
         this.commentId = comment.getCommentId();
         this.boardId = comment.getBoard().getBoardId();
+        this.memberId = comment.getMember().getMemberId();
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
         this.updatedAt = comment.getUpdatedAt();

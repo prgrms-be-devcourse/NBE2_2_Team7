@@ -18,9 +18,15 @@ const BoardDetailPage = () => {
     const [originalLocation, setOriginalLocation] = useState(null);
     const [imageUrls, setImageUrls] = useState([]); // 이미지 URL 상태 추가
     const [memberId, setMemberId] = useState(''); // memberId 상태 추가
+    const [originalMemberId, setOriginalMemberId] = useState(''); // 원래 memberId 상태 추가
 
     useEffect(() => {
         fetchBoard();
+        // 로컬 스토리지에서 memberId 가져오기
+        const storedMemberId = localStorage.getItem('memberId');
+        if (storedMemberId) {
+            setMemberId(storedMemberId);
+        }
     }, [boardId]);
 
     const fetchBoard = async () => {
@@ -40,6 +46,7 @@ const BoardDetailPage = () => {
                 longitude: response.data.longitude,
             });
             setImageUrls(response.data.imageUrls || []); // 이미지 URL 초기화
+            setOriginalMemberId(response.data.memberId); // 원래 memberId 저장
         } catch (error) {
             console.error('Error fetching board:', error);
         }
@@ -62,17 +69,19 @@ const BoardDetailPage = () => {
 
         try {
             const updatedBoard = {
-                memberId : 3,
+                boardId,
                 title,
                 content,
+                memberId: originalMemberId, // 원래 memberId 사용
                 location: location.name,
                 latitude: location.latitude,
                 longitude: location.longitude,
-                imageUrls: imageUrls.length > 0 ? imageUrls : null, // 이미지 URL 추가
+                imageUrls: imageUrls.length > 0 ? imageUrls : null,
             };
             await api.put(`/board/${boardId}`, updatedBoard);
             setIsEditMode(false);
             fetchBoard();
+            console.log(originalMemberId);
         } catch (error) {
             console.error('Error updating board:', error);
         }
