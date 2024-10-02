@@ -19,8 +19,9 @@ import {
     Grid, // Grid 컴포넌트 임포트
 } from '@mui/material';
 
-const BoardListPage = ({ memberName }) => {
-    const memberId = 3;
+const BoardListPage = () => {
+    const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
+    const nickname = localStorage.getItem('nickname'); // 로컬 스토리지에서 닉네임 가져오기
     const [boards, setBoards] = useState([]);
     const [filteredBoards, setFilteredBoards] = useState([]);
     const [page, setPage] = useState(1);
@@ -119,7 +120,7 @@ const BoardListPage = ({ memberName }) => {
                         <FaUserCircle size={30} />
                     </IconButton>
                     <Typography variant="h6" style={{ marginLeft: '10px' }}>
-                        {memberName}
+                        {nickname} {/* 로컬 스토리지에서 가져온 닉네임 표시 */}
                     </Typography>
                     <Button color="inherit" onClick={() => setShowMyBoards(!showMyBoards)} style={{ marginLeft: '10px' }}>
                         {showMyBoards ? '전체 글 보기' : '내 글 보기'}

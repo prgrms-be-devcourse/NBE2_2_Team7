@@ -1,61 +1,80 @@
 import React, { useState } from 'react';
+import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function LoginForm({ onLogin }) {
-    const [credentials, setCredentials] = useState({
-        email: '',
-        password: ''
-    });
+const LoginForm = ({ setToken }) => { // setToken을 props로 받기
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setCredentials({
-            ...credentials,
-            [e.target.name]: e.target.value
-        });
-    };
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
-        axios.post('/api/members/login', credentials, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                // 서버로부터 받은 토큰을 추출합니다.
-                const authHeader = response.headers['authorization'];
-                if (authHeader && authHeader.startsWith('Bearer ')) {
-                    const token = authHeader.substring(7, authHeader.length); // 'Bearer ' 제거
-                    // Axios의 기본 헤더에 Authorization 설정
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-                    // 상위 컴포넌트로 토큰 전달 (필요한 경우)
-                    onLogin(token);
-                } else {
-                    alert('토큰을 받지 못했습니다.');
+        try {
+            const response = await axios.post('http://localhost:8080/api/members/login', { email, password }, {
+                headers: {
+                    'Content-Type': 'application/json',
                 }
-            })
-            .catch(error => {
-                console.error(error);
-                alert('로그인에 실패했습니다.');
             });
+            console.log(response.data);
+            const token = response.data.token;
+            const memberId = response.data.memberId;
+            const role = response.data.role;
+            const nickname = response.data.nickname;
+            localStorage.setItem('token', token);
+            localStorage.setItem('memberId', memberId);
+            localStorage.setItem('role', role);
+            localStorage.setItem('nickname', nickname);
+
+            setToken(token); // 상태 업데이트
+            navigate('/');
+        } catch (error) {
+            console.log(error);
+            setError('로그인 실패. 다시 시도해주세요.');
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>로그인</h2>
-            <div>
-                <label>이메일 주소:</label>
-                <input type="email" name="email" value={credentials.email} onChange={handleChange} required />
-            </div>
-            <div>
-                <label>비밀번호:</label>
-                <input type="password" name="password" value={credentials.password} onChange={handleChange} required />
-            </div>
-            <button type="submit">로그인</button>
-        </form>
+        <Container maxWidth="xs">
+            <Box sx={{ mt: 8 }}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    로그인
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        label="이메일"
+                        fullWidth
+                        margin="normal"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <TextField
+                        label="비밀번호"
+                        type="password"
+                        fullWidth
+                        margin="normal"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    {error && <Typography color="error">{error}</Typography>}
+                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                        로그인
+                    </Button>
+                </form>
+                <Button
+                    variant="text"
+                    color="primary"
+                    onClick={() => navigate('/register')}
+                    sx={{ mt: 2 }}
+                >
+                    회원가입
+                </Button>
+            </Box>
+        </Container>
     );
-}
+};
 
 export default LoginForm;
