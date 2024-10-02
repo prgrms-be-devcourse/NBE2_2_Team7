@@ -26,9 +26,9 @@ public class ChatMessage extends BaseTimeEntity{
 
     private String message;
 
-    private boolean isRead=false;
+    @Column(nullable = false)
+    private Boolean isRead;
 
     @Enumerated(EnumType.STRING)
-    private MessageType type; // 메시지 타입
-
+    private MessageType type;
 }

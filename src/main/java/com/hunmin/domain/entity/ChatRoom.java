@@ -18,11 +18,15 @@ public class ChatRoom extends BaseTimeEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
-    private Member member; //nickname = 채팅방 이름
+    private Member member;
 
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) // @JoinColumn 제거
     private List<ChatMessage> chatMessage;
 
     private long userCount;
 
+    public void add(ChatMessage chatMessage){
+        this.chatMessage.add(chatMessage);
+        chatMessage.setChatRoom(this);
+    }
 }

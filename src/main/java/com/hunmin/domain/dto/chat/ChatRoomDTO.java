@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString(exclude = "chatMessageIds")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,17 +17,12 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatRoomDTO {
     private Long chatRoomId;
-    private Long memberId; //nickname = 채팅방 이름
-
+    private Long memberId; //nickname = 채팅방 이름(대화상대 닉네임)
     private String nickname;
     private long userCount;
     private List<Long> chatMessageIds = new ArrayList<>();
-
     private String latestMessageContent;
     private LocalDateTime latestMessageDate;
-
-
-
 
     public ChatRoomDTO(ChatRoom chatRoom) {
         this.chatRoomId = chatRoom.getChatRoomId();

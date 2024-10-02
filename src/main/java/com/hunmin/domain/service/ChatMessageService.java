@@ -8,8 +8,8 @@ import com.hunmin.domain.dto.page.ChatMessagePageRequestDTO;
 import com.hunmin.domain.entity.ChatMessage;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
-import com.hunmin.domain.exception.exception.ChatMessagesException;
-import com.hunmin.domain.exception.exception.ChatRoomException;
+import com.hunmin.domain.exception.ChatMessagesException;
+import com.hunmin.domain.exception.ChatRoomException;
 import com.hunmin.domain.pubsub.RedisSubscriber;
 import com.hunmin.domain.repository.ChatMessageRepository;
 import com.hunmin.domain.repository.ChatRoomRepository;
@@ -68,7 +68,7 @@ public class ChatMessageService {
         redisSubscriber.sendMessage(chatMessageDTO);
         log.info("채팅방에서 메시지 발송 topic: {}", topic.getTopic());
     }
-
+    //모든 채팅기록 조회
     public List<ChatMessageDTO> readAllMessages(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomException.NOT_FOUND::get);
@@ -93,7 +93,7 @@ public class ChatMessageService {
             Pageable pageable = chatMessagePageRequestDTO.getPageable(sort);
             return chatMessageRepository.chatMessageList(pageable, chatRoomId);
         } catch (Exception e) {
-            log.error("--- " + e.getMessage());
+            log.error("쳇서비스 페이징 실패 ={}",e.getMessage());
             throw ChatMessagesException.NOT_FETCHED.get();
         }
     }

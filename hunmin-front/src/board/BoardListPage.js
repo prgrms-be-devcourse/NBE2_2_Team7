@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../axios';
 import Map from './map/KakaoMap'; // Map 컴포넌트 임포트
 import { FaUserCircle } from 'react-icons/fa'; // 프로필 아이콘 임포트
 import {
@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 
 const BoardListPage = ({ memberName }) => {
-    const memberId = 1;
+    const memberId = 3;
     const [boards, setBoards] = useState([]);
     const [filteredBoards, setFilteredBoards] = useState([]);
     const [page, setPage] = useState(1);
@@ -45,7 +45,7 @@ const BoardListPage = ({ memberName }) => {
 
     const fetchBoards = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/board', {
+            const response = await api.get('/board', {
                 params: { page, size },
             });
             setBoards(response.data.content);
@@ -57,7 +57,7 @@ const BoardListPage = ({ memberName }) => {
 
     const fetchMyBoards = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/board/member/${memberId}`, {
+            const response = await api.get(`/board/member/${memberId}`, {
                 params: { page, size },
             });
             setBoards(response.data.content);

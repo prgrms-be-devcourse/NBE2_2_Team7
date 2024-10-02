@@ -10,12 +10,13 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@ToString
 public class ChatMessageDTO {
     private Long chatMessageId;
     private Long chatRoomId;
     private Long memberId;
     private String message;
-    private MessageType type; // 메시지 타입
+    private MessageType type;
 
     public ChatMessageDTO(ChatMessage chatMessage) {
         this.chatMessageId = chatMessage.getChatMessageId();

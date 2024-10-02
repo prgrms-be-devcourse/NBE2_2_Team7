@@ -22,9 +22,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
     @Bean
     public ChannelTopic topicPattern() {
-        // 예를 들어, chatroom:* 패턴을 사용하여 모든 채팅방 구독
+
         return new ChannelTopic("chatRoom");
     }
+    //클라이언트로 부터 메세지 수신
     @Bean
     public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory
                                                             ,MessageListenerAdapter listenerAdapter,
@@ -34,24 +35,23 @@ public class RedisConfig {
         container.addMessageListener(listenerAdapter, channelTopic);
         return container;
     }
+    //클라이언트로 부터 메세지 수신
     @Bean
     public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber, "sendMessage");
     }
+    // Object 직렬화
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
-        // Key 직렬화 설정
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        // ObjectMapper 설정
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // JavaTimeModule 등록
-        // Json 직렬화 설정
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
         return redisTemplate;
     }
-    // Redis 에 메시지 내역을 저장하기 위한 RedisTemplate 을 설정
+    // ChatMessageDTO 직렬화
     @Bean
     public RedisTemplate<String, ChatMessageDTO> redisTemplateMessage(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, ChatMessageDTO> redisTemplateMessage = new RedisTemplate<>();

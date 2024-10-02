@@ -198,10 +198,11 @@
 <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
 <script src="/webjars/stomp-websocket/2.3.3-1/stomp.min.js"></script>
 <script>
+    //stomp socket연결 변수 생성
     var sock = new SockJS("/ws-stomp");
     var ws = Stomp.over(sock);
     var isConnected = false;
-
+    //전역변수
     var vm = new Vue({
         el: '#app',
         data: {
@@ -212,6 +213,7 @@
             nickName: '',
             userCount: 0
         },
+        //페이지 시작시 실행 메서드 + 로컬 스레드 전역변수에 주입
         created() {
             this.roomId = localStorage.getItem('wschat.roomId');
             this.roomName = localStorage.getItem('wschat.memberId');
@@ -221,7 +223,7 @@
             var _this = this;
 
             // 이전 메시지 가져오기
-            axios.get('/chat/messages/' + this.roomId).then(response => {
+            axios.get('/api/chat/messages/' + this.roomId).then(response => {
                 _this.messages = response.data.map(function (recv) {
                     return {
                         chatRoomId: recv.roomId,
@@ -252,8 +254,10 @@
             });
         },
         methods: {
+            //메세지 송신
             sendMessage(type) {
                 if (this.message.trim() === '') {
+                    return;
                     return;  // 빈 메시지 전송 방지
                 }
                 var messageData = {
@@ -263,11 +267,12 @@
                     memberId: this.roomName,
                 };
                 console.log('메세지 전송:', messageData);
-                ws.send("/pub/chat/message", {}, JSON.stringify(messageData));
+                ws.send("/pub/api/chat/message", {}, JSON.stringify(messageData));
                 this.message = '';
                 this.$refs.chatInput.focus();
 
             },
+            //메세지 수신
             recvMessage(recv) {
                 console.log('recvMessage :', recv);
                 this.messages.unshift({
@@ -281,11 +286,12 @@
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 });
             },
+            //채팅방 나가기
             exitChat() {
                 ws.disconnect(() => {
                     console.log('WebSocket 연결 해제됨');
                 });
-                location.href = "/chat/room";
+                location.href = "/api/chat-room";
             },
         }
     });

@@ -130,6 +130,7 @@
 <script src="/webjars/vue/2.5.16/dist/vue.min.js"></script>
 <script src="/webjars/axios/0.17.1/dist/axios.min.js"></script>
 <script>
+    //전역 변수
     var vm = new Vue({
         el: '#app',
         data: {
@@ -139,18 +140,21 @@
             contextMenuVisible: false,  // 추가된 부분
             contextMenuPosition: { x: 0, y: 0 }  // 추가된 부분
         },
+        //페이지 시작시 실행 메서드
         created() {
             this.findAllRoom();
             document.addEventListener('click', this.hideContextMenu);  // 추가된 부분
         },
+        //모든 채팅방 목록 조회
         methods: {
             findAllRoom: function () {
-                axios.get('/chat/rooms').then(response => {
+                axios.get('/api/chat-room/list').then(response => {
                     if (Object.prototype.toString.call(response.data) === "[object Array]") {
                         this.chatrooms = response.data;
                     }
                 });
             },
+            //채팅방 생성
             createRoom: function () {
                 if ("" === this.room_name) {
                     alert("사용자 번호를 입력해 주십시요.");
@@ -158,7 +162,7 @@
                 } else {
                     var params = new URLSearchParams();
                     params.append("nickName", this.room_name);
-                    axios.post('/chat/room2', params)
+                    axios.post('/api/chat-room', params)
                         .then(response => {
                             console.log(response.data);
                             alert("["+response.data.nickName+"]방이 개설 되었습니다.");
@@ -171,10 +175,12 @@
                         });
                 }
             },
+            //채팅방 안으로 입장 + 로컨 스토리지에 정보 저장
             enterRoom: function (roomId, memberId) {
                 localStorage.setItem('wschat.roomId', roomId);
                 localStorage.setItem('wschat.memberId', memberId);
-                location.href = "/chat/room/enter/" + roomId;
+                location.href = "/api/chat-room/enter/" + roomId;
+
             },
             showContextMenu: function (event, roomId) {  // 추가된 부분
                 this.selectedRoomId = roomId;

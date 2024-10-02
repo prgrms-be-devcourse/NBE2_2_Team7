@@ -1,6 +1,5 @@
 package com.hunmin.domain.service;
 
-import com.hunmin.domain.dto.chat.ChatMessageDTO;
 import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
 import com.hunmin.domain.entity.ChatRoom;
@@ -38,6 +37,12 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
 
+    // 단일 채팅방 조회
+    public ChatRoomDTO findRoomById(Long id) {
+        ChatRoom chatRoom = chatRoomRepository.findById(id).orElseThrow(ChatRoomException.NOT_FOUND::get);
+        return new ChatRoomDTO(chatRoom);
+    }
+
     // 모든 채팅방 조회
     public List<ChatRoomDTO> findAllRoom() {
         List<ChatRoomDTO> chatRoomDTOList = new ArrayList<>();
@@ -49,11 +54,6 @@ public class ChatRoomService {
         return chatRoomDTOList;
     }
 
-    // 특정 채팅방 조회
-    public ChatRoomDTO findRoomById(Long id) {
-        ChatRoom chatRoom = chatRoomRepository.findById(id).orElseThrow(ChatRoomException.NOT_FOUND::get);
-        return new ChatRoomDTO(chatRoom);
-    }
 
     // 채팅방 생성 : 서버간 채팅방 공유를 위해 DB에 저장한다.
     public ChatRoomDTO createChatRoom(String memberId) {
@@ -67,7 +67,7 @@ public class ChatRoomService {
     // 채팅방 생성 : 이름으로 상대방 검색 후 채팅방 개설
     public ChatMessageRequestDTO createChatRoomByNickName(String nickName) {
         Member member = memberRepository.findByNickname(nickName)
-                .orElseThrow(() -> new RuntimeException("없는 사용자 불러오기"));
+                                .orElseThrow(() -> new RuntimeException("없는 사용자를 불러왔습니다."));
         ChatRoom chatRoom = ChatRoom.builder().member(member).userCount(1).build();
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
 
