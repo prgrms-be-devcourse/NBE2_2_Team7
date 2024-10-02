@@ -58,7 +58,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     // 로그인 성공 시 사용자 정보를 기반으로 JWT 토큰을 생성하고, 이를 Authorization 헤더에 추가
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                            FilterChain chain, Authentication authentication) {
+                                            FilterChain chain, Authentication authentication) throws IOException {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         // email 추출
         String email = customUserDetails.getUsername();
@@ -67,10 +67,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
-        String token = jwtUtil.createJwt(email, role, 60*60*10L);
-        response.addHeader("Authorization", "Bearer " + token);
+        String token = jwtUtil.createJwt(email, role, 60 * 60 * 100L);
+        Long memberId = customUserDetails.getMemberId();
+        String nickname = customUserDetails.getNickname();
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"token\": \"" + token + "\", \"memberId\": " + memberId + ", \"role\": \"" + role + "\", \"nickname\": \"" + nickname + "\"}");
+
         log.info("===== SUCCESSFUL AUTHENTICATION =====");
     }
+
 
     // 로그인 실패 시 HTTP 응답 401로 설정(유효한 자격 증명 미제공 시 요청 거부)
     @Override

@@ -40,6 +40,12 @@ public class CustomUserDetails implements UserDetails {
         return member.getEmail();
     }
 
+    // 사용자의 memberId 반환
+    public Long getMemberId() { return member.getMemberId(); }
+
+    //사용자의 닉네임 반환
+    public String getNickname() { return member.getNickname(); }
+
     // 계정이 만료되지 않았는지 여부 반환
     @Override
     public boolean isAccountNonExpired() {
