@@ -8,7 +8,11 @@ const countries = [
     "프랑스", "독일", "스페인", "캐나다", "호주"
 ];
 
-const levels = ["상", "중", "하"];
+const levels = [
+    { label: "상", value: "ADVANCED" },
+    { label: "중", value: "INTERMEDIATE" },
+    { label: "하", value: "BEGINNER" }
+];
 
 const RegistrationForm = () => {
     const [email, setEmail] = useState('');
@@ -84,8 +88,8 @@ const RegistrationForm = () => {
                             value={level}
                             onChange={(e) => setLevel(e.target.value)}
                         >
-                            {levels.map((level, index) => (
-                                <MenuItem key={index} value={level}>{level}</MenuItem>
+                            {levels.map((levelObj, index) => (
+                                <MenuItem key={index} value={levelObj.value}>{levelObj.label}</MenuItem>
                             ))}
                         </Select>
                     </FormControl>
