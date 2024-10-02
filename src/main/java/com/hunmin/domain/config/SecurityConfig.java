@@ -69,11 +69,15 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/members/register", "/api/members/login", "/main").permitAll()
+                        .requestMatchers("/api/members/register").permitAll()
+                        .requestMatchers("/api/members/login").permitAll()
+                        .requestMatchers("/main").permitAll()
                         .requestMatchers("/api/members/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/notification/subscribe/**").permitAll() //알림 실시간 반영 위한 수정
+                        .requestMatchers("/api/notification/**").permitAll() //알림 실시간 반영 위한 수정
                         .requestMatchers("/api/board/uploadImage/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll() //게시글 작성 시 이미지
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll() //swagger
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)

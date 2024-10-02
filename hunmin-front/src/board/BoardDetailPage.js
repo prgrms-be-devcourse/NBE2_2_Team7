@@ -17,6 +17,7 @@ const BoardDetailPage = () => {
     const [location, setLocation] = useState(null);
     const [originalLocation, setOriginalLocation] = useState(null);
     const [imageUrls, setImageUrls] = useState([]); // 이미지 URL 상태 추가
+    const [memberId, setMemberId] = useState(''); // memberId 상태 추가
 
     useEffect(() => {
         fetchBoard();
