@@ -9,16 +9,3 @@ spring:
     add-properties: false
   freemarker:
     cache: false
-#spring:
-#  profiles:
-#    active: local
-#  devtools:
-#    livereload:
-#      enabled: true
-#    restart:
-#      enabled: false
-#    add-properties: false
-#  freemarker:
-#    cache: false
-#  jwt:
-#    secret: govlepel@$&

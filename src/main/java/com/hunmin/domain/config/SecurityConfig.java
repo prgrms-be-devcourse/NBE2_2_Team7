@@ -71,6 +71,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/members/register", "/api/members/login", "/main").permitAll()
                         .requestMatchers("/api/members/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/chat-room/**").permitAll()//나중에 삭제할것
+                        .requestMatchers("/api/chat/**").permitAll()//나중에 삭제할것
+                        .requestMatchers("/api/chat/message").permitAll()//나중에 삭제할것
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
