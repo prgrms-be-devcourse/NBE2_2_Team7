@@ -32,14 +32,6 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 헤더 찍어보기
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-            log.debug("================ Header: " + headerName + " = " + headerValue);
-        }
-
         String authorization = request.getHeader("Authorization");
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {
@@ -58,8 +50,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String email = jwtUtil.getEmail(token);
         String role = jwtUtil.getRole(token);
-        log.debug("Extracted Email: " + email);
-        log.debug("Extracted Role: " + role);
+        log.debug("===== Extracted Email: " + email);
+        log.debug("===== Extracted Role: " + role);
 
         Member findMember = memberService.findByEmail(email);
         if (findMember == null) {
@@ -77,6 +69,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
 
-        log.info("Request URI: " + request.getRequestURI());
+        log.info("============= Request URI: " + request.getRequestURI());
     }
 }

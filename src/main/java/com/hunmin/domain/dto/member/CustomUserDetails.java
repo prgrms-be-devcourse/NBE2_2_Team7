@@ -20,7 +20,7 @@ public class CustomUserDetails implements UserDetails {
         this.member = member;
     }
 
-    // 사용자의 권한을 반환 (ADMIN 역할로 고정)
+    // 사용자의 권한을 반환
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collection = new ArrayList<>();
         collection.add(new SimpleGrantedAuthority("ROLE_" + member.getMemberRole().name()));

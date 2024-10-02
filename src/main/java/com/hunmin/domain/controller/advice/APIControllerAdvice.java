@@ -3,6 +3,7 @@ package com.hunmin.domain.controller.advice;
 import com.hunmin.domain.exception.BoardTaskException;
 import com.hunmin.domain.exception.CommentTaskException;
 import com.hunmin.domain.exception.NoticeTaskException;
+import com.hunmin.domain.exception.NotificationTaskException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
