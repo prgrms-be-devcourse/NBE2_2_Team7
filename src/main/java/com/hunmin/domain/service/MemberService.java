@@ -65,7 +65,7 @@ public class MemberService {
                 member.setCountry(memberDTO.getCountry());
             }
             if (memberDTO.getLevel() != null) {
-                member.setLevel(MemberLevel.BEGINNER);
+                member.setLevel(memberDTO.getLevel());
             }
 
             memberRepository.save(member);
