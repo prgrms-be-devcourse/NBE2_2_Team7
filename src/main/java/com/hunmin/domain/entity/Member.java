@@ -32,10 +32,10 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private MemberLevel level;
 
-    private String image;
-
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
+
+    private String image;
 
     public Member(Long memberId, String nickname) {
         this.memberId = memberId;

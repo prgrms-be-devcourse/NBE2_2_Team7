@@ -33,7 +33,7 @@ public class MemberService {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
 
-        // 사용자 레벨이 null이면 값 채우기
+        // 사용자 레벨이 null이면 데이터 채우기
         MemberLevel selectedLevel = memberDTO.getLevel() != null ? memberDTO.getLevel() : MemberLevel.BEGINNER;
 
         Member member = Member.builder()
