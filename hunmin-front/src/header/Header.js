@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../axios';
 import { AppBar, Toolbar, Badge, Typography, Grid, Button } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
@@ -20,7 +20,7 @@ const Header = () => {
 
     const fetchNotifications = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/notification/2');
+            const response = await api.get('/notification/2');
             const validNotifications = response.data.filter(notification => notification.message);
             setNotifications(validNotifications);
         } catch (error) {
@@ -60,7 +60,7 @@ const Header = () => {
 
     const markAsRead = async (notificationId) => {
         try {
-            await axios.put(`http://localhost:8080/api/notification/${notificationId}`);
+            await api.put(`/notification/${notificationId}`);
             setNotifications(prevNotifications =>
                 prevNotifications.map(notification =>
                     notification.notificationId === notificationId

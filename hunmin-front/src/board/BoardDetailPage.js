@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import CommentPage from '../comment/CommentPage';
 import KakaoMapSearch from './map/KakaoMapSearch';
 import { Typography, Button, TextField, Grid, Paper } from '@mui/material';
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import BoardWrite from '../board/write/BoardWrite'; // BoardWrite 컴포넌트 추가
+import api from '../axios';
 
 const BoardDetailPage = () => {
     const { boardId } = useParams();
@@ -24,7 +24,7 @@ const BoardDetailPage = () => {
 
     const fetchBoard = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/board/${boardId}`);
+            const response = await api.get(`/board/${boardId}`);
             setBoard(response.data);
             setTitle(response.data.title);
             setContent(response.data.content);
@@ -46,7 +46,7 @@ const BoardDetailPage = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://localhost:8080/api/board/${boardId}`);
+            await api.delete(`/board/${boardId}`);
             navigate('/');
         } catch (error) {
             console.error('Error deleting board:', error);
@@ -61,6 +61,7 @@ const BoardDetailPage = () => {
 
         try {
             const updatedBoard = {
+                memberId : 3,
                 title,
                 content,
                 location: location.name,
@@ -68,7 +69,7 @@ const BoardDetailPage = () => {
                 longitude: location.longitude,
                 imageUrls: imageUrls.length > 0 ? imageUrls : null, // 이미지 URL 추가
             };
-            await axios.put(`http://localhost:8080/api/board/${boardId}`, updatedBoard);
+            await api.put(`/board/${boardId}`, updatedBoard);
             setIsEditMode(false);
             fetchBoard();
         } catch (error) {
@@ -90,7 +91,7 @@ const BoardDetailPage = () => {
         formData.append('files', file);
 
         try {
-            const response = await axios.post('http://localhost:8080/api/board/uploadImage', formData, {
+            const response = await api.post('/board/uploadImage', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

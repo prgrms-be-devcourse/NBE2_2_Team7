@@ -47,7 +47,7 @@ const CommentPage = ({ boardId }) => {
 
     const handleCreate = async () => {
         try {
-            const commentData = { content, memberId: 1 }; // Replace memberId with actual userId
+            const commentData = { content, memberId: 3 }; // Replace memberId with actual userId
             await createComment(boardId, commentData);
             setContent('');
             fetchComments(currentPage); // 현재 페이지로 댓글 새로고침
@@ -58,7 +58,7 @@ const CommentPage = ({ boardId }) => {
 
     const handleReply = async (commentId) => {
         try {
-            const commentData = { content, memberId: 1 }; // Replace with actual userId
+            const commentData = { content, memberId: 3 }; // Replace with actual userId
             await createChildComment(boardId, commentId, commentData);
             setContent('');
             setReplyCommentId(null);
@@ -70,7 +70,7 @@ const CommentPage = ({ boardId }) => {
 
     const handleEdit = async () => {
         try {
-            const commentData = { content };
+            const commentData = { content, memberId: 3 }; // 실제 userId로 바꿔야 합니다
             await updateComment(boardId, editCommentId, commentData);
             setContent('');
             setEditCommentId(null);

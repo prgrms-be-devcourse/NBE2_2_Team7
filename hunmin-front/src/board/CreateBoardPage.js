@@ -4,6 +4,7 @@ import axios from 'axios';
 import KakaoMapSearch from '../board/map/KakaoMapSearch';
 import BoardWrite from '../board/write/BoardWrite';
 import { TextField, Button, Typography, Container, Box, Paper } from '@mui/material';
+import api from '../axios';
 
 const CreateBoardPage = () => {
     const [title, setTitle] = useState('');
@@ -44,10 +45,10 @@ const CreateBoardPage = () => {
                 latitude: location ? location.latitude : null,
                 longitude: location ? location.longitude : null,
                 imageUrls: imageUrls.length > 0 ? imageUrls : null,
-                memberId: 1,
+                memberId: 3,
             };
             console.log('Sending board data:', boardData);
-            const response = await axios.post('http://localhost:8080/api/board', boardData);
+            const response = await api.post('/board', boardData);
             console.log(response.data);
             navigate('/');
         } catch (error) {
