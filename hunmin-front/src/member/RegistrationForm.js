@@ -1,77 +1,106 @@
 import React, { useState } from 'react';
+import { TextField, Button, Container, Typography, Box, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-function RegistrationForm() {
-    const [member, setMember] = useState({
-        email: '',
-        password: '',
-        nickname: '',
-        country: '',
-        level: '',
-        image: ''
-    });
+const countries = [
+    "대한민국", "미국", "영국", "일본", "중국",
+    "프랑스", "독일", "스페인", "캐나다", "호주"
+];
 
-    const handleChange = (e) => {
-        setMember({
-            ...member,
-            [e.target.name]: e.target.value,
-        });
-    };
+const levels = [
+    { label: "상", value: "ADVANCED" },
+    { label: "중", value: "INTERMEDIATE" },
+    { label: "하", value: "BEGINNER" }
+];
 
-    const handleFileChange = (e) => {
-        setMember({
-            ...member,
-            image: e.target.files[0],
-        });
-    };
+const RegistrationForm = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [nickname, setNickname] = useState('');
+    const [country, setCountry] = useState('');
+    const [level, setLevel] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // 이미지 파일을 포함하여 폼 데이터를 생성합니다.
-        const formData = new FormData();
-        formData.append('email', member.email);
-        formData.append('password', member.password);
-        formData.append('nickname', member.nickname);
-        formData.append('country', member.country);
-        formData.append('level', member.level);
-
-        axios.post('/api/members/register', formData)
-            .then(response => {
-                alert(response.data); // "회원 가입이 완료되었습니다."
-            })
-            .catch(error => {
-                console.error(error);
-                alert('회원가입에 실패했습니다.');
+        try {
+            await axios.post('http://localhost:8080/api/members/register', {
+                email,
+                password,
+                nickname,
+                country,
+                level
             });
+            navigate('/login'); // 회원가입 성공 시 로그인 페이지로 이동
+        } catch (error) {
+            setError('회원가입 실패. 다시 시도해주세요.');
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>회원가입</h2>
-            <div>
-                <label>이메일 주소:</label>
-                <input type="email" name="email" value={member.email} onChange={handleChange} required />
-            </div>
-            <div>
-                <label>비밀번호:</label>
-                <input type="password" name="password" value={member.password} onChange={handleChange} required />
-            </div>
-            <div>
-                <label>닉네임:</label>
-                <input type="text" name="nickname" value={member.nickname} onChange={handleChange} required />
-            </div>
-            <div>
-                <label>국가:</label>
-                <input type="text" name="country" value={member.country} onChange={handleChange} required />
-            </div>
-            <div>
-                <label>레벨:</label>
-                <input type="text" name="level" value={member.level} onChange={handleChange} required />
-            </div>
-            <button type="submit">회원가입</button>
-        </form>
+        <Container maxWidth="xs">
+            <Box sx={{ mt: 8 }}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    회원가입
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        label="이름"
+                        fullWidth
+                        margin="normal"
+                        value={nickname}
+                        onChange={(e) => setNickname(e.target.value)}
+                        required
+                    />
+                    <TextField
+                        label="이메일"
+                        fullWidth
+                        margin="normal"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <TextField
+                        label="비밀번호"
+                        type="password"
+                        fullWidth
+                        margin="normal"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <FormControl fullWidth margin="normal" required>
+                        <InputLabel>국가</InputLabel>
+                        <Select
+                            value={country}
+                            onChange={(e) => setCountry(e.target.value)}
+                        >
+                            {countries.map((country, index) => (
+                                <MenuItem key={index} value={country}>{country}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl fullWidth margin="normal" required>
+                        <InputLabel>한국어 레벨</InputLabel>
+                        <Select
+                            value={level}
+                            onChange={(e) => setLevel(e.target.value)}
+                        >
+                            {levels.map((levelObj, index) => (
+                                <MenuItem key={index} value={levelObj.value}>{levelObj.label}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    {error && <Typography color="error">{error}</Typography>}
+                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                        회원가입
+                    </Button>
+                </form>
+            </Box>
+        </Container>
     );
-}
+};
 
 export default RegistrationForm;

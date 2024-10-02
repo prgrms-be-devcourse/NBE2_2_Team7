@@ -47,7 +47,8 @@ const CommentPage = ({ boardId }) => {
 
     const handleCreate = async () => {
         try {
-            const commentData = { content, memberId: 1 }; // Replace memberId with actual userId
+            const memberId = localStorage.getItem('memberId'); // localStorage에서 memberId 가져오기
+            const commentData = { content, memberId }; // memberId를 commentData에 포함
             await createComment(boardId, commentData);
             setContent('');
             fetchComments(currentPage); // 현재 페이지로 댓글 새로고침
@@ -58,7 +59,8 @@ const CommentPage = ({ boardId }) => {
 
     const handleReply = async (commentId) => {
         try {
-            const commentData = { content, memberId: 1 }; // Replace with actual userId
+            const memberId = localStorage.getItem('memberId'); // localStorage에서 memberId 가져오기
+            const commentData = { content, memberId }; // memberId를 commentData에 포함
             await createChildComment(boardId, commentId, commentData);
             setContent('');
             setReplyCommentId(null);
@@ -70,7 +72,8 @@ const CommentPage = ({ boardId }) => {
 
     const handleEdit = async () => {
         try {
-            const commentData = { content };
+            const memberId = localStorage.getItem('memberId'); // localStorage에서 memberId 가져오기
+            const commentData = { content, memberId }; // memberId를 commentData에 포함
             await updateComment(boardId, editCommentId, commentData);
             setContent('');
             setEditCommentId(null);
@@ -89,7 +92,6 @@ const CommentPage = ({ boardId }) => {
         }
     };
 
-    // renderComments 함수 수정: isChild 인수 추가
     const renderComments = (comments, level = 0) => {
         return comments.map((comment) => {
             const displayDate = comment.updatedAt

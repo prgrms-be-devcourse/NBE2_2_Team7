@@ -4,6 +4,7 @@ import axios from 'axios';
 import KakaoMapSearch from '../board/map/KakaoMapSearch';
 import BoardWrite from '../board/write/BoardWrite';
 import { TextField, Button, Typography, Container, Box, Paper } from '@mui/material';
+import api from '../axios';
 
 const CreateBoardPage = () => {
     const [title, setTitle] = useState('');
@@ -12,10 +13,12 @@ const CreateBoardPage = () => {
     const [imageUrls, setImageUrls] = useState([]);
     const navigate = useNavigate();
 
+    // Handle location selection from KakaoMapSearch component
     const handleLocationSelect = (selectedLocation) => {
         setLocation(selectedLocation);
     };
 
+    // Upload image function
     const uploadImage = async (file) => {
         const formData = new FormData();
         formData.append('files', file);
@@ -35,6 +38,7 @@ const CreateBoardPage = () => {
         }
     };
 
+    // Handle form submission
     const handleSubmit = async () => {
         try {
             const boardData = {
@@ -44,10 +48,10 @@ const CreateBoardPage = () => {
                 latitude: location ? location.latitude : null,
                 longitude: location ? location.longitude : null,
                 imageUrls: imageUrls.length > 0 ? imageUrls : null,
-                memberId: 1,
+                memberId: localStorage.getItem('memberId'), // 로컬 스토리지에서 memberId 가져오기
             };
             console.log('Sending board data:', boardData);
-            const response = await axios.post('http://localhost:8080/api/board', boardData);
+            const response = await api.post('/board', boardData);
             console.log(response.data);
             navigate('/');
         } catch (error) {

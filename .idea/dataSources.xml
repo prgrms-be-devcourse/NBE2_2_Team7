@@ -27,6 +27,7 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+<<<<<<< HEAD
     <data-source source="LOCAL" name="0@localhost" uuid="58be4a3b-72b3-4313-bbc8-a7dfd8882ad1">
       <driver-ref>redis</driver-ref>
       <synchronize>true</synchronize>
@@ -37,12 +38,19 @@
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
     <data-source source="LOCAL" name="world@localhost" uuid="ac69c2e1-3d81-43b9-931a-190c5b0482c0">
+=======
+    <data-source source="LOCAL" name="order_mgmt@localhost" uuid="4db056b1-8e89-4c0a-ac62-3ff290840d7d">
+>>>>>>> a497096c25f7c7916a510be0b0bedb1d7809cbf5
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <imported>true</imported>
       <remarks>$PROJECT_DIR$/src/main/resources/application.properties</remarks>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+<<<<<<< HEAD
       <jdbc-url>jdbc:mysql://localhost:3306/world</jdbc-url>
+=======
+      <jdbc-url>jdbc:mysql://localhost:3306/order_mgmt</jdbc-url>
+>>>>>>> a497096c25f7c7916a510be0b0bedb1d7809cbf5
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

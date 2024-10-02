@@ -69,18 +69,22 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/members/register", "/api/members/login", "/main").permitAll()
+                        .requestMatchers("/api/members/register").permitAll()
+                        .requestMatchers("/api/members/login").permitAll()
+                        .requestMatchers("/main").permitAll()
                         .requestMatchers("/api/members/admin").hasRole("ADMIN")
                         .requestMatchers("/api/chat-room/**").permitAll()//나중에 삭제할것
                         .requestMatchers("/api/chat/**").permitAll()//나중에 삭제할것
                         .requestMatchers("/api/chat/message").permitAll()//나중에 삭제할것
+                        .requestMatchers("/api/notification/**").permitAll() //알림 실시간 반영 위한 수정
+                        .requestMatchers("/api/board/uploadImage/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll() //게시글 작성 시 이미지
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll() //swagger
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JWTFilter(jwtUtil, memberService), UsernamePasswordAuthenticationFilter.class);
-//                .addFilterBefore(new JWTFilter(jwtUtil, memberService), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
-//        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
