@@ -10,8 +10,8 @@ public enum MemberLevel {
 
     private final String dispalyName;
 
-    MemberLevel(String deispalyName) {
-        this.dispalyName = deispalyName;
+    MemberLevel(String dispalyName) {
+        this.dispalyName = dispalyName;
     }
 
 }
