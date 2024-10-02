@@ -78,7 +78,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         log.info("===== SUCCESSFUL AUTHENTICATION =====");
     }
 
-
     // 로그인 실패 시 HTTP 응답 401로 설정(유효한 자격 증명 미제공 시 요청 거부)
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
