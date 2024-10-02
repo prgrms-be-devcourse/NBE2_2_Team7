@@ -1,6 +1,6 @@
 package com.hunmin.domain.dto.member;
 
-import com.hunmin.domain.entity.MemberRole;
+import com.hunmin.domain.entity.MemberLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +11,7 @@ public class MemberDTO {
     private String password;
     private String nickname;
     private String country;
-    private String level;
+    private MemberLevel level;
+    // private String image;
 
 }

@@ -2,7 +2,6 @@ package com.hunmin.domain.jwt;
 
 import com.hunmin.domain.dto.member.CustomUserDetails;
 import com.hunmin.domain.entity.Member;
-import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.service.MemberService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
 @Log4j2
 public class JWTFilter extends OncePerRequestFilter {
@@ -31,14 +29,6 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-        // 헤더 찍어보기
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-            log.debug("================ Header: " + headerName + " = " + headerValue);
-        }
 
         String authorization = request.getHeader("Authorization");
 
@@ -58,8 +48,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String email = jwtUtil.getEmail(token);
         String role = jwtUtil.getRole(token);
-        log.debug("Extracted Email: " + email);
-        log.debug("Extracted Role: " + role);
+        log.debug("===== Extracted Email: " + email);
+        log.debug("===== Extracted Role: " + role);
 
         Member findMember = memberService.findByEmail(email);
         if (findMember == null) {
@@ -77,6 +67,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
 
-        log.info("Request URI: " + request.getRequestURI());
+        log.info("============= Request URI: " + request.getRequestURI());
     }
 }
