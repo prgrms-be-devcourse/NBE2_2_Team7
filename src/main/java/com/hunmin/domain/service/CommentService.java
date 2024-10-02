@@ -4,6 +4,7 @@ import com.hunmin.domain.dto.comment.CommentRequestDTO;
 import com.hunmin.domain.dto.comment.CommentResponseDTO;
 import com.hunmin.domain.dto.notification.NotificationSendDTO;
 import com.hunmin.domain.exception.BoardException;
+import com.hunmin.domain.exception.MemberException;
 import com.hunmin.domain.handler.SseEmitters;
 import com.hunmin.domain.dto.page.PageRequestDTO;
 import com.hunmin.domain.entity.Board;
@@ -39,7 +40,7 @@ public class CommentService {
     // 댓글 등록
     public CommentResponseDTO createComment(Long boardId, CommentRequestDTO commentRequestDTO) {
         try {
-            Member member = memberRepository.findById(commentRequestDTO.getMemberId()).orElseThrow();
+            Member member = memberRepository.findById(commentRequestDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
             Board board = boardRepository.findById(boardId).orElseThrow(BoardException.NOT_FOUND::get);
 
             Comment comment = Comment.builder()
@@ -85,7 +86,7 @@ public class CommentService {
     //대댓글 등록
     public CommentResponseDTO createCommentChild(Long boardId, Long commentId, CommentRequestDTO commentRequestDTO) {
         try {
-            Member member = memberRepository.findById(commentRequestDTO.getMemberId()).orElseThrow();
+            Member member = memberRepository.findById(commentRequestDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
             Board board = boardRepository.findById(boardId).orElseThrow(BoardException.NOT_FOUND::get);
             Comment parent = commentRepository.findById(commentId).orElseThrow(CommentException.NOT_FOUND::get);
 

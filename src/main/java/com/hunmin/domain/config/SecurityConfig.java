@@ -71,6 +71,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/members/register", "/api/members/login", "/main").permitAll()
                         .requestMatchers("/api/members/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/notification/subscribe/**").permitAll() //알림 실시간 반영 위한 수정
+                        .requestMatchers("/api/board/uploadImage/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll() //게시글 작성 시 이미지
                         .anyRequest().authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)

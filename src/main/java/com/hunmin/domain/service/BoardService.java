@@ -6,6 +6,7 @@ import com.hunmin.domain.dto.page.PageRequestDTO;
 import com.hunmin.domain.entity.Board;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.exception.BoardException;
+import com.hunmin.domain.exception.MemberException;
 import com.hunmin.domain.repository.BoardRepository;
 import com.hunmin.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -74,7 +75,7 @@ public class BoardService {
     //게시글 등록
     public BoardResponseDTO createBoard(BoardRequestDTO boardRequestDTO) {
         try {
-            Member member = memberRepository.findById(boardRequestDTO.getMemberId()).orElseThrow();
+            Member member = memberRepository.findById(boardRequestDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
 
             Board board = Board.builder()
                     .member(member)
