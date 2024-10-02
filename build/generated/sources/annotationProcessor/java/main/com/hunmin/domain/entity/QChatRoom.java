@@ -24,7 +24,7 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
 
     public final QBaseTimeEntity _super = new QBaseTimeEntity(this);
 
-    public final ListPath<ChatMessages, QChatMessages> chatMessages = this.<ChatMessages, QChatMessages>createList("chatMessages", ChatMessages.class, QChatMessages.class, PathInits.DIRECT2);
+    public final ListPath<ChatMessage, QChatMessage> chatMessage = this.<ChatMessage, QChatMessage>createList("chatMessage", ChatMessage.class, QChatMessage.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> chatRoomId = createNumber("chatRoomId", Long.class);
 
@@ -35,6 +35,8 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
+
+    public final NumberPath<Long> userCount = createNumber("userCount", Long.class);
 
     public QChatRoom(String variable) {
         this(ChatRoom.class, forVariable(variable), INITS);

@@ -27,6 +27,8 @@ public class QNotification extends EntityPathBase<Notification> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
+    public final BooleanPath isRead = createBoolean("isRead");
+
     public final QMember member;
 
     public final StringPath message = createString("message");
@@ -37,6 +39,8 @@ public class QNotification extends EntityPathBase<Notification> {
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
+
+    public final StringPath url = createString("url");
 
     public QNotification(String variable) {
         this(Notification.class, forVariable(variable), INITS);
