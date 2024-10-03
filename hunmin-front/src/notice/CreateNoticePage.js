@@ -1,22 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './CreateNoticePage.css';
 import Markdown from 'markdown-to-jsx';
 import BoardWrite from '../board/write/BoardWrite'; // BoardWrite 컴포넌트를 임포트합니다.
+import './ErrorMessage.css';
+
 const CreateNoticePage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [notice, setNotice] = useState({ memberId: 1, title: '', content: '' });
+    const memberId = localStorage.getItem('memberId'); // 로컬 저장소에서 멤버 ID를 가져옵니다.
+    const [notice, setNotice] = useState({ memberId: memberId, title: '', content: '' });
+    const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지 상태 추가
 
     useEffect(() => {
         if (id) {
-            axios.get(`/api/notices/${id}`)
+            api.get(`/notices/${id}`) // Axios 인스턴스 사용
+            //axios.get(`/api/notices/${id}`)
                 .then(response => {
                     setNotice(response.data);
                 })
                 .catch(error => {
-                    console.error("There was an error fetching the notice!", error);
+                    if (error.response && error.response.data) {
+                        setErrorMessage(`Error: ${error.response.data.error}`); // 에러 메시지를 팝업으로 표시
+                        console.error(error)
+                    } else {
+                        setErrorMessage("There was an error creating/updating the notice!");
+                    }
+
                 });
         }
     }, [id]);
@@ -41,20 +53,32 @@ const CreateNoticePage = () => {
         e.preventDefault();
 
         if (id) {
-            axios.put(`/api/notices/${id}`, notice)
+            api.put(`/notices/${id}`, notice)
+            //axios.put(`/api/notices/${id}`, notice)
                 .then(response => {
                     navigate(`/notices/${id}`);
                 })
                 .catch(error => {
-                    console.error("There was an error updating the notice!", error);
+                    if (error.response && error.response.data) {
+                        setErrorMessage(`Error: ${error.response.data.error}`); // 에러 메시지를 팝업으로 표시
+                        console.error(error)
+                    } else {
+                        setErrorMessage("There was an error creating/updating the notice!");
+                    }
                 });
         } else {
-            axios.post('/api/notices', notice)
+            api.post('/notices', notice)
+            //axios.post('/api/notices', notice)
                 .then(response => {
                     navigate(`/notices/${response.data.noticeId}`);
                 })
                 .catch(error => {
-                    console.error("There was an error creating the notice!", error);
+                    if (error.response && error.response.data) {
+                        setErrorMessage(error.response.data.error);
+                        console.error(error)
+                    } else {
+                        setErrorMessage("There was an error creating the notice!");
+                    }
                 });
         }
     };
@@ -67,7 +91,7 @@ const CreateNoticePage = () => {
         formData.append('file', file);
 
         try {
-            const response = await axios.post('/api/upload', formData, {
+            const response = await api.post('/api/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -81,6 +105,11 @@ const CreateNoticePage = () => {
 
     return (
         <div className="form-container">
+            {errorMessage && (
+                <div className="error-message" style={{color: 'red', marginBottom: '10px'}}>
+                    {errorMessage}
+                </div>
+            )}
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label className="label">제목:</label>
@@ -109,24 +138,6 @@ const CreateNoticePage = () => {
         </div>
     );
 
-// return (
-//     <div className="form-container">
-//         <form onSubmit={handleSubmit}>
-//             <div className="form-group">
-//                 <label className="label">제목:</label>
-//                 <input type="text" name="title" value={notice.title} onChange={handleChange} required
-//                        className="input"/>
-//             </div>
-//             <div className="form-group">
-//                 <label className="label">내용:</label>
-//                 <textarea name="content" value={notice.content} onChange={handleChange} required
-//                           className="textarea"/>
-//             </div>
-//             <button type="submit" className="submit-button">{id ? '수정' : '생성'}</button>
-//         </form>
-//         <button onClick={handleGoHome} className="home-button">공지사항 목록으로 돌아가기</button>
-//     </div>
-// );
 };
 
 export default CreateNoticePage;

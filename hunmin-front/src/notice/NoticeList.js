@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../axios';
 import { Link } from 'react-router-dom';
 
 const NoticeList = () => {
     const [notices, setNotices] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/notices/list/1') // 1 페이지를 가져옵니다.
+        api.get('/notices/list/1') // 1 페이지를 가져옵니다.
             .then(response => {
                 setNotices(response.data);
             })

@@ -44,7 +44,6 @@ public class NoticeController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "공지 등록", description = "공지사항을 등록할때 사용하는 API")
     public ResponseEntity<NoticeResponseDTO> createNotice(@Validated @RequestBody NoticeRequestDTO noticeRequestDTO, @AuthenticationPrincipal UserDetails username) {
         NoticeResponseDTO notice = noticeService.createNotice(noticeRequestDTO, username.getUsername()); //이메일 반환
