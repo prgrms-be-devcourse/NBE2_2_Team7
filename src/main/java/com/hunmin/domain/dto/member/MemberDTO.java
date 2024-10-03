@@ -12,6 +12,5 @@ public class MemberDTO {
     private String nickname;
     private String country;
     private MemberLevel level;
-    // private String image;
-
+    private String image;
 }

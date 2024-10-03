@@ -2,6 +2,7 @@ package com.hunmin.domain.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hunmin.domain.dto.member.CustomUserDetails;
+import com.hunmin.domain.entity.MemberLevel;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -70,10 +71,20 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String token = jwtUtil.createJwt(email, role, 60 * 60 * 100L);
         Long memberId = customUserDetails.getMemberId();
         String nickname = customUserDetails.getNickname();
+        String image = "http://localhost:8080" + customUserDetails.getImage();
+        MemberLevel level = customUserDetails.getLevel();
+        String country = customUserDetails.getCountry();
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"token\": \"" + token + "\", \"memberId\": " + memberId + ", \"role\": \"" + role + "\", \"nickname\": \"" + nickname + "\"}");
+        response.getWriter().write("{\"token\": \"" + token + "\"," +
+                " \"memberId\": " + memberId + ", " +
+                "\"role\": \"" + role + "\", " +
+                "\"nickname\": \"" + nickname + "\", " +
+                "\"image\": \"" + image + "\", " +
+                "\"email\": \"" + email + "\", " +
+                "\"level\": \"" + level + "\", " +
+                "\"country\": \"" + country + "\"}");
 
         log.info("===== SUCCESSFUL AUTHENTICATION =====");
     }
