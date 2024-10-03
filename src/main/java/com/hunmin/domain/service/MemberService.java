@@ -2,6 +2,7 @@ package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.member.MemberDTO;
 import com.hunmin.domain.entity.Member;
+import com.hunmin.domain.entity.MemberLevel;
 import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,14 +10,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,13 +33,16 @@ public class MemberService {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
 
+        // 사용자 레벨이 null이면 데이터 채우기
+        MemberLevel selectedLevel = memberDTO.getLevel() != null ? memberDTO.getLevel() : MemberLevel.BEGINNER;
+
         Member member = Member.builder()
                 .email(email)
                 .password(bCryptPasswordEncoder.encode(password))
                 .nickname(memberDTO.getNickname())
                 .country(memberDTO.getCountry())
-                .level(memberDTO.getLevel())
                 .memberRole(MemberRole.USER)
+                .level(selectedLevel)
                 .build();
 
         memberRepository.save(member);

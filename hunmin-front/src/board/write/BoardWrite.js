@@ -26,18 +26,21 @@ class BoardWrite extends Component {
 
         input.onchange = async () => {
             const file = input.files[0];
-            const imgUrl = await this.props.uploadImage(file); // 이미지 업로드 및 URL 획득
 
-            if (imgUrl) {
+            // 파일 URL을 생성하여 에디터에 이미지 삽입
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imgSrc = e.target.result;
                 const editor = this.quillRef.getEditor();
-                const range = editor.getSelection(true); // Range를 true로 설정하여 포커스 없이 선택
+                const range = editor.getSelection(true);
 
-                // imgUrl이 올바른지 확인하기 위해 콘솔에 출력
-                console.log('Inserting image with URL:', imgUrl);
-                editor.insertEmbed(range.index, 'image', `http://localhost:8080${imgUrl}`); // URL을 사용하여 이미지 추가
-                editor.setSelection(range.index + 1); // 이미지 다음 위치로 커서 이동
-                this.props.setImageUrls((prev) => [...prev, imgUrl]); // 이미지 URL을 상태에 추가
-            }
+                editor.insertEmbed(range.index, 'image', imgSrc); // 클라이언트에 임시 이미지 삽입
+                editor.setSelection(range.index + 1);
+
+                // 이미지 파일을 상태에 저장하여 나중에 서버로 업로드할 수 있게 함
+                this.props.setImageUrls((prev) => [...prev, imgSrc]); // setImageFiles 대신 setImageUrls 사용
+            };
+            reader.readAsDataURL(file); // 파일을 읽어서 Base64 URL로 변환
         };
     };
 

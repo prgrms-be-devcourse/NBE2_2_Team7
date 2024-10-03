@@ -1,11 +1,9 @@
 package com.hunmin.domain.dto.member;
 
 import com.hunmin.domain.entity.Member;
-import com.hunmin.domain.entity.MemberRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +18,7 @@ public class CustomUserDetails implements UserDetails {
         this.member = member;
     }
 
-    // 사용자의 권한을 반환 (ADMIN 역할로 고정)
+    // 사용자의 권한을 반환
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collection = new ArrayList<>();
         collection.add(new SimpleGrantedAuthority("ROLE_" + member.getMemberRole().name()));
@@ -39,6 +37,12 @@ public class CustomUserDetails implements UserDetails {
     public String getUsername() {
         return member.getEmail();
     }
+
+    // 사용자의 memberId 반환
+    public Long getMemberId() { return member.getMemberId(); }
+
+    //사용자의 닉네임 반환
+    public String getNickname() { return member.getNickname(); }
 
     // 계정이 만료되지 않았는지 여부 반환
     @Override

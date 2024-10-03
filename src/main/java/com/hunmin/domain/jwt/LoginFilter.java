@@ -47,18 +47,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             Map<String, String> requestMap = mapper.readValue(request.getInputStream(), Map.class);
             String email = requestMap.get("email");
             String password = requestMap.get("password");
-            log.info("========= " + email + " =========");
+            log.info("========= 이메일: " + email + " =========");
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
             return authenticationManager.authenticate(authToken);
         } catch (IOException e) {
-            throw new AuthenticationServiceException("Invalid request format");
+            throw new AuthenticationServiceException("잘못된 요청 폼");
         }
     }
 
     // 로그인 성공 시 사용자 정보를 기반으로 JWT 토큰을 생성하고, 이를 Authorization 헤더에 추가
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                            FilterChain chain, Authentication authentication) {
+                                            FilterChain chain, Authentication authentication) throws IOException {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         // email 추출
         String email = customUserDetails.getUsername();
@@ -67,8 +67,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
-        String token = jwtUtil.createJwt(email, role, 60*60*100L); //유효기간 수정
+        String token = jwtUtil.createJwt(email, role, 600*60*10L);
         response.addHeader("Authorization", "Bearer " + token);
+        log.info("===== 인증 성공 =====");
+        Long memberId = customUserDetails.getMemberId();
+        String nickname = customUserDetails.getNickname();
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"token\": \"" + token + "\", \"memberId\": " + memberId + ", \"role\": \"" + role + "\", \"nickname\": \"" + nickname + "\"}");
+
         log.info("===== SUCCESSFUL AUTHENTICATION =====");
     }
 
@@ -77,6 +85,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) {
         response.setStatus(401);
-        log.info("===== UNSUCCESSFUL AUTHENTICATION =====");
+        log.info("===== 인증 실패 =====");
     }
 }

@@ -1,49 +1,43 @@
-import React, { useState, useEffect} from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Header from './header/Header'; // 새로 만든 Header 컴포넌트 추가
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import Header from './header/Header';
 import BoardListPage from './board/BoardListPage';
 import BoardDetailPage from './board/BoardDetailPage';
 import CreateBoardPage from './board/CreateBoardPage';
 import RegistrationForm from './member/RegistrationForm';
-import UpdateMemberForm from './member/UpdateMemberForm';
-import MainComponent from './member/MainComponent';
-import AdminComponent from './member/AdminComponent';
 import LoginForm from './member/LoginForm';
-import axios from 'axios';
-import NoticeListPage from './notice/NoticeListPage';
-import NoticeDetailPage from './notice/NoticeDetailPage';
-import CreateNoticePage from './notice/CreateNoticePage';
 
 const App = () => {
-    const [token, setToken] = useState('');
-
-    const handleLogin = (token) => {
-        setToken(token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    };
+    const [token, setToken] = useState(localStorage.getItem('token') || '');
 
     return (
         <Router>
-            <Header /> {/* 헤더 추가 */}
-            <Routes>
-                {/* 게시판 라우트 */}
-                <Route path="/" element={<BoardListPage />} />
-                <Route path="/board/:boardId" element={<BoardDetailPage />} />
-                <Route path="/create-board" element={<CreateBoardPage />} />
-
-                <Route path="/register" element={<RegistrationForm />} />
-                <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
-                <Route path="/update" element={<UpdateMemberForm />} />
-                <Route path="/main" element={<MainComponent />} />
-                <Route path="/admin" element={<AdminComponent />} />
-
-                {/* 공지사항 라우트 */}
-                <Route path="/notices" element={<NoticeListPage />} />
-                <Route path="/notices/:id" element={<NoticeDetailPage />} />
-                <Route path="/create-notice" element={<CreateNoticePage />} />
-                <Route path="/edit-notice/:id" element={<CreateNoticePage />} />
-            </Routes>
+            <AppContent token={token} setToken={setToken} /> {/* setToken 전달 */}
         </Router>
+    );
+};
+
+const AppContent = ({ token, setToken }) => {
+    const location = useLocation();
+    const hideHeaderRoutes = ['/login', '/register'];
+
+    return (
+        <>
+            {!hideHeaderRoutes.includes(location.pathname) && token && <Header />}
+            <Routes>
+                <Route path="/login" element={<LoginForm setToken={setToken} />} />
+                <Route path="/register" element={<RegistrationForm />} />
+                {token ? (
+                    <>
+                        <Route path="/" element={<BoardListPage />} />
+                        <Route path="/board/:boardId" element={<BoardDetailPage />} />
+                        <Route path="/create-board" element={<CreateBoardPage />} />
+                    </>
+                ) : (
+                    <Route path="*" element={<Navigate to="/login" />} />
+                )}
+            </Routes>
+        </>
     );
 };
 
