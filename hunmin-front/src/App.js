@@ -6,6 +6,7 @@ import BoardDetailPage from './board/BoardDetailPage';
 import CreateBoardPage from './board/CreateBoardPage';
 import RegistrationForm from './member/RegistrationForm';
 import LoginForm from './member/LoginForm';
+import UpdateMemberForm from "./member/UpdateMemberForm";
 import NoticeListPage from './notice/NoticeListPage';
 import NoticeDetailPage from "./notice/NoticeDetailPage";
 import CreateNoticePage from './notice/CreateNoticePage';
@@ -36,6 +37,7 @@ const AppContent = ({ token, setToken }) => {
                         <Route path="/" element={<BoardListPage />} />
                         <Route path="/board/:boardId" element={<BoardDetailPage />} />
                         <Route path="/create-board" element={<CreateBoardPage />} />
+                        <Route path="/update-member" element={<UpdateMemberForm />} />
 
                         {/* 공지사항 라우트 */}
                         <Route path="/notices" element={<NoticeListPage />} />

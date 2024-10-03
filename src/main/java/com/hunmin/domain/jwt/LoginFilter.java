@@ -3,6 +3,7 @@ package com.hunmin.domain.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hunmin.domain.dto.member.CustomUserDetails;
 import com.hunmin.domain.entity.MemberRole;
+import com.hunmin.domain.entity.MemberLevel;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,6 +68,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain, Authentication authentication) throws IOException {
         log.info("========= successfulAuthentication 시작 =========");
 
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
         //유저 정보
         String email = authentication.getName();
 
@@ -75,12 +78,28 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority().replace("ROLE_", "");
         log.info("===== Authentication 성공!! email: {}, Role: {}", email, role);
+        Long memberId = customUserDetails.getMemberId();
+        String nickname = customUserDetails.getNickname();
+        String image = "http://localhost:8080" + customUserDetails.getImage();
+        MemberLevel level = customUserDetails.getLevel();
+        String country = customUserDetails.getCountry();
 
         //토큰 생성
         String access = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 600000L);
         String refresh = jwtUtil.createJwt("refresh", email, MemberRole.valueOf(role), 86400000L);
         log.info("생성된 access 토큰: " + access);
         log.info("생성된 refresh 토큰: " + refresh);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"token\": \"" + access + "\"," +
+                " \"memberId\": " + memberId + ", " +
+                "\"role\": \"" + role + "\", " +
+                "\"nickname\": \"" + nickname + "\", " +
+                "\"image\": \"" + image + "\", " +
+                "\"email\": \"" + email + "\", " +
+                "\"level\": \"" + level + "\", " +
+                "\"country\": \"" + country + "\"}");
 
         //응답 설정
         response.setHeader("access", access);

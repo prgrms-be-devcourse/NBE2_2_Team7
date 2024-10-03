@@ -3,6 +3,8 @@ package com.hunmin.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Setter
 @Getter
@@ -35,6 +37,7 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MemberRole memberRole;
 
+    @Column(columnDefinition = "TEXT")
     private String image;
 
     public Member(Long memberId, String nickname) {

@@ -30,6 +30,7 @@ const CommentPage = ({ boardId }) => {
     const [replyCommentId, setReplyCommentId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [editCommentMemberId, setEditCommentMemberId] = useState(null); // 댓글의 원래 memberId 저장
 
     useEffect(() => {
         fetchComments(currentPage);
@@ -72,8 +73,7 @@ const CommentPage = ({ boardId }) => {
 
     const handleEdit = async () => {
         try {
-            const memberId = localStorage.getItem('memberId'); // localStorage에서 memberId 가져오기
-            const commentData = { content, memberId }; // memberId를 commentData에 포함
+            const commentData = { content, memberId: editCommentMemberId }; // 원래 댓글의 memberId 사용
             await updateComment(boardId, editCommentId, commentData);
             setContent('');
             setEditCommentId(null);
@@ -106,7 +106,7 @@ const CommentPage = ({ boardId }) => {
                             secondary={`작성일: ${displayDate}`}
                         />
                         <ListItemSecondaryAction>
-                            <IconButton edge="end" onClick={() => setEditCommentId(comment.commentId)}>
+                            <IconButton edge="end" onClick={() => handleEditClick(comment)}> {/* 수정 버튼 클릭 시 처리 */}
                                 <EditIcon />
                             </IconButton>
                             <IconButton edge="end" onClick={() => handleDelete(comment.commentId)}>
@@ -141,6 +141,12 @@ const CommentPage = ({ boardId }) => {
                 </div>
             );
         });
+    };
+
+    const handleEditClick = (comment) => {
+        setEditCommentId(comment.commentId);
+        setContent(comment.content);
+        setEditCommentMemberId(comment.memberId); // 댓글의 원래 memberId 저장
     };
 
     const handlePageChange = (event, newPage) => {

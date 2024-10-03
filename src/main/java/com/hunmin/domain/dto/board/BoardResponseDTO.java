@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class BoardResponseDTO {
     private Long boardId;
+    private Long memberId;
     private String title;
     private String nickname;
     private String content;
@@ -26,6 +27,7 @@ public class BoardResponseDTO {
 
     public BoardResponseDTO(Board board) {
         this.boardId = board.getBoardId();
+        this.memberId = board.getMember().getMemberId();
         this.title = board.getTitle();
         this.nickname = board.getNickname();
         this.content = board.getContent();
