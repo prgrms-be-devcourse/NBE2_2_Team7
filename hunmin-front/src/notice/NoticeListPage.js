@@ -49,6 +49,10 @@ const NoticeListPage = () => {
                 {notices.map(notice => (
                     <li key={notice.noticeId} className="list-item">
                         <Link to={`/notices/${notice.noticeId}`} className="styled-link">{notice.title}</Link>
+                        <div className="notice-details">
+                            <span>작성자: {notice.nickname}</span><br/>
+                            <span>{new Date(notice.createdAt).toLocaleDateString()}</span>
+                        </div>
                     </li>
                 ))}
             </ul>

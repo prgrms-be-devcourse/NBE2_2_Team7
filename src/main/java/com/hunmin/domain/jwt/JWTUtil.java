@@ -1,5 +1,6 @@
 package com.hunmin.domain.jwt;
 
+import com.hunmin.domain.entity.MemberRole;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,12 +37,18 @@ public class JWTUtil {
     public Boolean isExpired(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
+    
+    // 토큰 구분을 위한 카테고리
+    public String getCategory(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
+    }
 
     // 이메일과 역할 정보 기반으로 JWT 토큰 생성
-    public String createJwt(String email, String role, Long expiredMs) {
+    public String createJwt(String category, String email, MemberRole role, Long expiredMs) {
         return Jwts.builder()
+                .claim("category", category)
                 .claim("email", email)
-                .claim("role", role)
+                .claim("role", "ROLE_" + role.name())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
