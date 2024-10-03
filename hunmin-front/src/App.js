@@ -6,6 +6,7 @@ import BoardDetailPage from './board/BoardDetailPage';
 import CreateBoardPage from './board/CreateBoardPage';
 import RegistrationForm from './member/RegistrationForm';
 import LoginForm from './member/LoginForm';
+import UpdateMemberForm from "./member/UpdateMemberForm";
 
 const App = () => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -32,6 +33,7 @@ const AppContent = ({ token, setToken }) => {
                         <Route path="/" element={<BoardListPage />} />
                         <Route path="/board/:boardId" element={<BoardDetailPage />} />
                         <Route path="/create-board" element={<CreateBoardPage />} />
+                        <Route path="/update-member" element={<UpdateMemberForm />} />
                     </>
                 ) : (
                     <Route path="*" element={<Navigate to="/login" />} />

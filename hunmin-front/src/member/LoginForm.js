@@ -20,12 +20,21 @@ const LoginForm = ({ setToken }) => { // setToken을 props로 받기
             console.log(response.data);
             const token = response.data.token;
             const memberId = response.data.memberId;
+            const memberEmail = response.data.email;
             const role = response.data.role;
             const nickname = response.data.nickname;
+            const image = response.data.image;
+            const level = response.data.level;
+            const country = response.data.country;
+
             localStorage.setItem('token', token);
             localStorage.setItem('memberId', memberId);
+            localStorage.setItem('email', memberEmail);
             localStorage.setItem('role', role);
             localStorage.setItem('nickname', nickname);
+            localStorage.setItem('image', image);
+            localStorage.setItem('level', level);
+            localStorage.setItem('country', country);
 
             setToken(token); // 상태 업데이트
             navigate('/');
