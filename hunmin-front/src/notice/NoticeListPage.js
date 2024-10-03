@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../axios';
 import { Link , useNavigate } from 'react-router-dom';
 import './NoticeListPage.css';
 
@@ -12,12 +13,17 @@ const NoticeListPage = () => {
     }, [page]);
 
     const fetchNotices = (page) => {
-        axios.get(`/api/notices/list/${page}`)
+        //axios.get(`/api/notices/list/${page}`)
+        api.get(`/notices/list/${page}`)
             .then(response => {
                 setNotices(response.data);
             })
             .catch(error => {
-                console.error("There was an error fetching the notices!", error);
+                if (error.response && error.response.data) {
+                    alert(`Error: ${error.response.data.error}`);
+                } else {
+                    alert("There was an error fetching the notices!");
+                }
             });
     };
 
@@ -43,6 +49,10 @@ const NoticeListPage = () => {
                 {notices.map(notice => (
                     <li key={notice.noticeId} className="list-item">
                         <Link to={`/notices/${notice.noticeId}`} className="styled-link">{notice.title}</Link>
+                        <div className="notice-details">
+                            <span>작성자: {notice.nickname}</span><br/>
+                            <span>{new Date(notice.createdAt).toLocaleDateString()}</span>
+                        </div>
                     </li>
                 ))}
             </ul>
@@ -53,9 +63,9 @@ const NoticeListPage = () => {
             </div>
             <Link to="/create-notice" className="create-link">공지사항 생성</Link>
 
-</div>
-)
-    ;
+        </div>
+    )
+        ;
 };
 
 export default NoticeListPage;

@@ -99,7 +99,7 @@ public class MemberService {
                 member.setCountry(memberDTO.getCountry());
             }
             if (memberDTO.getLevel() != null) {
-                member.setLevel(MemberLevel.BEGINNER);
+                member.setLevel(memberDTO.getLevel());
             }
 
             if(memberDTO.getImage() != null) {
