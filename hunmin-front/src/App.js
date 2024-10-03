@@ -6,6 +6,10 @@ import BoardDetailPage from './board/BoardDetailPage';
 import CreateBoardPage from './board/CreateBoardPage';
 import RegistrationForm from './member/RegistrationForm';
 import LoginForm from './member/LoginForm';
+import NoticeListPage from './notice/NoticeListPage';
+import NoticeDetailPage from "./notice/NoticeDetailPage";
+import CreateNoticePage from './notice/CreateNoticePage';
+
 
 const App = () => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -32,6 +36,12 @@ const AppContent = ({ token, setToken }) => {
                         <Route path="/" element={<BoardListPage />} />
                         <Route path="/board/:boardId" element={<BoardDetailPage />} />
                         <Route path="/create-board" element={<CreateBoardPage />} />
+
+                        {/* 공지사항 라우트 */}
+                        <Route path="/notices" element={<NoticeListPage />} />
+                        <Route path="/notices/:id" element={<NoticeDetailPage />} />
+                        <Route path="/create-notice" element={<CreateNoticePage />} />
+                        <Route path="/edit-notice/:id" element={<CreateNoticePage />} />
                     </>
                 ) : (
                     <Route path="*" element={<Navigate to="/login" />} />

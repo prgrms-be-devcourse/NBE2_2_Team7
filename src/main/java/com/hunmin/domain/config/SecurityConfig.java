@@ -78,7 +78,10 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll() //게시글 작성 시 이미지
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll() //swagger
+                        .requestMatchers("/swagger-ui.html").permitAll() // 추가
+                        .requestMatchers("/api/notices/list/**").permitAll() // 추가
                         .anyRequest().authenticated())
+
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JWTFilter(jwtUtil, memberService), UsernamePasswordAuthenticationFilter.class);

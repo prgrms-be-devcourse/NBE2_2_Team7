@@ -12,9 +12,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 public class NoticeUpdateDTO {
+/*
+RequestDTO와 인스턴스가 같긴 한데 용도는 다르니 혹시몰라서 ..
+ */
 
-    private Long noticeId;
-    private Long memberId;
     @NotEmpty(message = "제목을 입력하세요")
     private String title;
     @NotEmpty(message = "내용을 입력하세요")
