@@ -47,11 +47,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             Map<String, String> requestMap = mapper.readValue(request.getInputStream(), Map.class);
             String email = requestMap.get("email");
             String password = requestMap.get("password");
-            log.info("========= " + email + " =========");
+            log.info("========= 이메일: " + email + " =========");
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
             return authenticationManager.authenticate(authToken);
         } catch (IOException e) {
-            throw new AuthenticationServiceException("Invalid request format");
+            throw new AuthenticationServiceException("잘못된 요청 폼");
         }
     }
 
@@ -85,6 +85,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) {
         response.setStatus(401);
-        log.info("===== UNSUCCESSFUL AUTHENTICATION =====");
+        log.info("===== 인증 실패 =====");
     }
 }
