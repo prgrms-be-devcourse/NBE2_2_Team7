@@ -73,7 +73,7 @@
 <div class="container" id="app" v-cloak>
     <div class="header d-flex justify-content-between align-items-center">
         <h3>채팅방 목록</h3>
-        <a class="btn btn-primary btn-sm" href="/logout">로그아웃</a>
+        <a class="btn btn-primary btn-sm">로그아웃</a>
     </div>
 
     <div class="input-group">
@@ -109,11 +109,13 @@
         el: '#app',
         data: {
             room_name: '',
-            chatrooms: []
+            chatrooms: [],
+            token:'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRvbTEwNDZAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcyNzkzNDU5NCwiZXhwIjoxNzI3OTM0OTU0fQ.t8MomgfpZWrV7vznwa6N7dIRBjHhZapACJd-492TvRY'
         },
         //페이지 시작시 실행 메서드
         created() {
             this.findAllRoom();
+            localStorage.setItem('wschat.token',this.token);
         },
         //모든 채팅방 목록 조회
         methods: {

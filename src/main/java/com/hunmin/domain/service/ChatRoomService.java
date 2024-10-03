@@ -55,22 +55,22 @@ public class ChatRoomService {
     }
 
     // 채팅방 유저수 조회
-    public long getUserCount(Long roomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(ChatRoomException.NOT_FOUND::get);
+    public long getUserCount(String roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(Long.parseLong(roomId)).orElseThrow(ChatRoomException.NOT_FOUND::get);
         return chatRoom.getUserCount();
     }
 
     // 채팅방에 입장한 유저수 +1
-    public long plusUserCount(Long roomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(ChatRoomException.NOT_FOUND::get);
+    public long plusUserCount(String roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(Long.parseLong(roomId)).orElseThrow(ChatRoomException.NOT_FOUND::get);
         chatRoom.setUserCount(chatRoom.getUserCount() + 1);
         chatRoomRepository.save(chatRoom);
         return chatRoom.getUserCount();
     }
 
     // 채팅방에 입장한 유저수 -1
-    public long minusUserCount(Long roomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(ChatRoomException.NOT_FOUND::get);
+    public long minusUserCount(String roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(Long.parseLong(roomId)).orElseThrow(ChatRoomException.NOT_FOUND::get);
         chatRoom.setUserCount(chatRoom.getUserCount() - 1);
         chatRoomRepository.save(chatRoom);
         if (chatRoom.getUserCount() < 1) {

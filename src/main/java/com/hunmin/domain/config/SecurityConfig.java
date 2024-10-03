@@ -75,7 +75,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/members/admin").hasRole("ADMIN")
                         .requestMatchers("/api/chat-room/**").permitAll()//나중에 삭제할것
                         .requestMatchers("/api/chat/**").permitAll()//나중에 삭제할것
-                        .requestMatchers("/api/chat/message").permitAll()//나중에 삭제할것
+                        .requestMatchers("/webjars/**", "/images/**", "/favicon.ico").permitAll()//웹 자원 경로 허용
+                        .requestMatchers("/ws-stomp/**").permitAll() //websocket 연결 허용
                         .requestMatchers("/api/notification/**").permitAll() //알림 실시간 반영 위한 수정
                         .requestMatchers("/api/board/uploadImage/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll() //게시글 작성 시 이미지

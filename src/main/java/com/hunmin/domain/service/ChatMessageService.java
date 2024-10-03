@@ -37,6 +37,15 @@ public class ChatMessageService {
     private final ChatRoomRepository chatRoomRepository;
     private final RedisSubscriber redisSubscriber;
 
+    //roomId 찾기
+    public String getRoomId(String destination) {
+        int lastIndex = destination.lastIndexOf('/');
+        if (lastIndex != -1)
+            return destination.substring(lastIndex + 1);
+        else
+            return "";
+    }
+
     // 채팅방에 메시지 발송
     public void sendChatMessage(ChatMessageDTO chatMessageDTO) {
         Member member = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(ChatRoomException.NOT_FOUND::get);
