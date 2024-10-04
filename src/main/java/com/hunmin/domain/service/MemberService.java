@@ -4,6 +4,7 @@ import com.hunmin.domain.dto.member.MemberDTO;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.MemberLevel;
 import com.hunmin.domain.entity.MemberRole;
+import com.hunmin.domain.jwt.JWTUtil;
 import com.hunmin.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,6 +29,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JWTUtil jwtUtil;
 
     // 이미지 업로드
     public String uploadImage(MultipartFile file) throws IOException {
@@ -110,9 +112,5 @@ public class MemberService {
         } else {
             throw new RuntimeException("회원 정보를 찾을 수 없습니다.");
         }
-    }
-
-    public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email);
     }
 }

@@ -85,8 +85,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String country = customUserDetails.getCountry();
 
         //토큰 생성
-        String access = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 600000L);
-        String refresh = jwtUtil.createJwt("refresh", email, MemberRole.valueOf(role), 86400000L);
+        String access = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 600000L); // 10분
+        String refresh = jwtUtil.createJwt("refresh", email, MemberRole.valueOf(role), 86400000L); // 24시간
         log.info("생성된 access 토큰: " + access);
         log.info("생성된 refresh 토큰: " + refresh);
 
@@ -122,7 +122,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // cookie.setSecure(true); // https 사용 시 적용
         // cookie.setPath("/"); // 쿠키 적용 범위
         cookie.setHttpOnly(true); // 자바스크립트로 쿠키에 접근 제한
-
         return cookie;
     }
 }
