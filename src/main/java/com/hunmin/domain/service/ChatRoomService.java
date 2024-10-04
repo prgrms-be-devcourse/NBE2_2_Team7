@@ -43,7 +43,6 @@ public class ChatRoomService {
         List<ChatRoom> partnerNameAndChatRoom = roomStorage.values(me.getNickname());
         log.info("partnerNameAndChatRoom={}", partnerNameAndChatRoom);
         List<ChatRoomDTO> chatRoomDTOList = new ArrayList<>();
-<<<<<<< HEAD
         for (Object rawChatRoom : partnerNameAndChatRoom) {
             ChatRoom chatRoom;
             if (rawChatRoom instanceof LinkedHashMap) {
@@ -51,10 +50,7 @@ public class ChatRoomService {
             } else {
                 chatRoom = (ChatRoom) rawChatRoom;
             }
-=======
-        List<ChatRoom> chatRoomList = chatRoomRepository.findAllOrderByLatestMessageDateDesc();
-        for (ChatRoom chatRoom : chatRoomList) {
->>>>>>> c5b8e6ea1014c53fc72b7ba0f17a72247ba8becf
+
             chatRoomDTOList.add(new ChatRoomDTO(chatRoom));
         }
 
