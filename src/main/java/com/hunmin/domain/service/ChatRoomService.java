@@ -39,7 +39,7 @@ public class ChatRoomService {
     // 모든 채팅방 조회
     public List<ChatRoomDTO> findAllRoom() {
         List<ChatRoomDTO> chatRoomDTOList = new ArrayList<>();
-        List<ChatRoom> chatRoomList = chatRoomRepository.findAll();
+        List<ChatRoom> chatRoomList = chatRoomRepository.findAllOrderByLatestMessageDateDesc();
         for (ChatRoom chatRoom : chatRoomList) {
             chatRoomDTOList.add(new ChatRoomDTO(chatRoom));
         }
