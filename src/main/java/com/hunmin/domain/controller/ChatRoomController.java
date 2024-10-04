@@ -2,15 +2,20 @@ package com.hunmin.domain.controller;
 
 import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
+import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.service.ChatRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 @RequiredArgsConstructor
 @Controller
@@ -18,7 +23,6 @@ import java.util.List;
 @RequestMapping("/api/chat-room")
 @Tag(name = "채팅목록", description = "채팅목록 CRUD")
 public class ChatRoomController {
-
 
     private final ChatRoomService chatRoomService;
     //채팅방 생성
@@ -28,31 +32,29 @@ public class ChatRoomController {
     }
 
     //채팅방 생성
-    @PostMapping("")
+    @PostMapping("/{nickName}/{currentMemberEmail}")
     @ResponseBody
     @Operation(summary = "채팅방 생성", description = "채팅방을 이름으로 생성하는 API")
-    public ChatMessageRequestDTO createRoomByNickName(@RequestParam("nickName") String nickName) {
-        return chatRoomService.createChatRoomByNickName(nickName);
+    public ChatMessageRequestDTO createRoomByNickName(@PathVariable("nickName") String nickName
+            ,@PathVariable("currentMemberEmail") String currentMemberEmail) {
+        log.info("nickName={}", nickName);
+        log.info("Email={}", currentMemberEmail);
+//        String currentMemberEmail = authentication.getName(); -> 토큰 처리 후 주석풀기
+        return chatRoomService.createChatRoomByNickName(nickName, currentMemberEmail);
     }
-    //모든 채팅방 목록 조회
+
+    //나랑 관련된 채팅방만 조회
     @GetMapping("/list")
     @ResponseBody
-    @Operation(summary = "채팅 목록 조회", description = "모든 채팅방 목록을 조회하는 API")
-    public List<ChatRoomDTO> rooms() {
-        return chatRoomService.findAllRoom();
+    public List<ChatRoomDTO> myRooms(@RequestParam("email") String email) {
+        log.info("email={}",email);
+//        String currentMemberEmail = authentication.getName(); -> 토큰 처리 후 주석풀기
+        return chatRoomService.findRoomByEmail(email);
     }
-//    //나랑 관련된 채팅방만 조회
-//    @GetMapping("/list")
-//    @ResponseBody
-//    public List<ChatRoomDTO> myRooms(Authentication authentication) {
-//        String currentMemberEmail = authentication.getName();
-//        log.info("current Email {}",currentMemberEmail);
-//        return chatRoomService.findRoomByEmail(currentMemberEmail);
-//    }
 
     //채팅방 안으로 입장
     @GetMapping("/enter/{chatRoomId}")
-    public String roomDetail(Model model, @PathVariable String chatRoomId) {
+    public String RoomEnter(Model model, @PathVariable String chatRoomId) {
         log.info("room/enter/chatRoomId:{}",chatRoomId);
         model.addAttribute("roomId", Long.valueOf(chatRoomId));
         return "message/roomdetail";
@@ -64,5 +66,11 @@ public class ChatRoomController {
     public ChatRoomDTO roomInfo(@PathVariable Long chatRoomId) {
         return chatRoomService.findRoomById(chatRoomId);
     }
-
+    //채팅방 삭제
+    @DeleteMapping("/{chatRoomId}")
+    @ResponseBody
+    @Operation(summary = "채팅방 삭제", description = "삭제하고 싶은 채팅방을 삭제하는 API")
+    public Boolean deleteRoom(@PathVariable Long chatRoomId) {
+        return chatRoomService.deleteChatRoom(chatRoomId);
+    }
 }

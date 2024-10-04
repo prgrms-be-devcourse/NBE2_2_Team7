@@ -37,15 +37,6 @@ public class ChatMessageService {
     private final ChatRoomRepository chatRoomRepository;
     private final RedisSubscriber redisSubscriber;
 
-    //roomId 찾기
-    public String getRoomId(String destination) {
-        int lastIndex = destination.lastIndexOf('/');
-        if (lastIndex != -1)
-            return destination.substring(lastIndex + 1);
-        else
-            return "";
-    }
-
     // 채팅방에 메시지 발송
     public void sendChatMessage(ChatMessageDTO chatMessageDTO) {
         Member member = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(ChatRoomException.NOT_FOUND::get);
@@ -67,6 +58,7 @@ public class ChatMessageService {
         redisSubscriber.sendMessage(chatMessageDTO);
         log.info("채팅방에서 메시지 발송 topic: {}", topic.getTopic());
     }
+
     //모든 채팅기록 조회
     public List<ChatMessageDTO> readAllMessages(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
@@ -85,22 +77,13 @@ public class ChatMessageService {
         Collections.reverse(chatLists);
         return chatLists;
     }
-    //채팅목록 페이징
-    public Page<ChatMessageListRequestDTO> getList(ChatMessagePageRequestDTO chatMessagePageRequestDTO, Long chatRoomId) { //목록
-        try {
-            Sort sort = Sort.by("createdAt").descending();
-            Pageable pageable = chatMessagePageRequestDTO.getPageable(sort);
-            return chatMessageRepository.chatMessageList(pageable, chatRoomId);
-        } catch (Exception e) {
-            log.error("쳇서비스 페이징 실패 ={}",e.getMessage());
-            throw ChatMessageException.NOT_FETCHED.get();
-        }
-    }
+
     //채팅 조회
     public ChatMessageDTO readChatMessage(Long chatMessageId) {
         return new ChatMessageDTO(chatMessageRepository.findById(chatMessageId)
                 .orElseThrow(ChatMessageException.NOT_FOUND::get));
     }
+
     //채팅 수정
     public ChatMessageDTO updateChatMessage(ChatMessageDTO chatMessageDTO) {
         ChatMessage foundChatMessage = chatMessageRepository.findById(chatMessageDTO.getChatMessageId())
@@ -109,11 +92,12 @@ public class ChatMessageService {
         foundChatMessage.setMessage(chatMessageDTO.getMessage());
         return new ChatMessageDTO(chatMessageRepository.save(foundChatMessage));
     }
+
     //채팅 삭제
     public Boolean deleteChatMessage(Long chatMessageId) {
-        ChatMessage chatMessage= chatMessageRepository.findById(chatMessageId)
+        ChatMessage chatMessage = chatMessageRepository.findById(chatMessageId)
                 .orElseThrow(ChatMessageException.NOT_FOUND::get);
-            chatMessageRepository.deleteById(chatMessageId);
-            return true;
+        chatMessageRepository.deleteById(chatMessageId);
+        return true;
     }
 }

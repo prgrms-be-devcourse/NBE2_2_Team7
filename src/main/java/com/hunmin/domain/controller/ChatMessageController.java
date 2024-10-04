@@ -52,20 +52,11 @@ public class ChatMessageController {
     public ResponseEntity<ChatMessageDTO> updateMessage(@RequestBody ChatMessageDTO message) {
         return ResponseEntity.ok(chatMessageService.updateChatMessage(message));
     }
+    //채팅삭제
     @DeleteMapping("/{chatMessageId}")
     @ResponseBody
     @Operation(summary = "채팅 삭제", description = "삭제하고 싶은 채팅을 삭제하는 API")
     public ResponseEntity<Boolean> deleteMessage(@PathVariable Long chatMessageId) {
         return ResponseEntity.ok(chatMessageService.deleteChatMessage(chatMessageId));
     }
-//     아직 미완성 페이징 기술
-//    @GetMapping("/messages/{chatRoomId}")
-//    @ResponseBody
-//    public ResponseEntity<Page<ChatMessageListRequestDTO>> loadMessageList(@PathVariable Long chatRoomId,
-//                                                                           @RequestParam(value = "page", defaultValue = "1") int page,
-//                                                                           @RequestParam(value = "size", defaultValue = "10") int size) {
-//        ChatMessagePageRequestDTO chatMessagePageRequestDTO = ChatMessagePageRequestDTO.builder().page(page).size(size).build();
-//        log.info("/loadMessageList {}", chatMessagePageRequestDTO.toString());
-//        return ResponseEntity.ok(chatMessageService.getList(chatMessagePageRequestDTO, chatRoomId));
-//    }
 }
