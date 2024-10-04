@@ -1,8 +1,6 @@
 package com.hunmin.domain.repository;
 
-import com.hunmin.domain.dto.notice.NoticeResponseDTO;
 import com.hunmin.domain.entity.Notice;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

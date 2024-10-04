@@ -2,7 +2,6 @@ package com.hunmin.domain.jwt;
 
 import com.hunmin.domain.entity.MemberRole;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

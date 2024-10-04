@@ -6,11 +6,10 @@ import com.hunmin.domain.dto.word.WordResponseDTO;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.entity.Word;
-import com.hunmin.domain.exception.WordException;
 import com.hunmin.domain.exception.WordCustomException;
+import com.hunmin.domain.exception.WordException;
 import com.hunmin.domain.repository.MemberRepository;
 import com.hunmin.domain.repository.WordRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -18,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/dist/css/bootstrap.min.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,6 +67,7 @@
             border-radius: 10px 10px 10px 0;
             padding: 10px;
         }
+
         .message-sender {
             font-size: 12px;
             color: gray;
@@ -94,10 +96,12 @@
             box-sizing: border-box;
             transition: border-color 0.3s ease;
         }
+
         .chat-input:focus {
             border-color: rgba(0, 0, 0, 0.4);
             outline: none;
         }
+
         .send-button {
             background-image: url('/images/pressicon.png');
             background-size: contain;
@@ -141,6 +145,10 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
+        .delete-button:hover {
+            color: darkred;
+        }
+
         .exit-button:hover {
             transform: scale(0.98);
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
@@ -165,13 +173,15 @@
     </div>
     <!-- 채팅 메시지 목록 /id나 이름으로 구분하여 채팅 표기가능-->
     <div class="chat-messages">
-        <div v-for="message in messages"
+        <div v-for="(message,index) in messages"
+             :key="message.chatMessageId"
              :class="{'message': true, 'user': message.memberId == roomName, 'partner': message.memberId != roomName}">
             <div class="message-sender">
-                <strong>{{ message.memberId==roomName ? '나':'상대방' }}</strong>
+                <strong>{{ message.memberId == roomName ? '나' : '상대방' }}</strong>
             </div>
             <div class="message-content">
                 {{ message.message }}
+                <button class="delete-button" @click="confirmDelete(index)">x</button>
             </div>
         </div>
     </div>
@@ -204,6 +214,7 @@
     var vm = new Vue({
         el: '#app',
         data: {
+            token: '',
             roomId: '',
             roomName: '',
             message: '',
@@ -211,14 +222,27 @@
             nickName: '',
             userCount: 0
         },
-        //페이지 시작시 실행 메서드 + 로컬 스레드 전역변수에 주입
         created() {
             this.roomId = localStorage.getItem('wschat.roomId');
             this.roomName = localStorage.getItem('wschat.memberId');
             this.nickName = localStorage.getItem('wschat.nickName');
+            this.token = localStorage.getItem('wschat.token');
             console.log('Room ID:', this.roomId);
             console.log('roomName:', this.roomName);
             var _this = this;
+
+            //socket 연결
+            ws.connect({"token": _this.token}, function (frame) {
+                ws.subscribe("/sub/chat/room/" + _this.roomId, function (message) {
+                    var recv = JSON.parse(message.body);
+                    console.log(' ws 연결성공 =', recv);
+                    _this.recvMessage(recv);
+                });
+            }, function (error) {
+                console.error('WebSocket Connection Error:', error);
+                alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
+                location.href = "/api/chat-room";
+            });
 
             // 이전 메시지 가져오기
             axios.get('/api/chat/messages/' + this.roomId).then(response => {
@@ -237,18 +261,6 @@
                 });
             }).catch(error => {
                 console.error('이전메세지 가져오기 에러:', error);
-            });
-            //socket 연결
-            ws.connect({}, function (frame) {
-                ws.subscribe("/sub/chat/room/" + _this.roomId, function (message) {
-                    var recv = JSON.parse(message.body);
-                    console.log(' ws 연결성공 =',recv);
-                    _this.recvMessage(recv);
-                });
-            }, function (error) {
-                console.error('WebSocket Connection Error:', error);
-                alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
-                location.href = "/chat/room";
             });
         },
         methods: {
@@ -282,6 +294,37 @@
                     const chatMessages = this.$el.querySelector('.chat-messages');
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 });
+            },
+            // 메시지 삭제 확인
+            confirmDelete(index) {
+                let message = this.messages[index];
+                if (message.memberId == this.roomName) { // 본인 메시지만 삭제 가능하도록 확인
+                    if (confirm('메시지를 삭제하시겠습니까?')) {
+                        this.deleteMessage(index);
+                    }
+                } else {
+                    alert('본인의 메시지만 삭제할 수 있습니다.');
+                }
+            },
+            deleteMessage(index) {
+                let message = this.messages[index];
+                var _this = this;
+                console.info('컨트롤러 들어가기전')
+                axios.delete('/api/chat/' + index)
+                    .then(response => {
+                        console.info('컨트롤러는 갔다옴')
+                        if (response.data) {
+                            _this.messages.splice(index, 1);
+                            console.log('메시지가 삭제되었습니다:', message.getChatMessageId);
+                        } else {
+                            console.error('서버가 메시지 삭제를 실패했습니다:', message.chatMessageId);
+                            alert('메시지 삭제에 실패하였습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('메세지 삭제에 실패하였습니다.');
+                        alert('메세지 삭제에 실패하였습니다.');
+                    })
             },
             //채팅방 나가기
             exitChat() {

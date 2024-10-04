@@ -1,9 +1,6 @@
 package com.hunmin.domain.controller.advice;
 
-import com.hunmin.domain.exception.BoardTaskException;
-import com.hunmin.domain.exception.CommentTaskException;
-import com.hunmin.domain.exception.NoticeTaskException;
-import com.hunmin.domain.exception.NotificationTaskException;
+import com.hunmin.domain.exception.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,6 +36,20 @@ public class APIControllerAdvice {
     //알림 예외 처리
     @ExceptionHandler(NotificationTaskException.class)
     public ResponseEntity<Map<String, String>> handleNotificationTaskException(NotificationTaskException e) {
+        Map<String, String> map = Map.of("error", e.getMessage());
+
+        return ResponseEntity.status(e.getCode()).body(map);
+    }
+    //채팅 예외 처리
+    @ExceptionHandler(ChatMessageTaskException.class)
+    public ResponseEntity<Map<String, String>> handleChatMessageTaskException(ChatMessageTaskException e) {
+        Map<String, String> map = Map.of("error", e.getMessage());
+
+        return ResponseEntity.status(e.getCode()).body(map);
+    }
+    //채팅룸 예외 처리
+    @ExceptionHandler(ChatRoomTaskException.class)
+    public ResponseEntity<Map<String, String>> handleChatRoomTaskException(ChatRoomTaskException e) {
         Map<String, String> map = Map.of("error", e.getMessage());
 
         return ResponseEntity.status(e.getCode()).body(map);

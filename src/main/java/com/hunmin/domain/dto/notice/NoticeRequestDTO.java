@@ -1,11 +1,8 @@
 package com.hunmin.domain.dto.notice;
 
-import com.hunmin.domain.entity.BaseTimeEntity;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.Notice;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
