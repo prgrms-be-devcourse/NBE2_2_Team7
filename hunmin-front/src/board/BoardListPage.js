@@ -22,6 +22,7 @@ import {
 const BoardListPage = () => {
     const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
     const nickname = localStorage.getItem('nickname'); // 로컬 스토리지에서 닉네임 가져오기
+    const profileImage = localStorage.getItem('image'); // 로컬 스토리지에서 프로필 이미지 가져오기
     const [boards, setBoards] = useState([]);
     const [filteredBoards, setFilteredBoards] = useState([]);
     const [page, setPage] = useState(1);
@@ -112,14 +113,34 @@ const BoardListPage = () => {
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     };
 
+    // 프로필 이미지가 유효한지 확인하는 함수
+    const isValidProfileImage = (image) => {
+        return image && !image.includes('null'); // 이미지가 존재하고 'null'이 포함되지 않은 경우
+    };
+
     return (
         <Container>
             <AppBar position="static">
                 <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    <IconButton edge="start" color="inherit" aria-label="logo">
-                        <FaUserCircle size={30} />
-                    </IconButton>
-                    <Typography variant="h6" style={{ marginLeft: '10px' }}>
+                    {/* 프로필 이미지가 있으면 이미지, 없으면 아이콘 표시 */}
+                    <Link to="/update-member" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        {isValidProfileImage(profileImage) ? (
+                            <img
+                                src={profileImage}
+                                alt="프로필"
+                                style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover',
+                                    border: '2px solid #fff', // 이미지에 테두리 추가 (선택적)
+                                }}
+                            />
+                        ) : (
+                            <FaUserCircle size={30} style={{ color: '#fff' }} /> // 프로필 아이콘 표시
+                        )}
+                    </Link>
+                    <Typography variant="h6" style={{ marginLeft: '20px' }}>
                         {nickname} {/* 로컬 스토리지에서 가져온 닉네임 표시 */}
                     </Typography>
                     <Button color="inherit" onClick={() => setShowMyBoards(!showMyBoards)} style={{ marginLeft: '10px' }}>
@@ -162,12 +183,10 @@ const BoardListPage = () => {
                                             }
                                         />
                                     </Grid>
-
-                                    {/* 썸네일 이미지가 있을 경우 오른쪽에 표시 */}
                                     {board.imageUrls && board.imageUrls.length > 0 ? (
                                         <Grid item xs={2}>
                                             <img
-                                                src={board.imageUrls[0]} // 첫 번째 이미지를 썸네일로 사용
+                                                src={board.imageUrls[0]}
                                                 alt={board.title}
                                                 style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
                                             />
