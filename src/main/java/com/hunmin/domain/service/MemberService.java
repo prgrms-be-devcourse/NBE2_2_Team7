@@ -2,6 +2,7 @@ package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.member.MemberDTO;
 import com.hunmin.domain.entity.Member;
+import com.hunmin.domain.entity.MemberLevel;
 import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,24 +29,54 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    // 이미지 업로드
+    public String uploadImage(MultipartFile file) throws IOException {
+        String uploadDir = Paths.get("uploads").toAbsolutePath().normalize().toString();
+        File directory = new File(uploadDir);
+
+        if (!directory.exists()) {
+            boolean created = directory.mkdirs();
+            if (!created) {
+                throw new IOException("Failed to create directory");
+            }
+        }
+
+        String fileName = UUID.randomUUID() + "." + getFileExtension(file.getOriginalFilename());
+        Path filePath = Paths.get(uploadDir, fileName);
+        Files.copy(file.getInputStream(), filePath);
+
+        return "/uploads/" + fileName;
+    }
+
+    // 파일 확장자 추출
+    private String getFileExtension(String fileName) {
+        if (fileName == null || !fileName.contains(".")) {
+            throw new IllegalArgumentException("Invalid file name: " + fileName);
+        }
+
+        return fileName.substring(fileName.lastIndexOf('.') + 1);
+    }
+
     // 회원 가입
     public void registerProcess(MemberDTO memberDTO) {
         String email = memberDTO.getEmail();
         String password = memberDTO.getPassword();
 
         boolean isExist = memberRepository.existsByEmail(email);
-
         if (isExist) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
+
+        MemberLevel selectedLevel = memberDTO.getLevel() != null ? memberDTO.getLevel() : MemberLevel.BEGINNER;
 
         Member member = Member.builder()
                 .email(email)
                 .password(bCryptPasswordEncoder.encode(password))
                 .nickname(memberDTO.getNickname())
                 .country(memberDTO.getCountry())
-                .level(memberDTO.getLevel())
                 .memberRole(MemberRole.USER)
+                .level(selectedLevel)
+                .image(memberDTO.getImage())
                 .build();
 
         memberRepository.save(member);
@@ -68,6 +100,10 @@ public class MemberService {
             }
             if (memberDTO.getLevel() != null) {
                 member.setLevel(memberDTO.getLevel());
+            }
+
+            if(memberDTO.getImage() != null) {
+                member.setImage(memberDTO.getImage());
             }
 
             memberRepository.save(member);

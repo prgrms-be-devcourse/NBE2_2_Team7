@@ -14,13 +14,14 @@ const Header = () => {
         if (message) {
             setPopupMessage(message);
             setShowPopup(true);
-            setTimeout(() => setShowPopup(false), 5000);  // 5초 후 팝업 자동 닫힘
+            setTimeout(() => setShowPopup(false), 5000);
         }
     };
 
     const fetchNotifications = async () => {
+        const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
         try {
-            const response = await api.get('/notification/2');
+            const response = await api.get(`/notification/${memberId}`); // memberId를 URL에 포함
             const validNotifications = response.data.filter(notification => notification.message);
             setNotifications(validNotifications);
         } catch (error) {
@@ -30,7 +31,8 @@ const Header = () => {
 
     useEffect(() => {
         fetchNotifications();
-        const eventSource = new EventSource('http://localhost:8080/api/notification/subscribe/2');
+        const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
+        const eventSource = new EventSource(`http://localhost:8080/api/notification/subscribe/${memberId}`); // memberId를 URL에 포함
 
         eventSource.onmessage = (event) => {
             const newNotification = JSON.parse(event.data);
@@ -51,7 +53,6 @@ const Header = () => {
     }, []);
 
     const toggleDropdown = () => {
-        // 드롭다운 열릴 때마다 최신 알림 상태를 불러옴
         if (!showDropdown) {
             fetchNotifications();
         }
@@ -84,12 +85,12 @@ const Header = () => {
                 <Grid container justifyContent="space-between" alignItems="center">
                     <Grid item>
                         <Link to="/" style={{ marginRight: '20px', textDecoration: 'none', color: 'white' }}>
-                            <Typography variant="h6" style={{ fontSize: '1.25rem' }}>훈민정음 2.0</Typography> {/* 홈 버튼 폰트 사이즈 */}
+                            <Typography variant="h6" style={{ fontSize: '1.25rem' }}>훈민정음 2.0</Typography>
                         </Link>
                     </Grid>
                     <Grid item>
                         <Link to="/notices" style={{ marginRight: '20px', textDecoration: 'none', color: 'white' }}>
-                            <Button color="inherit" style={{ fontSize: '1.25rem' }}>공지사항</Button> {/* 공지사항 버튼 폰트 사이즈 통일 */}
+                            <Button color="inherit" style={{ fontSize: '1.25rem' }}>공지사항</Button>
                         </Link>
                     </Grid>
                     <Grid item style={{ position: 'relative' }}>
@@ -155,13 +156,11 @@ const Header = () => {
                     top: '20px',
                     right: '50px',
                     backgroundColor: 'white',
+                    border: '1px solid black',
                     padding: '10px',
-                    borderRadius: '5px',
-                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-                    color: 'black',
-                    zIndex: 9999
+                    zIndex: 1000,
                 }}>
-                    <p>{popupMessage}</p>
+                    {popupMessage}
                 </div>
             )}
         </AppBar>

@@ -1,88 +1,182 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import {
+    TextField,
+    Button,
+    Container,
+    Typography,
+    Box,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // useNavigate 추가
+import api from '../axios'; // axios 인스턴스 import
+import axios from 'axios'; // 기본 axios import
 
-function UpdateMemberForm() {
+const levels = [
+    { label: "상", value: "ADVANCED" },
+    { label: "중", value: "INTERMEDIATE" },
+    { label: "하", value: "BEGINNER" }
+];
+
+const UpdateMemberForm = () => {
     const [memberId, setMemberId] = useState('');
-    const [member, setMember] = useState({
-        password: '',
-        nickname: '',
-        country: '',
-        level: '',
-        image: ''
-    });
+    const [nickname, setNickname] = useState('');
+    const [level, setLevel] = useState('');
+    const [image, setImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [error, setError] = useState('');
+    const navigate = useNavigate(); // navigate 훅 사용
 
-    const handleIdChange = (e) => {
-        setMemberId(e.target.value);
+    useEffect(() => {
+        const storedEmail = localStorage.getItem('email');
+        const storedNickname = localStorage.getItem('nickname');
+        const storedLevel = localStorage.getItem('level');
+        const storedMemberId = localStorage.getItem('memberId');
+        const storedCountry = localStorage.getItem('country');
+
+        if (storedEmail) {
+            setMemberId(storedMemberId);
+        }
+        if (storedNickname) {
+            setNickname(storedNickname);
+        }
+        if (storedLevel) {
+            setLevel(storedLevel);
+        }
+        const storedImage = localStorage.getItem('image');
+        if (storedImage) {
+            setImagePreview(storedImage);
+        }
+    }, []);
+
+    const handleNicknameChange = (e) => {
+        setNickname(e.target.value);
     };
 
-    const handleChange = (e) => {
-        setMember({
-            ...member,
-            [e.target.name]: e.target.value,
-        });
+    const handleLevelChange = (e) => {
+        setLevel(e.target.value);
     };
 
     const handleFileChange = (e) => {
-        setMember({
-            ...member,
-            image: e.target.files[0],
-        });
+        const file = e.target.files[0];
+        if (file) {
+            setImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 이미지 파일을 포함하여 폼 데이터를 생성합니다.
-        const formData = new FormData();
-        if (member.password) formData.append('password', member.password);
-        if (member.nickname) formData.append('nickname', member.nickname);
-        if (member.country) formData.append('country', member.country);
-        if (member.level) formData.append('level', member.level);
-        if (member.image) {
-            formData.append('image', member.image);
+        const updatedData = {};
+
+        const storedNickname = localStorage.getItem('nickname');
+        const storedLevel = localStorage.getItem('level');
+
+        if (nickname && nickname !== storedNickname) {
+            updatedData.nickname = nickname;
         }
 
-        axios.put(`/api/members/${memberId}`, formData)
-            .then(response => {
-                alert('회원정보가 수정되었습니다.');
-            })
-            .catch(error => {
-                console.error(error);
-                alert('회원정보 수정에 실패했습니다.');
-            });
+        if (level && level !== storedLevel) {
+            updatedData.level = level;
+        }
 
+        let imageUrl = null;
+
+        if (image) {
+            const imageData = new FormData();
+            imageData.append('image', image);
+            const imageResponse = await axios.post('http://localhost:8080/uploads', imageData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            imageUrl = imageResponse.data;
+            updatedData.image = imageUrl;
+        }
+
+        if (Object.keys(updatedData).length > 0) {
+            try {
+                await api.put(`/members/${memberId}`, {
+                    ...updatedData,
+                });
+                alert('회원정보가 수정되었습니다. 다시 로그인 해주세요.'); // 메시지 추가
+                navigate('/login'); // 로그인 페이지로 리다이렉트
+            } catch (error) {
+                console.error(error);
+                setError('회원정보 수정에 실패했습니다.');
+            }
+        } else {
+            alert('변경된 정보가 없습니다.');
+        }
     };
 
+    const storedEmail = localStorage.getItem('email');
+    const storedCountry = localStorage.getItem('country');
+
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>회원정보 수정</h2>
-            <div>
-                <label>회원 ID:</label>
-                <input type="text" value={memberId} onChange={handleIdChange} required />
-            </div>
-            <div>
-                <label>비밀번호:</label>
-                <input type="password" name="password" value={member.password} onChange={handleChange} />
-            </div>
-            <div>
-                <label>닉네임:</label>
-                <input type="text" name="nickname" value={member.nickname} onChange={handleChange} />
-            </div>
-            <div>
-                <label>국가:</label>
-                <input type="text" name="country" value={member.country} onChange={handleChange} />
-            </div>
-            <div>
-                <label>레벨:</label>
-                <input type="text" name="level" value={member.level} onChange={handleChange} />
-            </div>
-            <div>
-                <label>프로필 이미지:</label>
-                <input type="file" name="image" onChange={handleFileChange} accept="image/*" />
-            </div>
-            <button type="submit">수정하기</button>
-        </form>
+        <Container maxWidth="xs">
+            <Box sx={{ mt: 8 }}>
+                <Typography variant="body1" color="textSecondary">
+                    이메일: {storedEmail}
+                </Typography>
+                <Typography variant="body1" color="textSecondary">
+                    국적: {storedCountry}
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        label="닉네임"
+                        fullWidth
+                        margin="normal"
+                        value={nickname}
+                        onChange={handleNicknameChange}
+                    />
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel>한국어 레벨</InputLabel>
+                        <Select
+                            value={level}
+                            onChange={handleLevelChange}
+                        >
+                            {levels.map((levelObj, index) => (
+                                <MenuItem key={index} value={levelObj.value}>{levelObj.label}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <Button
+                        variant="contained"
+                        component="label"
+                        fullWidth
+                        sx={{ mt: 2 }}
+                    >
+                        프로필 이미지 업로드
+                        <input
+                            type="file"
+                            hidden
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+                    </Button>
+
+                    {imagePreview && (
+                        <Box mt={2} sx={{ textAlign: 'center' }}>
+                            <img src={imagePreview} alt="프로필 미리보기" style={{ width: '100%', maxHeight: '300px', objectFit: 'cover' }} />
+                        </Box>
+                    )}
+
+                    {error && <Typography color="error">{error}</Typography>}
+                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+                        수정하기
+                    </Button>
+                </form>
+            </Box>
+        </Container>
     );
-}
+};
 
 export default UpdateMemberForm;

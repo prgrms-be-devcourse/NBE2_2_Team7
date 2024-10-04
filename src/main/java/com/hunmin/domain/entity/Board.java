@@ -26,7 +26,7 @@ public class Board extends BaseTimeEntity {
     @Column(nullable = false)
     private String nickname;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     private String location;
@@ -36,6 +36,8 @@ public class Board extends BaseTimeEntity {
     private Double longitude;
 
     @ElementCollection
+    @CollectionTable(name = "board_image_urls", joinColumns = @JoinColumn(name = "board_id"))
+    @Column(name = "image_urls", columnDefinition = "TEXT", nullable = false)
     private List<String> imageUrls;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

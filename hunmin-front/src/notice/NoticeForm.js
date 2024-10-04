@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const NoticeForm = () => {
@@ -9,12 +10,16 @@ const NoticeForm = () => {
 
     useEffect(() => {
         if (id) {
-            axios.get(`/api/notices/${id}`)
+            api.get(`/notices/${id}`)
                 .then(response => {
                     setNotice(response.data);
                 })
                 .catch(error => {
-                    console.error("There was an error fetching the notice!", error);
+                    if (error.response && error.response.data) {
+                        alert(`Error: ${error.response.data.error}`);
+                    } else {
+                        alert("There was an error fetching the notice!");
+                    }
                 });
         }
     }, [id]);
@@ -31,20 +36,28 @@ const NoticeForm = () => {
         e.preventDefault();
 
         if (id) {
-            axios.put(`/api/notices/${id}`, notice)
+            api.put(`/notices/${id}`, notice)
                 .then(response => {
                     navigate(`/notices/${id}`);
                 })
                 .catch(error => {
-                    console.error("There was an error updating the notice!", error);
+                    if (error.response && error.response.data) {
+                        alert(`Error: ${error.response.data.error}`);
+                    } else {
+                        alert("There was an error updating the notice!");
+                    }
                 });
         } else {
-            axios.post('/api/notices', notice)
+            api.post('/notices', notice)
                 .then(response => {
                     navigate(`/notices/${response.data.noticeId}`);
                 })
                 .catch(error => {
-                    console.error("There was an error creating the notice!", error);
+                    if (error.response && error.response.data) {
+                        alert(`Error: ${error.response.data.error}`);
+                    } else {
+                        alert("There was an error creating the notice!");
+                    }
                 });
         }
     };

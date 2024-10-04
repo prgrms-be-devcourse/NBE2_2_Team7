@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../axios';
 import { useParams, Link } from 'react-router-dom';
 
 const NoticeDetail = () => {
@@ -7,7 +8,8 @@ const NoticeDetail = () => {
     const [notice, setNotice] = useState(null);
 
     useEffect(() => {
-        axios.get(`/api/notices/${id}`)
+        //axios.get(`/api/notices/${id}`)
+        api.get(`/notices/${id}`)
             .then(response => {
                 setNotice(response.data);
             })

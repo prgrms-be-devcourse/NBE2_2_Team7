@@ -11,6 +11,6 @@ import lombok.Setter;
 public class NoticeDeleteDTO {
 
     private Long noticeId;
-    private Long memberId;
+
 
 }
