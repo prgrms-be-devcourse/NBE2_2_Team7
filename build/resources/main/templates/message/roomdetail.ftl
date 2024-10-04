@@ -7,6 +7,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/dist/css/bootstrap.min.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -206,6 +207,7 @@
     var vm = new Vue({
         el: '#app',
         data: {
+            token:'',
             roomId: '',
             roomName: '',
             message: '',
@@ -218,9 +220,23 @@
             this.roomId = localStorage.getItem('wschat.roomId');
             this.roomName = localStorage.getItem('wschat.memberId');
             this.nickName = localStorage.getItem('wschat.nickName');
+            this.token = localStorage.getItem('wschat.token');
             console.log('Room ID:', this.roomId);
             console.log('roomName:', this.roomName);
             var _this = this;
+
+            //socket 연결
+            ws.connect({"token":_this.token}, function (frame) {
+                ws.subscribe("/sub/chat/room/" + _this.roomId, function (message) {
+                    var recv = JSON.parse(message.body);
+                    console.log(' ws 연결성공 =',recv);
+                    _this.recvMessage(recv);
+                });
+            }, function (error) {
+                console.error('WebSocket Connection Error:', error);
+                alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
+                location.href = "/api/chat-room";
+            });
 
             // 이전 메시지 가져오기
             axios.get('/api/chat/messages/' + this.roomId).then(response => {
@@ -239,18 +255,6 @@
                 });
             }).catch(error => {
                 console.error('이전메세지 가져오기 에러:', error);
-            });
-            //socket 연결
-            ws.connect({}, function (frame) {
-                ws.subscribe("/sub/chat/room/" + _this.roomId, function (message) {
-                    var recv = JSON.parse(message.body);
-                    console.log(' ws 연결성공 =',recv);
-                    _this.recvMessage(recv);
-                });
-            }, function (error) {
-                console.error('WebSocket Connection Error:', error);
-                alert("서버 연결에 실패 하였습니다. 다시 접속해 주십시요.");
-                location.href = "/chat/room";
             });
         },
         methods: {

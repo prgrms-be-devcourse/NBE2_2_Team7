@@ -2,7 +2,6 @@ package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.chat.ChatMessageDTO;
 import com.hunmin.domain.dto.chat.ChatMessageListRequestDTO;
-import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.MessageType;
 import com.hunmin.domain.dto.page.ChatMessagePageRequestDTO;
 import com.hunmin.domain.entity.ChatMessage;
@@ -38,7 +37,7 @@ public class ChatMessageService {
     private final ChatRoomRepository chatRoomRepository;
     private final RedisSubscriber redisSubscriber;
 
-    // destination 정보에서 roomId 추출
+    //roomId 찾기
     public String getRoomId(String destination) {
         int lastIndex = destination.lastIndexOf('/');
         if (lastIndex != -1)

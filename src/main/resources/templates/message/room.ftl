@@ -4,8 +4,6 @@
     <title>Websocket Chat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/webjars/bootstrap/4.3.1/dist/css/bootstrap.min.css">
     <style>
         body {
@@ -18,7 +16,6 @@
             align-items: flex-start;
             min-height: 100vh;
         }
-
         #app {
             width: 100%;
             max-width: 800px;
@@ -95,7 +92,7 @@
 <div class="container" id="app" v-cloak>
     <div class="header d-flex justify-content-between align-items-center">
         <h3>채팅방 목록</h3>
-        <a class="btn btn-primary btn-sm" href="/logout">로그아웃</a>
+        <a class="btn btn-primary btn-sm">로그아웃</a>
     </div>
 
     <div class="input-group">
@@ -138,11 +135,13 @@
             chatrooms: [],
             selectedRoomId: null,  // 추가된 부분
             contextMenuVisible: false,  // 추가된 부분
-            contextMenuPosition: { x: 0, y: 0 }  // 추가된 부분
+            contextMenuPosition: { x: 0, y: 0 },  // 추가된 부분
+            token:'eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImRvbTEwNDZAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcyNzkzNDU5NCwiZXhwIjoxNzI3OTM0OTU0fQ.t8MomgfpZWrV7vznwa6N7dIRBjHhZapACJd-492TvRY'
         },
         //페이지 시작시 실행 메서드
         created() {
             this.findAllRoom();
+            localStorage.setItem('wschat.token',this.token);
             document.addEventListener('click', this.hideContextMenu);  // 추가된 부분
         },
         //모든 채팅방 목록 조회
