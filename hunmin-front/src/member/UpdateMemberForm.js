@@ -92,13 +92,14 @@ const UpdateMemberForm = () => {
         if (image) {
             const imageData = new FormData();
             imageData.append('image', image);
-            const imageResponse = await axios.post('http://localhost:8080/uploads', imageData, {
+            const imageResponse = await axios.post('http://localhost:8080/api/members/uploads', imageData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
             imageUrl = imageResponse.data;
             updatedData.image = imageUrl;
+            console.log(imageUrl);
         }
 
         if (Object.keys(updatedData).length > 0) {
