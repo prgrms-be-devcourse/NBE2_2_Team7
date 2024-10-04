@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>단어 학습</title>
+  <link rel="stylesheet" href="styles.css"> <!-- CSS 파일 링크 -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 20px 10px;
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: relative; /* 버튼의 위치를 절대적으로 지정할 수 있도록 설정 */
+    }
+
+    h1 {
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #007bff; /* 제목 색상 */
+    }
+
+    .word-list {
+      margin-top: 20px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      transition: background-color 0.3s ease;
+    }
+
+    li:hover {
+      background-color: #f1f1f1; /* 마우스 오버 시 배경색 변화 */
+    }
+
+    .translation,
+    .definition {
+      display: none; /* 초기 상태에서 숨김 */
+    }
+
+    a {
+      text-decoration: none;
+      color: #007bff;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+
+    .timer {
+      font-size: 24px;
+      text-align: center;
+      margin: 20px 0;
+      color: #007bff; /* 기본 타이머 색상 */
+    }
+
+    .home-button {
+      position: absolute; /* 절대 위치 지정 */
+      top: 10px; /* 상단에서 10px */
+      right: 10px; /* 오른쪽에서 10px */
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .home-button:hover {
+      background-color: #0056b3; /* 마우스 오버 시 배경색 변화 */
+    }
+
+    .retry-button {
+      display: none; /* 기본적으로 숨김 처리 */
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin: 20px auto; /* 여백 추가 및 가운데 정렬 */
+    }
+
+    .retry-button:hover {
+      background-color: #0056b3; /* 마우스 오버 시 배경색 변화 */
+    }
+
+    .end-message {
+      font-size: 24px;
+      text-align: center;
+      color: #007bff; /* 종료 메시지 색상 */
+      margin-top: 20px; /* 여백 추가 */
+      display: none; /* 기본적으로 숨김 처리 */
+    }
+  </style>
+  <script>
+    // 페이지 로드 후 단어 표시를 제어하는 함수
+    window.onload = function() {
+      const wordItems = document.querySelectorAll('.word-item');
+      const displayTime = parseInt(document.getElementById('displayTime').innerText); // 설정된 표시 시간 가져오기
+
+      // 타이머 표시
+      const timerDisplay = document.getElementById('timerDisplay');
+      const retryButton = document.getElementById('retryButton'); // 다시하기 버튼 가져오기
+      const endMessage = document.getElementById('endMessage'); // 종료 메시지 가져오기
+      let timeLeft = displayTime / 1000; // milliseconds to seconds
+
+      // 초기 타이머 설정
+      timerDisplay.innerText = `${timeLeft}`; // 시작할 때는 displayTime에 해당하는 초로 설정
+
+      const countdown = setInterval(() => {
+        if (timeLeft <= 1) { // 1초 남았을 때
+          timerDisplay.innerText = ""; // 타이머 표시를 비우기
+          endMessage.innerText = "시간이 종료되었습니다!"; // 종료 메시지 설정
+          endMessage.style.display = 'block'; // 종료 메시지 표시
+          retryButton.style.display = 'block'; // 다시하기 버튼 표시
+          clearInterval(countdown);
+          // 번역과 정의 표시
+          wordItems.forEach(item => {
+            const translation = item.querySelector('.translation');
+            const definition = item.querySelector('.definition');
+            translation.style.display = 'inline'; // 번역 표시
+            definition.style.display = 'block'; // 정의 표시
+          });
+        } else {
+          // 11초 이상일 때 파란색, 10초 이하일 때 빨간색
+          timerDisplay.style.color = (timeLeft <= 11) ? 'red' : '#007bff';
+          timerDisplay.innerText = `${timeLeft - 1}`; // 남은 시간 표시
+        }
+        timeLeft -= 1;
+      }, 1000); // 1초마다 실행
+    };
+  </script>
+</head>
+<body>
+<div class="banner">단어 학습</div>
+<div class="container">
+  <h1>단어 학습</h1>
+
+  <!-- 홈으로 돌아가기 버튼 -->
+  <a href="/words" class="home-button">홈으로 돌아가기</a>
+
+  <!-- 타이머 표시 -->
+  <div class="timer" id="timerDisplay">남은 시간: 0초</div>
+
+  <!-- 종료 메시지와 다시하기 버튼 -->
+  <div class="end-message" id="endMessage"></div>
+  <button id="retryButton" class="retry-button" onclick="window.location.reload();">다시하기</button>
+
+  <!-- 표시 시간 표시 (숨김 처리) -->
+  <h2 style="display: none;">설정된 표시 시간: <span id="displayTime" th:text="${displayTime}"></span>ms</h2>
+
+  <!-- 선택된 언어 표시 (숨김 처리) -->
+  <h2 style="display: none;">선택된 언어: <span th:text="${lang}"></span></h2>
+
+  <!-- 선택된 레벨 표시 (숨김 처리) -->
+  <h2 style="display: none;">선택된 레벨: <span th:text="${level}"></span></h2>
+
+  <!-- 가져온 단어 수 표시 (숨김 처리) -->
+  <h2 style="display: none;">가져온 단어 수: <span th:text="${#lists.size(words)}"></span></h2>
+
+  <!-- 단어 목록 표시 -->
+  <div class="word-list">
+    <ul>
+      <li th:each="word : ${words}" class="word-item">
+        <strong th:text="${word.displayWord}"></strong> -
+        <span class="translation" th:text="${word.displayTranslation}"></span>
+        <p class="definition" th:text="${word.definition}"></p>
+      </li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

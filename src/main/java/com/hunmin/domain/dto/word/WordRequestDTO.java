@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WordRequestDTO {
 
-    @NotNull
     private Long wordId;
 
     @NotNull
@@ -20,8 +19,11 @@ public class WordRequestDTO {
     @NotEmpty(message = "명칭은 필수 입력값입니다.")
     private String title;
 
-    @NotEmpty(message = "내용은 필수 입력값입니다.")
-    private String description;
+    @NotEmpty(message = "번역은 필수 입력값입니다.")
+    private String translation;
+
+    @NotEmpty(message = "정의는 필수 입력값입니다.")
+    private String definition;
 
     @NotEmpty(message = "언어는 필수 입력값입니다.")
     private String lang;
@@ -30,7 +32,8 @@ public class WordRequestDTO {
         return Word.builder()
                 .wordId(wordId)
                 .title(title)
-                .description(description)
+                .translation(translation)
+                .definition(definition)
                 .lang(lang)
                 .build();
     }
