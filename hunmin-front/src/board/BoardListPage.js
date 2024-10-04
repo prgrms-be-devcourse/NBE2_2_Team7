@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../axios';
 import Map from './map/KakaoMap'; // Map 컴포넌트 임포트
 import { FaUserCircle } from 'react-icons/fa'; // 프로필 아이콘 임포트
@@ -20,24 +20,25 @@ import {
 } from '@mui/material';
 
 const BoardListPage = () => {
-    const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
-    const nickname = localStorage.getItem('nickname'); // 로컬 스토리지에서 닉네임 가져오기
-    const profileImage = localStorage.getItem('image'); // 로컬 스토리지에서 프로필 이미지 가져오기
+    const navigate = useNavigate(); // navigate 함수 추가
+    const memberId = localStorage.getItem('memberId');
+    const nickname = localStorage.getItem('nickname');
+    const profileImage = localStorage.getItem('image');
     const [boards, setBoards] = useState([]);
     const [filteredBoards, setFilteredBoards] = useState([]);
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
-    const [totalPages, setTotalPages] = useState(0); // 전체 페이지 수 상태 추가
+    const [totalPages, setTotalPages] = useState(0);
     const [searchLocation, setSearchLocation] = useState('');
-    const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 }); // 초기 지도 중심 설정
-    const [mapLevel, setMapLevel] = useState(9); // 지도 레벨 상태 추가
-    const [showMyBoards, setShowMyBoards] = useState(false); // 내 작성글 보기 상태
+    const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 });
+    const [mapLevel, setMapLevel] = useState(9);
+    const [showMyBoards, setShowMyBoards] = useState(false);
 
     useEffect(() => {
         if (showMyBoards) {
-            fetchMyBoards(); // 내 게시글 목록 가져오기
+            fetchMyBoards();
         } else {
-            fetchBoards(); // 전체 게시글 목록 가져오기
+            fetchBoards();
         }
     }, [page, size, showMyBoards]);
 
@@ -51,7 +52,7 @@ const BoardListPage = () => {
                 params: { page, size },
             });
             setBoards(response.data.content);
-            setTotalPages(response.data.totalPages); // 전체 페이지 수 설정
+            setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error('Error fetching boards:', error);
         }
@@ -63,7 +64,7 @@ const BoardListPage = () => {
                 params: { page, size },
             });
             setBoards(response.data.content);
-            setTotalPages(response.data.totalPages); // 전체 페이지 수 설정
+            setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error('Error fetching my boards:', error);
         }
@@ -85,10 +86,10 @@ const BoardListPage = () => {
 
                 setFilteredBoards(nearbyBoards);
                 setMapCenter(center);
-                setMapLevel(5); // 검색 후 지도 확대
+                setMapLevel(5);
             } else {
                 setFilteredBoards([]);
-                setMapLevel(9); // 초기 레벨로 설정
+                setMapLevel(9);
             }
         });
     };
@@ -113,16 +114,33 @@ const BoardListPage = () => {
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     };
 
-    // 프로필 이미지가 유효한지 확인하는 함수
     const isValidProfileImage = (image) => {
-        return image && !image.includes('null'); // 이미지가 존재하고 'null'이 포함되지 않은 경우
+        return image && !image.includes('null');
     };
+
+    // 로그아웃 처리 함수
+    const handleLogout = async () => {
+        try {
+            // 현재 쿠키 상태 로그
+            console.log('Current cookies:', document.cookie);
+
+            // 로그아웃 요청
+            const response = await api.post('/members/logout', {}, { withCredentials: true });
+            console.log('Logout response:', response); // 응답 확인
+
+            // 로컬 스토리지 초기화
+            localStorage.clear();
+            // 로그인 페이지로 이동
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed:', error); // 오류 출력
+        }
+    }
 
     return (
         <Container>
             <AppBar position="static">
                 <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    {/* 프로필 이미지가 있으면 이미지, 없으면 아이콘 표시 */}
                     <Link to="/update-member" style={{ textDecoration: 'none', color: 'inherit' }}>
                         {isValidProfileImage(profileImage) ? (
                             <img
@@ -133,18 +151,18 @@ const BoardListPage = () => {
                                     height: '40px',
                                     borderRadius: '50%',
                                     objectFit: 'cover',
-                                    border: '2px solid #fff', // 이미지에 테두리 추가 (선택적)
+                                    border: '2px solid #fff',
                                 }}
                             />
                         ) : (
-                            <FaUserCircle size={30} style={{ color: '#fff' }} /> // 프로필 아이콘 표시
+                            <FaUserCircle size={30} style={{ color: '#fff' }} />
                         )}
                     </Link>
                     <Typography variant="h6" style={{ marginLeft: '20px' }}>
-                        {nickname} {/* 로컬 스토리지에서 가져온 닉네임 표시 */}
+                        {nickname}
                     </Typography>
-                    <Button color="inherit" onClick={() => setShowMyBoards(!showMyBoards)} style={{ marginLeft: '10px' }}>
-                        {showMyBoards ? '전체 글 보기' : '내 글 보기'}
+                    <Button color="inherit" onClick={handleLogout} style={{ marginLeft: '10px' }}>
+                        로그아웃
                     </Button>
                 </Toolbar>
             </AppBar>
@@ -154,6 +172,14 @@ const BoardListPage = () => {
                 <Link to="/create-board">
                     <Button variant="contained" color="primary">게시글 작성</Button>
                 </Link>
+                <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={() => setShowMyBoards(!showMyBoards)}
+                    style={{ marginLeft: '10px' }}
+                >
+                    {showMyBoards ? '전체 글 보기' : '내 글 보기'}
+                </Button>
             </Box>
 
             <Grid container spacing={2} mt={2}>

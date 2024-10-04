@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Cookies from 'js-cookie'; // js-cookie import
 
-const LoginForm = ({ setToken }) => { // setToken을 props로 받기
+const LoginForm = ({ setToken }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -15,8 +16,10 @@ const LoginForm = ({ setToken }) => { // setToken을 props로 받기
             const response = await axios.post('http://localhost:8080/api/members/login', { email, password }, {
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                withCredentials: true // 쿠키 전송 허용
             });
+
             console.log(response.data);
             const token = response.data.token;
             const memberId = response.data.memberId;
@@ -26,7 +29,9 @@ const LoginForm = ({ setToken }) => { // setToken을 props로 받기
             const image = response.data.image;
             const level = response.data.level;
             const country = response.data.country;
+            const refreshToken = response.data.refreshToken; // refreshToken 추가
 
+            // localStorage에 데이터 저장
             localStorage.setItem('token', token);
             localStorage.setItem('memberId', memberId);
             localStorage.setItem('email', memberEmail);
@@ -35,6 +40,12 @@ const LoginForm = ({ setToken }) => { // setToken을 props로 받기
             localStorage.setItem('image', image);
             localStorage.setItem('level', level);
             localStorage.setItem('country', country);
+
+            // 쿠키 설정
+            Cookies.set('refresh', refreshToken, {
+                expires: 1, // 1일 동안 유지
+                path: '/' // 경로 설정
+            });
 
             setToken(token); // 상태 업데이트
             navigate('/');
