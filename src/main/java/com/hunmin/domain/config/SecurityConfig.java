@@ -83,7 +83,8 @@ public class SecurityConfig {
                         .requestMatchers("/ws-stomp/**").permitAll() //websocket 연결 허용
                         .requestMatchers("/api/notification/**").permitAll() //알림 실시간 반영 위한 수정
                         .requestMatchers("/api/board/uploadImage/**").permitAll() //게시글 작성 이미지
-                        .requestMatchers("/uploads/**").permitAll() //프로필 이미지
+                        .requestMatchers("uploads/**").permitAll()
+                        .requestMatchers("api/members/uploads/**").permitAll() //프로필 이미지
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll() //swagger
                         .requestMatchers("/swagger-ui.html").permitAll() // 추가

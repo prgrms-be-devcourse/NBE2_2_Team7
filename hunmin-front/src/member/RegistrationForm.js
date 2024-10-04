@@ -49,7 +49,7 @@ const RegistrationForm = () => {
             if (image) {
                 const imageData = new FormData();
                 imageData.append('image', image);
-                const imageResponse = await axios.post('http://localhost:8080/uploads', imageData, {
+                const imageResponse = await axios.post('http://localhost:8080/api/members/uploads', imageData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
