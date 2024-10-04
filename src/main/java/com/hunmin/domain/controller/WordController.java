@@ -3,16 +3,8 @@ package com.hunmin.domain.controller;
 import com.hunmin.domain.dto.page.WordPageRequestDTO;
 import com.hunmin.domain.dto.word.WordRequestDTO;
 import com.hunmin.domain.dto.word.WordResponseDTO;
-import com.hunmin.domain.entity.Word;
-import com.hunmin.domain.exception.WordCustomException;
-import com.hunmin.domain.exception.WordException;
 import com.hunmin.domain.repository.WordRepository;
 import com.hunmin.domain.service.WordService;
-<<<<<<< HEAD
-=======
-import com.hunmin.domain.service.WordViewService;
-import java.util.Map;
->>>>>>> da13000e07de0fcea286b2011d11b9cd95be832d
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

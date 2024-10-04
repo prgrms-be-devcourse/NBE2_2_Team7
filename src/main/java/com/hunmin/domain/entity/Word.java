@@ -1,13 +1,10 @@
 package com.hunmin.domain.entity;
 
-<<<<<<< HEAD
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-=======
 import jakarta.persistence.*;
->>>>>>> da13000e07de0fcea286b2011d11b9cd95be832d
 import lombok.*;
 
 @Entity

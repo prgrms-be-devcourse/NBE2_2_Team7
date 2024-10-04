@@ -77,16 +77,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/members/login").permitAll()
                         .requestMatchers("/api/members/reissue").permitAll()
                         .requestMatchers("/api/members/admin").hasRole("ADMIN")
-<<<<<<< HEAD
                         .requestMatchers("/api/chat-room/**").permitAll()//나중에 삭제할것
+                        .requestMatchers("/api/chat/**").permitAll()//나중에 삭제할것
                         .requestMatchers("/webjars/**", "/images/**", "/favicon.ico").permitAll()//웹 자원 경로 허용
                         .requestMatchers("/ws-stomp/**").permitAll() //websocket 연결 허용
-=======
-                        .requestMatchers("/api/chat-room/**").permitAll()
-                        .requestMatchers("/api/chat/**").permitAll()
-                        .requestMatchers("/webjars/**", "/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/ws-stomp/**").permitAll()
->>>>>>> da13000e07de0fcea286b2011d11b9cd95be832d
                         .requestMatchers("/api/notification/**").permitAll() //알림 실시간 반영 위한 수정
                         .requestMatchers("/api/board/uploadImage/**").permitAll() //게시글 작성 이미지
                         .requestMatchers("/uploads/**").permitAll() //프로필 이미지
