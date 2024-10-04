@@ -1,9 +1,7 @@
 package com.hunmin.domain.dto.notice;
 
-import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.Notice;
 import lombok.Getter;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 

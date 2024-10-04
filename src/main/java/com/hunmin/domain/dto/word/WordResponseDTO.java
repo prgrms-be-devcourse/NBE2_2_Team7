@@ -1,9 +1,10 @@
 package com.hunmin.domain.dto.word;
 
 import com.hunmin.domain.entity.Word;
-import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor

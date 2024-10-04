@@ -23,7 +23,7 @@ public class ChatRoom extends BaseTimeEntity{
     @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY) // @JoinColumn 제거
     private List<ChatMessage> chatMessage;
 
-    private long userCount;
+    private long userCount=1;
 
     public void add(ChatMessage chatMessage){
         this.chatMessage.add(chatMessage);

@@ -9,6 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    @Query("SELECT c FROM ChatRoom c JOIN Member m on m.nickname= :nickName")
-    Optional<List<ChatRoom>> findByNickname(@Param("nickName") String nickName);
+    @Query("SELECT c FROM ChatRoom c JOIN Member m on c.member.memberId= :memberId")
+    Optional<List<ChatRoom>> findByMemberId(@Param("memberId") Long memberId);
 }

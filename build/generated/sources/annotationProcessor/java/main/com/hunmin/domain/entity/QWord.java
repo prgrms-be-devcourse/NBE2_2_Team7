@@ -24,11 +24,13 @@ public class QWord extends EntityPathBase<Word> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final StringPath description = createString("description");
+    public final StringPath definition = createString("definition");
 
     public final StringPath lang = createString("lang");
 
     public final StringPath title = createString("title");
+
+    public final StringPath translation = createString("translation");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
