@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>단어 조회</title>
+</head>
+<body>
+<h1 th:text="${wordRequestDTO.title}"></h1>
+<p>뜻: <span th:text="${wordRequestDTO.translation}"></span></p>
+<p>정의: <span th:text="${wordRequestDTO.definition}"></span></p>
+<p>언어: <span th:text="${wordRequestDTO.lang}"></span></p>
+<p>작성일: <span th:text="${wordRequestDTO.createdAt}"></span></p>
+<p>수정일: <span th:text="${wordRequestDTO.updatedAt}"></span></p>
+
+<form th:action="@{/words/update/check(title=${wordRequestDTO.title}, lang=${wordRequestDTO.lang})}" method="post" style="display:inline;">
+    <button type="submit">수정하기</button>
+</form>
+<form th:action="@{/words/delete/check(title=${wordRequestDTO.title}, lang=${wordRequestDTO.lang})}" method="post" style="display:inline;">
+    <button type="submit">삭제하기</button>
+</form>
+<a href="/words">홈으로 돌아가기</a>
+<a href="/words/list">단어 목록 보기</a>
+<a href="/words/view/input">단어 조회하기</a>
+</body>
+</html>

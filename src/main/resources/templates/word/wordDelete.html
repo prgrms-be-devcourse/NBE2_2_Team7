@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>단어 삭제 확인</title>
+</head>
+<body>
+
+<h1>단어 삭제 확인</h1>
+<p th:text="'정말로 단어 ' + ${title} + ' / ' + ${lang} + ' 데이터를 삭제하시겠습니까?'"></p>
+<form th:action="@{/words/delete/{title}(title=${title}, lang=${lang})}" method="post">
+    <button type="submit">삭제</button>
+    <button type="button" onclick="location.href='/words/list'">취소</button>
+</form>
+</body>
+</html>
