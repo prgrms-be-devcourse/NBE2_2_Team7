@@ -10,10 +10,14 @@ import UpdateMemberForm from "./member/UpdateMemberForm";
 import NoticeListPage from './notice/NoticeListPage';
 import NoticeDetailPage from "./notice/NoticeDetailPage";
 import CreateNoticePage from './notice/CreateNoticePage';
+import ChatRoomList  from "./chat-room/ChatRoomList";
+import CreateChatRoom from "./chat-room/CreateChatRoom";
+import ChatRoomDetail from "./chat-room/ChatRoomDetail";
 
 
 const App = () => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
+
 
     return (
         <Router>
@@ -44,6 +48,11 @@ const AppContent = ({ token, setToken }) => {
                         <Route path="/notices/:id" element={<NoticeDetailPage />} />
                         <Route path="/create-notice" element={<CreateNoticePage />} />
                         <Route path="/edit-notice/:id" element={<CreateNoticePage />} />
+
+                        {/* 채팅 기능 라우트 */}
+                        <Route path="/chat-rooms/list" element={<ChatRoomList />} />
+                        <Route path="chat-room/" element={<CreateChatRoom />} />
+                        <Route path="/chat-room/:chatRoomId" element={<ChatRoomDetail />} />
                     </>
                 ) : (
                     <Route path="*" element={<Navigate to="/login" />} />
