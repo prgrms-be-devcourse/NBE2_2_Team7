@@ -112,7 +112,7 @@
         data: {
             room_name: '',
             chatrooms: [],
-            token: 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiZG9tMTA0NjFAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcyODAwNjI1OSwiZXhwIjoxNzI4MDA2ODU5fQ.5onmtLDG7TJfEg26SLuUAaHwUVXtd0KreVHlm3x8faM'
+            token: 'eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoiZG9tMTA0NjJAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTcyODAyMTUxNCwiZXhwIjoxNzI4MDIyMTE0fQ.fPtHH9hmCWlewTaEGDf-qUvnUt7Z8Xvaig-qpnNb0IY'
         },
         //페이지 시작시 실행 메서드
         created() {
