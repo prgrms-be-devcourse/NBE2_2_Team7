@@ -3,16 +3,19 @@ package com.hunmin.domain.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hunmin.domain.dto.chat.ChatMessageDTO;
+import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.pubsub.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -40,25 +43,29 @@ public class RedisConfig {
     public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber, "sendMessage");
     }
-    // Object 직렬화
+    // chatRoom 직렬화
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(connectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // JavaTimeModule 등록
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
-        return redisTemplate;
-    }
-    // ChatMessageDTO 직렬화
-    @Bean
-    public RedisTemplate<String, ChatMessageDTO> redisTemplateMessage(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, ChatMessageDTO> redisTemplateMessage = new RedisTemplate<>();
-        redisTemplateMessage.setConnectionFactory(connectionFactory);
-        redisTemplateMessage.setKeySerializer(new StringRedisSerializer());        // Key Serializer
-        redisTemplateMessage.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));      // Value Serializer
+    public RedisTemplate<String, ChatRoom> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
+        RedisTemplate<String, ChatRoom> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
 
-        return redisTemplateMessage;
+        // GenericJackson2JsonRedisSerializer 설정
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
+        // Key Serializer 설정
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
+
+        // Value Serializer 설정
+        template.setValueSerializer(serializer);
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+    @Bean
+    public HashOperations<String, String, ChatRoom> hashOperations(RedisTemplate<String, ChatRoom> redisTemplate) {
+        return redisTemplate.opsForHash();
     }
 }
