@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import CommentPage from '../comment/CommentPage';
-import KakaoMapSearch from './KakaoMapSearch'; // 추가
+import KakaoMapSearch from './map/KakaoMapSearch';
+import { Typography, Button, TextField, Grid, Paper } from '@mui/material';
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import BoardWrite from '../board/write/BoardWrite'; // BoardWrite 컴포넌트 추가
+import api from '../axios';
 
 const BoardDetailPage = () => {
     const { boardId } = useParams();
@@ -11,16 +14,24 @@ const BoardDetailPage = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [location, setLocation] = useState(null); // 선택한 위치 상태
-    const [originalLocation, setOriginalLocation] = useState(null); // 수정 전 위치 상태
+    const [location, setLocation] = useState(null);
+    const [originalLocation, setOriginalLocation] = useState(null);
+    const [imageUrls, setImageUrls] = useState([]); // 이미지 URL 상태 추가
+    const [memberId, setMemberId] = useState(''); // memberId 상태 추가
+    const [originalMemberId, setOriginalMemberId] = useState(''); // 원래 memberId 상태 추가
 
     useEffect(() => {
         fetchBoard();
+        // 로컬 스토리지에서 memberId 가져오기
+        const storedMemberId = localStorage.getItem('memberId');
+        if (storedMemberId) {
+            setMemberId(storedMemberId);
+        }
     }, [boardId]);
 
     const fetchBoard = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/board/${boardId}`);
+            const response = await api.get(`/board/${boardId}`);
             setBoard(response.data);
             setTitle(response.data.title);
             setContent(response.data.content);
@@ -28,12 +39,14 @@ const BoardDetailPage = () => {
                 name: response.data.location,
                 latitude: response.data.latitude,
                 longitude: response.data.longitude,
-            }); // 수정 전 위치 정보 설정
+            });
             setLocation({
                 name: response.data.location,
                 latitude: response.data.latitude,
                 longitude: response.data.longitude,
-            }); // 수정 전 위치 정보와 동일하게 설정
+            });
+            setImageUrls(response.data.imageUrls || []); // 이미지 URL 초기화
+            setOriginalMemberId(response.data.memberId); // 원래 memberId 저장
         } catch (error) {
             console.error('Error fetching board:', error);
         }
@@ -41,7 +54,7 @@ const BoardDetailPage = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`http://localhost:8080/api/board/${boardId}`);
+            await api.delete(`/board/${boardId}`);
             navigate('/');
         } catch (error) {
             console.error('Error deleting board:', error);
@@ -56,22 +69,26 @@ const BoardDetailPage = () => {
 
         try {
             const updatedBoard = {
+                boardId,
                 title,
                 content,
-                location: location.name, // 수정 후 위치 정보 추가
+                memberId: originalMemberId, // 원래 memberId 사용
+                location: location.name,
                 latitude: location.latitude,
                 longitude: location.longitude,
+                imageUrls: imageUrls.length > 0 ? imageUrls : null,
             };
-            await axios.put(`http://localhost:8080/api/board/${boardId}`, updatedBoard);
+            await api.put(`/board/${boardId}`, updatedBoard);
             setIsEditMode(false);
             fetchBoard();
+            console.log(originalMemberId);
         } catch (error) {
             console.error('Error updating board:', error);
         }
     };
 
     const handleLocationSelect = (selectedLocation) => {
-        setLocation(selectedLocation); // 새로운 위치 정보 업데이트
+        setLocation(selectedLocation);
     };
 
     const formatDate = (dateString) => {
@@ -79,54 +96,89 @@ const BoardDetailPage = () => {
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     };
 
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append('files', file);
+
+        try {
+            const response = await api.post('/board/uploadImage', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('Uploaded image URL:', response.data[0]); // URL을 배열에서 가져옴
+            return response.data[0]; // 첫 번째 URL 반환
+        } catch (error) {
+            console.error('Image upload failed:', error);
+            return null;
+        }
+    };
+
     if (!board) {
         return <div>Loading...</div>;
     }
 
     return (
-        <div>
-            {isEditMode ? (
-                <div>
-                    <h2>게시글 수정</h2>
-                    제목
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
-                    <div></div>
-                    내용
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                    />
+        <div style={{ padding: '20px' }}>
+            <Paper elevation={3} style={{ padding: '20px' }}>
+                {isEditMode ? (
                     <div>
+                        <Typography variant="h5">게시글 수정</Typography>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="제목"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <BoardWrite
+                                    value={content}
+                                    onChange={setContent}
+                                    uploadImage={uploadImage} // 이미지 업로드 함수 전달
+                                    setImageUrls={setImageUrls} // 이미지 URL 상태 변경 함수 전달
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <KakaoMapSearch onLocationSelect={handleLocationSelect} />
+                                <Typography variant="subtitle1">수정 전 장소: {originalLocation?.name || '없음'}</Typography>
+                                <Typography variant="subtitle1">수정 후 장소: {location?.name || '선택된 장소 없음'}</Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Button variant="contained" color="primary" onClick={handleUpdate}>저장</Button>
+                                <Button variant="outlined" color="secondary" onClick={() => setIsEditMode(false)}>취소</Button>
+                            </Grid>
+                        </Grid>
                     </div>
-                    장소
-                    <KakaoMapSearch onLocationSelect={handleLocationSelect} /> {/* 장소 검색 추가 */}
+                ) : (
                     <div>
-                        <h4>수정 전 장소: {originalLocation?.name || '없음'}</h4>
-                        <h4>수정 후 장소: {location?.name || '선택된 장소 없음'}</h4>
+                        <Typography variant="h5">{board.title}</Typography>
+                        <Typography variant="body1">
+                            <strong>작성자 :</strong> {board.nickname}
+                            <span style={{ margin: '0 8px' }} /> {/* 공백 추가 */}
+                            <strong>{board.updatedAt ? '수정일 :' : '작성일 :'}</strong> {formatDate(board.updatedAt || board.createdAt)}
+                            <span style={{ margin: '0 8px' }} /> {/* 공백 추가 */}
+                            {board.location && (
+                                <>
+                                    <LocationOnIcon style={{ marginRight: '4px' }} />
+                                    {board.location}
+                                </>
+                            )}
+                        </Typography>
+                        <hr />
+                        <Typography variant="body1" dangerouslySetInnerHTML={{ __html: board.content }} />
+                        <Grid item xs={12}>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                                <Button variant="contained" color="primary" onClick={() => setIsEditMode(true)}>수정</Button>
+                                <Button variant="outlined" color="secondary" onClick={handleDelete}>삭제</Button>
+                            </div>
+                        </Grid>
                     </div>
-                    <button onClick={handleUpdate}>Update</button>
-                    <button onClick={() => setIsEditMode(false)}>Cancel</button>
-                </div>
-            ) : (
-                <div>
-                    <h2>제목: {board.title}</h2>
-                    <p><strong>작성자:</strong> {board.nickname}</p>
-                    <p>
-                        <strong>{board.updatedAt ? '수정일' : '작성일'}:</strong> {formatDate(board.updatedAt || board.createdAt)}
-                    </p>
-                    {board.location && (
-                        <p><strong>Location:</strong> {board.location}</p>
-                    )}
-                    <p>내용: {board.content}</p>
-                    <button onClick={() => setIsEditMode(true)}>수정</button>
-                    <button onClick={handleDelete}>삭제</button>
-                </div>
-            )}
-
+                )}
+            </Paper>
             <CommentPage boardId={boardId} />
         </div>
     );

@@ -6,21 +6,41 @@ import {
     deleteComment,
     getCommentsByBoard
 } from './CommentService';
+import {
+    Typography,
+    TextField,
+    Button,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemSecondaryAction,
+    IconButton,
+    Paper,
+    Divider,
+    Pagination,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ReplyIcon from '@mui/icons-material/Reply';
 
 const CommentPage = ({ boardId }) => {
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState('');
     const [editCommentId, setEditCommentId] = useState(null);
     const [replyCommentId, setReplyCommentId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [editCommentMemberId, setEditCommentMemberId] = useState(null); // 댓글의 원래 memberId 저장
 
     useEffect(() => {
-        fetchComments();
-    }, [boardId]);
+        fetchComments(currentPage);
+    }, [boardId, currentPage]);
 
-    const fetchComments = async () => {
+    const fetchComments = async (page) => {
         try {
-            const response = await getCommentsByBoard(boardId, { page: 1, size: 5 });
+            const response = await getCommentsByBoard(boardId, { page, size: 5 });
             setComments(response.data.content);
+            setTotalPages(response.data.totalPages); // 전체 페이지 수 설정
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
@@ -28,10 +48,11 @@ const CommentPage = ({ boardId }) => {
 
     const handleCreate = async () => {
         try {
-            const commentData = { content, memberId: 1 }; // Replace memberId with actual userId
+            const memberId = localStorage.getItem('memberId'); // localStorage에서 memberId 가져오기
+            const commentData = { content, memberId }; // memberId를 commentData에 포함
             await createComment(boardId, commentData);
             setContent('');
-            fetchComments();
+            fetchComments(currentPage); // 현재 페이지로 댓글 새로고침
         } catch (error) {
             console.error('Error creating comment:', error);
         }
@@ -39,11 +60,12 @@ const CommentPage = ({ boardId }) => {
 
     const handleReply = async (commentId) => {
         try {
-            const commentData = { content, memberId: 1 }; // Replace with actual userId
+            const memberId = localStorage.getItem('memberId'); // localStorage에서 memberId 가져오기
+            const commentData = { content, memberId }; // memberId를 commentData에 포함
             await createChildComment(boardId, commentId, commentData);
             setContent('');
             setReplyCommentId(null);
-            fetchComments();
+            fetchComments(currentPage);
         } catch (error) {
             console.error('Error replying to comment:', error);
         }
@@ -51,11 +73,11 @@ const CommentPage = ({ boardId }) => {
 
     const handleEdit = async () => {
         try {
-            const commentData = { content };
-            await updateComment(boardId, editCommentId, commentData); // boardId와 editCommentId 전달
+            const commentData = { content, memberId: editCommentMemberId }; // 원래 댓글의 memberId 사용
+            await updateComment(boardId, editCommentId, commentData);
             setContent('');
             setEditCommentId(null);
-            fetchComments();
+            fetchComments(currentPage);
         } catch (error) {
             console.error('Error updating comment:', error);
         }
@@ -63,74 +85,106 @@ const CommentPage = ({ boardId }) => {
 
     const handleDelete = async (commentId) => {
         try {
-            await deleteComment(boardId, commentId); // boardId와 commentId 전달
-            fetchComments();
+            await deleteComment(boardId, commentId);
+            fetchComments(currentPage);
         } catch (error) {
             console.error('Error deleting comment:', error);
         }
     };
 
-    const renderComments = (comments) => {
+    const renderComments = (comments, level = 0) => {
         return comments.map((comment) => {
             const displayDate = comment.updatedAt
                 ? new Date(comment.updatedAt).toLocaleString()
                 : new Date(comment.createdAt).toLocaleString();
 
             return (
-                <li key={comment.commentId}>
-                    <div>
-                        <span>{comment.nickname}:</span>
-                        <span>{comment.content}</span>
-                        <div>
-                            <small>{`작성일: ${displayDate}`}</small> {/* 조건에 따라 작성일 또는 수정일 표시 */}
-                        </div>
-                        <button onClick={() => setEditCommentId(comment.commentId)}>수정</button>
-                        <button onClick={() => handleDelete(comment.commentId)}>삭제</button>
-                        <button onClick={() => setReplyCommentId(comment.commentId)}>댓글</button>
-                    </div>
+                <div key={comment.commentId}>
+                    <ListItem divider style={{ marginLeft: level * 20 }}> {/* 계단식 들여쓰기 */}
+                        <ListItemText
+                            primary={`${comment.nickname}: ${comment.content}`}
+                            secondary={`작성일: ${displayDate}`}
+                        />
+                        <ListItemSecondaryAction>
+                            <IconButton edge="end" onClick={() => handleEditClick(comment)}> {/* 수정 버튼 클릭 시 처리 */}
+                                <EditIcon />
+                            </IconButton>
+                            <IconButton edge="end" onClick={() => handleDelete(comment.commentId)}>
+                                <DeleteIcon />
+                            </IconButton>
+                            <IconButton edge="end" onClick={() => setReplyCommentId(comment.commentId)}>
+                                <ReplyIcon />
+                            </IconButton>
+                        </ListItemSecondaryAction>
+                    </ListItem>
 
                     {replyCommentId === comment.commentId && (
-                        <div style={{ marginLeft: '20px' }}>
-                        <textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                        />
-                            <button onClick={() => handleReply(comment.commentId)}>Reply</button>
+                        <div style={{ marginLeft: '40px', marginTop: '10px' }}>
+                            <TextField
+                                fullWidth
+                                placeholder="답글을 입력하세요..."
+                                variant="outlined"
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                            />
+                            <Button onClick={() => handleReply(comment.commentId)} variant="contained" color="primary">
+                                답글
+                            </Button>
                         </div>
                     )}
 
-                    {/* 대댓글이 있는 경우 재귀적으로 렌더링 */}
                     {comment.children && comment.children.length > 0 && (
-                        <ul style={{ marginLeft: '20px' }}>
-                            {renderComments(comment.children)}
-                        </ul>
+                        <List>
+                            {renderComments(comment.children, level + 1)} {/* 대댓글에 대한 레벨 증가 */}
+                        </List>
                     )}
-                </li>
+                </div>
             );
         });
     };
 
+    const handleEditClick = (comment) => {
+        setEditCommentId(comment.commentId);
+        setContent(comment.content);
+        setEditCommentMemberId(comment.memberId); // 댓글의 원래 memberId 저장
+    };
+
+    const handlePageChange = (event, newPage) => {
+        if (newPage > 0 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
 
     return (
-        <div>
-            <hr />
-            <h3>댓글 목록</h3>
-            <ul>
+        <Paper style={{ padding: '20px' }}>
+            <hr/>
+            <List>
                 {renderComments(comments)}
-            </ul>
-
-            <div>
-                <textarea
+            </List>
+            <Divider />
+            <div style={{ marginTop: '20px' }}>
+                <TextField
+                    fullWidth
+                    placeholder="댓글을 입력하세요..."
+                    variant="outlined"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                 />
                 {editCommentId ? (
-                    <button onClick={handleEdit}>Update Comment</button>
+                    <Button onClick={handleEdit} variant="contained" color="primary">댓글 수정</Button>
                 ) : (
-                    <button onClick={handleCreate}>Add Comment</button>
+                    <Button onClick={handleCreate} variant="contained" color="primary">댓글 추가</Button>
                 )}
             </div>
-        </div>
+            <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                variant="outlined"
+                color="primary"
+                style={{ marginTop: '20px' }}
+            />
+        </Paper>
     );
 };
 

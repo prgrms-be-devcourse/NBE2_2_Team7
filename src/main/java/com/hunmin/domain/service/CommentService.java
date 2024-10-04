@@ -2,10 +2,15 @@ package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.comment.CommentRequestDTO;
 import com.hunmin.domain.dto.comment.CommentResponseDTO;
+import com.hunmin.domain.dto.notification.NotificationSendDTO;
+import com.hunmin.domain.exception.BoardException;
+import com.hunmin.domain.exception.MemberException;
+import com.hunmin.domain.handler.SseEmitters;
 import com.hunmin.domain.dto.page.PageRequestDTO;
 import com.hunmin.domain.entity.Board;
 import com.hunmin.domain.entity.Comment;
 import com.hunmin.domain.entity.Member;
+import com.hunmin.domain.entity.NotificationType;
 import com.hunmin.domain.exception.CommentException;
 import com.hunmin.domain.repository.BoardRepository;
 import com.hunmin.domain.repository.CommentRepository;
@@ -17,6 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,16 +34,47 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
+    private final SseEmitters sseEmitters;
 
-    //댓글 등록
+    // 댓글 등록
     public CommentResponseDTO createComment(Long boardId, CommentRequestDTO commentRequestDTO) {
         try {
-            Member member = memberRepository.findById(commentRequestDTO.getMemberId()).orElseThrow();
-            Board board = boardRepository.findById(boardId).orElseThrow();
+            Member member = memberRepository.findById(commentRequestDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
+            Board board = boardRepository.findById(boardId).orElseThrow(BoardException.NOT_FOUND::get);
 
-            Comment comment = Comment.builder().member(member).board(board).content(commentRequestDTO.getContent()).build();
+            Comment comment = Comment.builder()
+                    .member(member)
+                    .board(board)
+                    .content(commentRequestDTO.getContent())
+                    .build();
 
             commentRepository.save(comment);
+
+            Long boardMemberId = comment.getBoard().getMember().getMemberId();
+
+            if (!boardMemberId.equals(comment.getMember().getMemberId())) {
+                NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
+                        .memberId(boardMemberId)
+                        .message("[" + board.getTitle() + "] 새로운 댓글이 작성되었습니다!")
+                        .notificationType(NotificationType.COMMENT)
+                        .url("/board/" + boardId)
+                        .build();
+
+                notificationService.send(notificationSendDTO);
+            }
+
+            String emitterId = boardMemberId + "_";
+            SseEmitter emitter = sseEmitters.findSingleEmitter(emitterId);
+
+            if (emitter != null) {
+                try {
+                    emitter.send(new CommentResponseDTO(comment));
+                } catch (IOException e) {
+                    log.error("Error sending comment to client via SSE: {}", e.getMessage());
+                    sseEmitters.delete(emitterId);
+                }
+            }
 
             return new CommentResponseDTO(comment);
         } catch (Exception e) {
@@ -47,13 +86,40 @@ public class CommentService {
     //대댓글 등록
     public CommentResponseDTO createCommentChild(Long boardId, Long commentId, CommentRequestDTO commentRequestDTO) {
         try {
-            Member member = memberRepository.findById(commentRequestDTO.getMemberId()).orElseThrow();
-            Board board = boardRepository.findById(boardId).orElseThrow();
-            Comment parent = commentRepository.findById(commentId).orElseThrow();
+            Member member = memberRepository.findById(commentRequestDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
+            Board board = boardRepository.findById(boardId).orElseThrow(BoardException.NOT_FOUND::get);
+            Comment parent = commentRepository.findById(commentId).orElseThrow(CommentException.NOT_FOUND::get);
 
             Comment children = Comment.builder().member(member).board(board).parent(parent).content(commentRequestDTO.getContent()).build();
 
             commentRepository.save(children);
+
+            Long parentMemberId = parent.getMember().getMemberId();
+
+            if (!parentMemberId.equals(children.getMember().getMemberId())) {
+                NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
+                        .memberId(parentMemberId)
+                        .message("[" + board.getTitle() + "] 에 작성한 " + "'" + parent.getContent() +"'에 새로운 대댓글이 작성되었습니다!")
+                        .notificationType(NotificationType.COMMENT)
+                        .url("/board/" + boardId)
+                        .build();
+
+                notificationService.send(notificationSendDTO);
+            }
+
+            String emitterId = parentMemberId + "_";
+            SseEmitter emitter = sseEmitters.findSingleEmitter(emitterId);
+
+            if (emitter != null) {
+                try {
+                    emitter.send(new CommentResponseDTO(children));
+                } catch (IOException e) {
+                    log.error("Error sending comment to client via SSE: {}", e.getMessage());
+                    sseEmitters.delete(emitterId);
+                }
+            } else {
+                log.warn("Emitter not found for member ID: {}", parentMemberId);
+            }
 
             return new CommentResponseDTO(children);
         } catch (Exception e) {

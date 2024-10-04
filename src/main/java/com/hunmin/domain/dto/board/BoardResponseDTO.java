@@ -13,24 +13,28 @@ import java.util.List;
 @NoArgsConstructor
 public class BoardResponseDTO {
     private Long boardId;
+    private Long memberId;
     private String title;
     private String nickname;
     private String content;
     private String location;
     private Double latitude;
     private Double longitude;
+    private List<String> imageUrls;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CommentResponseDTO> comments;
 
     public BoardResponseDTO(Board board) {
         this.boardId = board.getBoardId();
+        this.memberId = board.getMember().getMemberId();
         this.title = board.getTitle();
         this.nickname = board.getNickname();
         this.content = board.getContent();
         this.location = board.getLocation();
         this.latitude = board.getLatitude();
         this.longitude = board.getLongitude();
+        this.imageUrls = board.getImageUrls();
         this.createdAt = board.getCreatedAt();
         this.updatedAt = board.getUpdatedAt();
         if (board.getComments() != null) {
