@@ -17,9 +17,9 @@ public class WordPageRequestDTO {
     private int page = 1;
 
     @Builder.Default
-    @Min(20)
+    @Min(1)
     @Max(100)
-    private int size = 20;
+    private int size = 25;
 
     public Pageable getPageable(Sort sort){
         return PageRequest.of(page - 1, size, sort);

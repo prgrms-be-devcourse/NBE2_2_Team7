@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>단어 수정 입력</title>
+</head>
+<body>
+<h1>단어 수정</h1>
+<div th:if="${errorMessage}" style="color: red;">
+  <p th:text="${errorMessage}"></p>
+</div>
+
+<form action="/words/update/check" method="post">
+  <label for="title">수정할 단어 입력:</label>
+  <input type="text" id="title" name="title" required />
+
+  <label for="lang">언어 선택:</label>
+  <select id="lang" name="lang" required>
+    <option value="영어">영어 / English</option>
+    <option value="일본어">일본어 / 日本語</option>
+    <option value="중국어">중국어 / 中文</option>
+    <option value="베트남어">베트남어 / Tiếng Việt</option>
+    <option value="프랑스어">프랑스어 / Français</option>
+  </select>
+
+  <button type="submit">조회</button>
+</form>
+
+<a href="/words">홈으로 돌아가기</a>
+<a href="/words/list">단어 목록 보기</a>
+</body>
+</html>
