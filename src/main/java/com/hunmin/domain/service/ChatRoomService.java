@@ -12,13 +12,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class ChatRoomService {
+
+    public static Map<String, String> roomStorage = new ConcurrentHashMap<>();
 
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
@@ -48,17 +50,35 @@ public class ChatRoomService {
     }
 
     // 채팅방 생성 : 이름으로 상대방 검색 후 채팅방 개설
-    public ChatMessageRequestDTO createChatRoomByNickName(String nickName) {
-        Member member = memberRepository.findByNickname(nickName)
-                .orElseThrow(MemberException.NOT_FOUND::get);
-        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.builder().member(member).build());
+    public ChatMessageRequestDTO createChatRoomByNickName(String partnerName,String myEmail) {
+        Member me = memberRepository.findByEmail(myEmail);
+
+        if ((roomStorage.get(me.getNickname())!=null && roomStorage.get(me.getNickname()).equals(partnerName))
+        ||){
+            throw ChatRoomException.CHATROOM_ALREADY_EXIST.get();
+        }
+        roomStorage.put(partnerName,me.getNickname());
+
+        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.builder().member(me).build());
 
         return ChatMessageRequestDTO.builder()
-                    .chatRoomId(chatRoom.getChatRoomId())
-                    .userCount(chatRoom.getUserCount())
-                    .createdAt(chatRoom.getCreatedAt())
-                    .nickName(member.getNickname())
-                    .MemberId(member.getMemberId()).build();
+                .chatRoomId(chatRoom.getChatRoomId())
+                .userCount(chatRoom.getUserCount())
+                .createdAt(chatRoom.getCreatedAt())
+                .nickName(me.getNickname())
+                .MemberId(me.getMemberId()).build();
+    }
+
+    // 채팅방 삭제
+    public Boolean deleteChatRoom(Long chatRoomId) {
+        ChatRoom foundChatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(ChatRoomException.NOT_FOUND::get);
+
+        if (foundChatRoom == null) {
+            return false;
+        }
+        chatRoomRepository.delete(foundChatRoom);
+        return true;
     }
 
     // 채팅방 유저수 조회
