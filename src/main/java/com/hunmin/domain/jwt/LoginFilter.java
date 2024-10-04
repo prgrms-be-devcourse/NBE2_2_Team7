@@ -85,13 +85,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String country = customUserDetails.getCountry();
 
         //토큰 생성
-<<<<<<< HEAD
-        String access = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 86400000L); // 10분
-        String refresh = jwtUtil.createJwt("refresh", email, MemberRole.valueOf(role), 86400000L); // 24시간
-=======
         String access = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 86400000L);
         String refresh = jwtUtil.createJwt("refresh", email, MemberRole.valueOf(role), 86400000L);
->>>>>>> 536c5ba12972a3fe5ed9d9f25fd495e91be8e4d3
         log.info("생성된 access 토큰: " + access);
         log.info("생성된 refresh 토큰: " + refresh);
 
