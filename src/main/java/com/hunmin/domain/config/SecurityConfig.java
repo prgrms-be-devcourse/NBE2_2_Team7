@@ -77,7 +77,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/members/login").permitAll()
                         .requestMatchers("/api/members/reissue").permitAll()
                         .requestMatchers("/api/members/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/chat-room/**").permitAll()//나중에 삭제할것
+                        .requestMatchers("/api/chat-room/**").authenticated()//나중에 삭제할것
                         .requestMatchers("/api/chat/**").permitAll()//나중에 삭제할것
                         .requestMatchers("/webjars/**", "/images/**", "/favicon.ico").permitAll()//웹 자원 경로 허용
                         .requestMatchers("/ws-stomp/**").permitAll() //websocket 연결 허용
@@ -89,7 +89,7 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**").permitAll() //swagger
                         .requestMatchers("/swagger-ui.html").permitAll() // 추가
                         .requestMatchers("/api/notices/list/**").permitAll() // 추가
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
 
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
