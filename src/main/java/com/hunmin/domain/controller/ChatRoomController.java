@@ -24,7 +24,7 @@ public class ChatRoomController {
     //채팅방 생성
     @PostMapping("/{nickName}")
     @Operation(summary = "채팅방 생성", description = "채팅방을 이름으로 생성하는 API")
-    public ResponseEntity<ChatRoomDTO> createRoomByNickName(@PathVariable("nickName") String nickName
+    public ResponseEntity<ChatRoomRequestDTO> createRoomByNickName(@PathVariable("nickName") String nickName
                                                         , Authentication authentication) {
         log.info("nickName={}", nickName);
         String currentMemberEmail = authentication.getName();
@@ -52,9 +52,9 @@ public class ChatRoomController {
         return chatRoomService.findRoomById(chatRoomId);
     }
     //채팅방 삭제
-    @DeleteMapping("/{chatRoomId}")
+    @DeleteMapping("/{chatRoomId}/{partnerName}")
     @Operation(summary = "채팅방 삭제", description = "삭제하고 싶은 채팅방을 삭제하는 API")
-    public Boolean deleteRoom(@PathVariable Long chatRoomId) {
-        return chatRoomService.deleteChatRoom(chatRoomId);
+    public Boolean deleteRoom(@PathVariable Long chatRoomId, @PathVariable String partnerName) {
+        return chatRoomService.deleteChatRoom(chatRoomId,partnerName);
     }
 }

@@ -87,7 +87,7 @@ public class ChatRoomService {
     }
 
     // 채팅방 생성 : 이름으로 상대방 검색 후 채팅방 개설  -> 새로운
-    public ChatRoomDTO createChatRoomByNickName(String partnerName, String myEmail) {
+    public ChatRoomRequestDTO createChatRoomByNickName(String partnerName, String myEmail) {
         Member me = memberRepository.findByEmail(myEmail);
         log.info("me ={}", me);
         ChatRoomRequestDTO chatRoomFromStorage = roomStorage.get(me.getNickname(), partnerName);
@@ -98,14 +98,14 @@ public class ChatRoomService {
             log.info("이미존재합니다");
             throw ChatRoomException.CHATROOM_ALREADY_EXIST.get();
         }
-
-        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.builder().member(me).build());
-        roomStorage.put(myNickname, partnerName, ChatRoomRequestDTO.builder()
-                .chatRoomId(chatRoom.getChatRoomId())
+        ChatRoom chatRoom = ChatRoom.builder().member(me).build();
+        ChatRoom SavedchatRoom = chatRoomRepository.save(chatRoom);
+        roomStorage.put(me.getNickname(), partnerName, ChatRoomRequestDTO.builder()
+                .chatRoomId(SavedchatRoom.getChatRoomId())
                 .memberId(me.getMemberId())
                 .nickName(me.getNickname())
                 .partnerName(partnerName)
-                .createdAt(chatRoom.getCreatedAt())
+                .createdAt(SavedchatRoom.getCreatedAt())
                 .build());
         log.info("roomStorage ={}", roomStorage);
 
@@ -118,7 +118,7 @@ public class ChatRoomService {
                     .memberId(partnerId)
                     .message("[" + me.getNickname() + "]님이 새로운 채팅방을 개설했습니다.")
                     .notificationType(NotificationType.CHAT)
-                    .url("/chat-room/enter/" + chatRoom.getChatRoomId())
+                    .url("/chat-room/enter/" + SavedchatRoom.getChatRoomId())
                     .build();
 
             notificationService.send(notificationSendDTO);
@@ -128,22 +128,37 @@ public class ChatRoomService {
 
             if (emitter != null) {
                 try {
-                    emitter.send(new ChatRoomDTO(chatRoom));
+                    emitter.send(new ChatRoomDTO(SavedchatRoom));
                 } catch (IOException e) {
                     log.error("Error sending chat room notification to client via SSE: {}", e.getMessage());
                     sseEmitters.delete(emitterId);
                 }
             }
         }
-        return new ChatRoomDTO(chatRoom);
+        return ChatRoomRequestDTO.builder()
+                .chatRoomId(SavedchatRoom.getChatRoomId())
+                .partnerName(partnerName)
+                .nickName(me.getNickname())
+                .memberId(me.getMemberId())
+                .createdAt(SavedchatRoom.getCreatedAt())
+                .build();
     }
 
     // 채팅방 삭제
-    public Boolean deleteChatRoom(Long chatRoomId) {
+    public Boolean deleteChatRoom(Long chatRoomId, String partnerName) {
         ChatRoom foundChatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomException.NOT_FOUND::get);
 
         if (foundChatRoom == null) {
+            return false;
+        }
+        String userName = foundChatRoom.getMember().getNickname();
+        if (roomStorage.get(partnerName, userName)!=null){
+            roomStorage.delete(partnerName, userName);
+        }
+        else if (roomStorage.get(userName,partnerName)!=null){
+            roomStorage.delete(userName, partnerName);
+        }else {
             return false;
         }
         chatRoomRepository.delete(foundChatRoom);

@@ -1,6 +1,5 @@
 package com.hunmin.domain.dto.chat;
 
-import com.hunmin.domain.entity.ChatRoom;
 import lombok.*;
 
 import java.time.LocalDateTime;
