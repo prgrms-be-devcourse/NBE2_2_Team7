@@ -88,6 +88,12 @@ public class ChatRoomService {
 
     // 채팅방 생성 : 이름으로 상대방 검색 후 채팅방 개설  -> 새로운
     public ChatRoomRequestDTO createChatRoomByNickName(String partnerName, String myEmail) {
+
+        Optional<Member> byNickname = memberRepository.findByNickname(partnerName);
+        if (byNickname.isEmpty()) {
+            throw  MemberException.NOT_FOUND.get();
+        }
+
         Member me = memberRepository.findByEmail(myEmail);
         log.info("me ={}", me);
         ChatRoomRequestDTO chatRoomFromStorage = roomStorage.get(me.getNickname(), partnerName);
@@ -145,21 +151,30 @@ public class ChatRoomService {
     }
 
     // 채팅방 삭제
-    public Boolean deleteChatRoom(Long chatRoomId, String partnerName) {
+    public Boolean deleteChatRoom(Long chatRoomId, String partnerName, String meEmail) {
+
+        Optional<Member> byNickname = memberRepository.findByNickname(partnerName);
+        if (byNickname.isEmpty()) {
+            throw  MemberException.NOT_FOUND.get();
+        }
+
+        Member me = memberRepository.findByEmail(meEmail);
+
         ChatRoom foundChatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomException.NOT_FOUND::get);
 
         if (foundChatRoom == null) {
             return false;
         }
-        String userName = foundChatRoom.getMember().getNickname();
-        if (roomStorage.get(partnerName, userName)!=null){
-            roomStorage.delete(partnerName, userName);
-        }
-        else if (roomStorage.get(userName,partnerName)!=null){
-            roomStorage.delete(userName, partnerName);
-        }else {
+        if ((roomStorage.get(partnerName, me.getNickname())==null)
+                &&(roomStorage.get(me.getNickname(),partnerName)==null)){
             return false;
+        }
+        if (roomStorage.get(partnerName, me.getNickname())!=null){
+            roomStorage.delete(partnerName, me.getNickname());
+        }
+        else if (roomStorage.get(me.getNickname(),partnerName)!=null){
+            roomStorage.delete(me.getNickname(), partnerName);
         }
         chatRoomRepository.delete(foundChatRoom);
         return true;
