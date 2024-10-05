@@ -22,10 +22,10 @@ import ChatIcon from '@mui/icons-material/Chat'; // 채팅 아이콘 임포트
 import EditIcon from '@mui/icons-material/Edit'; // 연필 아이콘 임포트
 
 const BoardListPage = () => {
-    const navigate = useNavigate(); // useNavigate 훅 사용
-    const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
-    const nickname = localStorage.getItem('nickname'); // 로컬 스토리지에서 닉네임 가져오기
-    const profileImage = localStorage.getItem('image'); // 로컬 스토리지에서 프로필 이미지 가져오기
+    const navigate = useNavigate(); // navigate 함수 추가
+    const memberId = localStorage.getItem('memberId');
+    const nickname = localStorage.getItem('nickname');
+    const profileImage = localStorage.getItem('image');
     const [boards, setBoards] = useState([]);
     const [filteredBoards, setFilteredBoards] = useState([]);
     const [page, setPage] = useState(1);
@@ -39,9 +39,9 @@ const BoardListPage = () => {
 
     useEffect(() => {
         if (showMyBoards) {
-            fetchMyBoards(); // 내 게시글 목록 가져오기
+            fetchMyBoards();
         } else {
-            fetchBoards(); // 전체 게시글 목록 가져오기
+            fetchBoards();
         }
     }, [page, size, showMyBoards]);
 
@@ -49,33 +49,13 @@ const BoardListPage = () => {
         setFilteredBoards(boards);
     }, [boards]);
 
-    useEffect(() => {
-        console.log('Kakao API Key:', process.env.REACT_APP_KAKAO_API_KEY); // 추가
-        if (!window.kakao) {
-            const script = document.createElement('script');
-            script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.REACT_APP_KAKAO_API_KEY}&libraries=services,clusterer,drawing`;
-            script.async = true;
-            script.onload = () => {
-                console.log('Kakao Maps SDK loaded.');
-                setKakaoLoaded(true);
-            };
-            script.onerror = () => {
-                console.error('Kakao Maps SDK script failed to load.');
-            };
-            document.head.appendChild(script);
-        } else {
-            console.log('Kakao Maps SDK already loaded.');
-            setKakaoLoaded(true);
-        }
-    }, []);
-
     const fetchBoards = async () => {
         try {
             const response = await api.get('/board', {
                 params: { page, size },
             });
             setBoards(response.data.content);
-            setTotalPages(response.data.totalPages); // 전체 페이지 수 설정
+            setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error('Error fetching boards:', error);
         }
@@ -87,25 +67,20 @@ const BoardListPage = () => {
                 params: { page, size },
             });
             setBoards(response.data.content);
-            setTotalPages(response.data.totalPages); // 전체 페이지 수 설정
+            setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error('Error fetching my boards:', error);
         }
     };
 
     const handleSearch = async () => {
-        if (!kakaoLoaded || !window.kakao.maps) {
-            console.error('Kakao Maps SDK is not loaded yet.');
-            return;
-        }
-
         const kakao = window.kakao;
         const ps = new kakao.maps.services.Places();
 
         ps.keywordSearch(searchLocation, (data, status) => {
             if (status === kakao.maps.services.Status.OK) {
                 const firstPlace = data[0];
-                const center = { lat: parseFloat(firstPlace.y), lng: parseFloat(firstPlace.x) };
+                const center = { lat: firstPlace.y, lng: firstPlace.x };
 
                 const nearbyBoards = boards.filter(board => {
                     const distance = getDistance(board.latitude, board.longitude, center.lat, center.lng);
@@ -114,10 +89,10 @@ const BoardListPage = () => {
 
                 setFilteredBoards(nearbyBoards);
                 setMapCenter(center);
-                setMapLevel(5); // 검색 후 지도 확대
+                setMapLevel(5);
             } else {
                 setFilteredBoards([]);
-                setMapLevel(9); // 초기 레벨로 설정
+                setMapLevel(9);
             }
         });
     };
@@ -212,7 +187,7 @@ const BoardListPage = () => {
 
             <Box mt={2}>
                 <Typography variant="h4">{showMyBoards ? '내 글' : '전체 글'}</Typography>
-                <Link to="/create-board" style={{ textDecoration: 'none' }}>
+                <Link to="/create-board">
                     <Button variant="contained" color="primary">게시글 작성</Button>
                 </Link>
                 <Button
@@ -225,41 +200,77 @@ const BoardListPage = () => {
                 </Button>
             </Box>
 
-            <Box mt={2}>
-                <TextField
-                    label="장소 검색"
-                    variant="outlined"
-                    fullWidth
-                    value={searchLocation}
-                    onChange={(e) => setSearchLocation(e.target.value)}
-                />
-                <Button variant="contained" color="primary" onClick={handleSearch}>
-                    검색
-                </Button>
-            </Box>
-
-            {/* 게시글 리스트 */}
-            <List>
-                {filteredBoards.map((board) => (
-                    <ListItem key={board.id} button onClick={() => navigate(`/board/${board.id}`)}>
-                        <ListItemText
-                            primary={board.title}
-                            secondary={`${formatDate(board.createdAt)} - ${board.nickname}`}
-                        />
-                    </ListItem>
-                ))}
-            </List>
-
-            <Pagination
-                count={totalPages}
-                page={page}
-                onChange={(event, value) => setPage(value)}
-                color="primary"
-            />
-
             <Grid container spacing={2} mt={2}>
-                <Grid item xs={12}>
-                    <Map center={mapCenter} level={mapLevel} boards={filteredBoards} />
+                <Grid item xs={12} md={6}>
+                    <List>
+                        {filteredBoards.map((board) => (
+                            <ListItem key={board.boardId}>
+                                <Grid container alignItems="center">
+                                    <Grid item xs={10}>
+                                        <ListItemText
+                                            primary={
+                                                <Link to={`/board/${board.boardId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                    <strong>{board.title}</strong> - {board.nickname}
+                                                </Link>
+                                            }
+                                            secondary={
+                                                <>
+                                                    {board.updatedAt ? (
+                                                        <span>수정일: {formatDate(board.updatedAt)}</span>
+                                                    ) : (
+                                                        <span>작성일: {formatDate(board.createdAt)}</span>
+                                                    )}
+                                                    {board.location && (
+                                                        <span> 장소: {board.location}</span>
+                                                    )}
+                                                </>
+                                            }
+                                        />
+                                    </Grid>
+                                    {board.imageUrls && board.imageUrls.length > 0 ? (
+                                        <Grid item xs={2}>
+                                            <img
+                                                src={board.imageUrls[0]}
+                                                alt={board.title}
+                                                style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+                                            />
+                                        </Grid>
+                                    ) : (
+                                        <Grid item xs={2}>
+                                            {/* 이미지가 없는 경우 빈 공간으로 유지 */}
+                                            <div style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                backgroundColor: '#f0f0f0',
+                                                borderRadius: '8px',
+                                            }}>
+                                            </div>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </ListItem>
+                        ))}
+                    </List>
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={(event, value) => setPage(value)}
+                        color="primary"
+                    />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                    <TextField
+                        label="위치를 입력하세요"
+                        variant="outlined"
+                        value={searchLocation}
+                        onChange={(e) => setSearchLocation(e.target.value)}
+                        fullWidth
+                    />
+                    <Button variant="contained" color="primary" onClick={handleSearch} style={{ marginTop: '10px' }}>
+                        검색
+                    </Button>
+                    <Map boards={filteredBoards} mapLevel={mapLevel} mapCenter={mapCenter} />
                 </Grid>
             </Grid>
         </Container>

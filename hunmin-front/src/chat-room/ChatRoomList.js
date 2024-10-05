@@ -1,6 +1,5 @@
-// src/components/chat-room/ChatRoomList.js
-import React, { useState, useEffect } from 'react';
-import api from '../axios'; // 정확한 경로로 임포트
+import React, {useState, useEffect} from 'react';
+import api from '../axios'; // API 요청을 위해 정의된 axios 인스턴스
 import {
     Box,
     Card,
@@ -27,31 +26,26 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const ChatRoomCard = ({ room, onEnter, onRightClick }) => {
+const ChatRoomCard = ({room, onEnter, onRightClick}) => {
     return (
         <Card
-            sx={{ marginBottom: 2, cursor: 'pointer' }}
+            sx={{marginBottom: 2, cursor: 'pointer', width: '100%'}}
             onClick={() => onEnter(room.chatRoomId)}
             onContextMenu={(e) => onRightClick(e, room.chatRoomId)}
         >
             <CardHeader
-                title={room.nickname}
+                title={`대화방 (${room.nickName}, ${room.partnerName || 'N/A'})`}
                 action={
                     <IconButton onClick={(e) => onRightClick(e, room.chatRoomId)}>
-                        <MoreVertIcon />
+                        <MoreVertIcon/>
                     </IconButton>
                 }
             />
             <CardContent>
                 <Typography variant="body2" color="text.secondary">
-                    최근 메시지: {room.latestMessageContent || '최근 메시지가 없습니다.'}
+                    생성일: {room.createdAt ? new Date(room.createdAt).toLocaleString() : 'N/A'}
                 </Typography>
             </CardContent>
-            <CardActions>
-                <Typography variant="caption" color="text.secondary">
-                    최근 활동: {room.latestMessageDate ? new Date(room.latestMessageDate).toLocaleString() : 'N/A'}
-                </Typography>
-            </CardActions>
         </Card>
     );
 };
@@ -60,19 +54,19 @@ const ChatRoomList = () => {
     const [chatRooms, setChatRooms] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedChatRoom, setSelectedChatRoom] = useState(null);
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-    const [openDialog, setOpenDialog] = useState(false);
+    const [snackbar, setSnackbar] = useState({open: false, message: '', severity: 'success'});
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);  // 삭제 Dialog 상태 추가
+    const [openCreateDialog, setOpenCreateDialog] = useState(false);  // 생성 Dialog 상태 추가
     const [newNickName, setNewNickName] = useState('');
+    const [partnerName, setPartnerName] = useState('');  // 파트너 이름 상태 추가
 
     useEffect(() => {
         // 인증된 사용자인지 확인 후 요청
         api.get('/chat-room/list')
             .then(response => {
-                console.log('Chat Rooms:', response.data); // 데이터 출력
                 setChatRooms(response.data);
             })
             .catch(error => {
-                console.error('채팅방 가져오기 오류:', error);
                 setSnackbar({
                     open: true,
                     message: '채팅방 목록을 불러오는데 실패했습니다.',
@@ -96,40 +90,67 @@ const ChatRoomList = () => {
         setSelectedChatRoom(null);
     };
 
+    // 삭제 버튼 클릭 시 파트너 이름 입력 Dialog 열기
+    const openPartnerNameDialog = () => {
+        setOpenDeleteDialog(true);  // 삭제 Dialog 열기
+    };
+
+    // 채팅방 삭제 요청
     const deleteChatRoom = () => {
+        if (!partnerName) {
+            setSnackbar({
+                open: true,
+                message: '대화상대 닉네임을 입력해주세요.',
+                severity: 'warning',
+            });
+            return;
+        }
         if (selectedChatRoom) {
-            api.delete(`/chat-room/${selectedChatRoom}`)
-                .then(() => {
-                    setChatRooms(chatRooms.filter(room => room.chatRoomId !== selectedChatRoom));
-                    setSnackbar({
-                        open: true,
-                        message: '채팅방이 성공적으로 삭제되었습니다.',
-                        severity: 'success',
-                    });
+            api.delete(`/chat-room/${selectedChatRoom}/${partnerName}`)
+                .then((response) => {
+                    if (response.data === true) { // 서버에서 true를 반환하면 성공 처리
+                        setChatRooms(chatRooms.filter(room => room.chatRoomId !== selectedChatRoom));
+                        setSnackbar({
+                            open: true,
+                            message: '채팅방이 성공적으로 삭제되었습니다.',
+                            severity: 'success',
+                        });
+                        handleCloseDeleteDialog(); // 다이얼로그 닫기
+                    } else {
+                        setSnackbar({
+                            open: true,
+                            message: '닉네임이 일치하지 않습니다.',
+                            severity: 'error',
+                        });
+                        handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
+                    }
                 })
                 .catch(error => {
-                    console.error('채팅방 삭제 오류:', error);
                     setSnackbar({
                         open: true,
                         message: '채팅방 삭제에 실패했습니다.',
                         severity: 'error',
                     });
+                    handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
                 });
             handleMenuClose();
         }
     };
 
     const handleCloseSnackbar = () => {
-        setSnackbar({ ...snackbar, open: false });
+        setSnackbar({...snackbar, open: false});
     };
 
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
+    // 삭제 다이얼로그 닫기
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false);
+        setPartnerName('');  // 입력 필드 초기화
     };
 
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-        setNewNickName('');
+    // 생성 다이얼로그 닫기
+    const handleCloseCreateDialog = () => {
+        setOpenCreateDialog(false);
+        setNewNickName('');  // 입력 필드 초기화
     };
 
     const handleCreateChatRoom = () => {
@@ -150,27 +171,28 @@ const ChatRoomList = () => {
                     message: '채팅방이 성공적으로 생성되었습니다.',
                     severity: 'success',
                 });
-                handleCloseDialog();
+                handleCloseCreateDialog();
             })
             .catch(error => {
-                console.error('채팅방 생성 오류:', error);
                 setSnackbar({
                     open: true,
                     message: '채팅방 생성에 실패했습니다.',
                     severity: 'error',
                 });
+                handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
             });
     };
 
     return (
-        <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2 }}>
+        <Box sx={{maxWidth: 700, margin: 'auto', padding: 2}}>
             <Typography variant="h4" gutterBottom>
                 채팅방 목록
             </Typography>
-            <Button variant="contained" color="primary" onClick={handleOpenDialog} sx={{ marginBottom: 2 }}>
+            <Button variant="contained" color="primary" onClick={() => setOpenCreateDialog(true)}
+                    sx={{marginBottom: 2}}>
                 채팅방 생성
             </Button>
-            <List>
+            <List sx={{width: '100%'}}>
                 {chatRooms.map(room => (
                     <React.Fragment key={room.chatRoomId}> {/* chatRoomId가 고유한지 확인 */}
                         <ListItem>
@@ -180,7 +202,7 @@ const ChatRoomList = () => {
                                 onRightClick={handleMenuOpen}
                             />
                         </ListItem>
-                        <Divider component="li" />
+                        <Divider component="li"/>
                     </React.Fragment>
                 ))}
             </List>
@@ -197,26 +219,54 @@ const ChatRoomList = () => {
                     horizontal: 'right',
                 }}
             >
-                <MenuItem onClick={deleteChatRoom}>
-                    <DeleteIcon fontSize="small" sx={{ marginRight: 1 }} />
+                <MenuItem onClick={openPartnerNameDialog}>
+                    <DeleteIcon fontSize="small" sx={{marginRight: 1}}/>
                     채팅방 삭제
                 </MenuItem>
             </Menu>
+
+            {/* Snackbar */}
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
             >
-                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{width: '100%'}}>
                     {snackbar.message}
                 </Alert>
             </Snackbar>
-            <Dialog open={openDialog} onClose={handleCloseDialog}>
+
+            {/* 삭제 다이얼로그 */}
+            <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
+                <DialogTitle>대화상대 닉네임 입력</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        채팅방 삭제를 위해 대화상대 닉네임을 입력해주세요.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="파트너 이름"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        value={partnerName}
+                        onChange={(e) => setPartnerName(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteDialog}>취소</Button>
+                    <Button onClick={deleteChatRoom}>삭제</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* 채팅방 생성 다이얼로그 */}
+            <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
                 <DialogTitle>채팅방 생성</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        생성할 채팅방의 닉네임을 입력해주세요.
+                        대화상대 닉네임을 입력해주세요.
                     </DialogContentText>
                     <TextField
                         autoFocus
@@ -230,7 +280,7 @@ const ChatRoomList = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>취소</Button>
+                    <Button onClick={handleCloseCreateDialog}>취소</Button>
                     <Button onClick={handleCreateChatRoom}>생성</Button>
                 </DialogActions>
             </Dialog>

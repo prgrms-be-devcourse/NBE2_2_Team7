@@ -1,8 +1,8 @@
 package com.hunmin.domain.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
+import com.hunmin.domain.dto.chat.ChatRoomRequestDTO;
 import com.hunmin.domain.dto.notification.NotificationSendDTO;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
@@ -28,7 +28,7 @@ import java.io.IOException;
 public class ChatRoomService {
 
     @Resource(name = "redisTemplate")
-    private HashOperations<String, String, ChatRoom> roomStorage;
+    private HashOperations<String, String, ChatRoomRequestDTO> roomStorage;
     private final ObjectMapper objectMapper;
 
     private final ChatRoomRepository chatRoomRepository;
@@ -44,22 +44,25 @@ public class ChatRoomService {
     }
 
     // 나랑 관련된 모든 채팅방 조회
-    public List<ChatRoomDTO> findRoomByEmail(String email) {
+    public List<ChatRoomRequestDTO> findRoomByEmail(String email) {
         Member me = memberRepository.findByEmail(email);
-        List<ChatRoom> partnerNameAndChatRoom = roomStorage.values(me.getNickname());
+        List<ChatRoomRequestDTO> partnerNameAndChatRoom = roomStorage.values(me.getNickname());
         log.info("partnerNameAndChatRoom={}", partnerNameAndChatRoom);
 
-        List<ChatRoomDTO> chatRoomDTOList = new ArrayList<>();
+        List<ChatRoomRequestDTO> chatRoomRequestDTOList = new ArrayList<>();
         Set<Long> chatRoomIdInSet = new HashSet<>();
         for (Object rawChatRoom : partnerNameAndChatRoom) {
-            ChatRoom chatRoom;
+            ChatRoomRequestDTO chatRoomRequestDTO;
             if (rawChatRoom instanceof LinkedHashMap) {
-                chatRoom = objectMapper.convertValue(rawChatRoom, ChatRoom.class);
+                chatRoomRequestDTO = objectMapper.convertValue(rawChatRoom, ChatRoomRequestDTO.class);
             } else {
-                chatRoom = (ChatRoom) rawChatRoom;
+                chatRoomRequestDTO = (ChatRoomRequestDTO) rawChatRoom;
             }
-            chatRoomIdInSet.add(chatRoom.getChatRoomId());
-            chatRoomDTOList.add(new ChatRoomDTO(chatRoom));
+            chatRoomIdInSet.add(chatRoomRequestDTO.getChatRoomId());
+            chatRoomRequestDTOList.add(chatRoomRequestDTO);
+            log.info("chatRoomIdInSet={}",chatRoomIdInSet);
+            log.info("chatRoomRequestDTOList={}",chatRoomRequestDTOList);
+
         }
 
         Set<String> partnerNames = roomStorage.keys(me.getNickname());
@@ -67,27 +70,33 @@ public class ChatRoomService {
             log.info("partnerName={}", partnerName);
             Object rawChatRoom = roomStorage.get(partnerName, me.getNickname());
             if (rawChatRoom != null) {
-                ChatRoom chatRoom;
-                log.info("chatRoom={}", rawChatRoom);
+                ChatRoomRequestDTO chatRoomRequestDTO;
+                log.info("rawChatRoom={}", rawChatRoom);
                 if (rawChatRoom instanceof LinkedHashMap) {
-                    chatRoom = objectMapper.convertValue(rawChatRoom, ChatRoom.class);
+                    chatRoomRequestDTO = objectMapper.convertValue(rawChatRoom, ChatRoomRequestDTO.class);
                 } else {
-                    chatRoom = (ChatRoom) rawChatRoom;
-                    log.info("chatRoom={}", chatRoom);
+                    chatRoomRequestDTO = (ChatRoomRequestDTO) rawChatRoom;
+                    log.info("chatRoomRequestDTO={}", chatRoomRequestDTO);
                 }
-                if (!chatRoomIdInSet.contains(chatRoom.getChatRoomId())){
-                    chatRoomDTOList.add(new ChatRoomDTO(chatRoom));
+                if (!chatRoomIdInSet.contains(chatRoomRequestDTO.getChatRoomId())){
+                    chatRoomRequestDTOList.add(chatRoomRequestDTO);
                 }
             }
         }
-        return chatRoomDTOList;
+        return chatRoomRequestDTOList;
     }
 
     // 채팅방 생성 : 이름으로 상대방 검색 후 채팅방 개설  -> 새로운
-    public ChatMessageRequestDTO createChatRoomByNickName(String partnerName, String myEmail) {
+    public ChatRoomRequestDTO createChatRoomByNickName(String partnerName, String myEmail) {
+
+        Optional<Member> byNickname = memberRepository.findByNickname(partnerName);
+        if (byNickname.isEmpty()) {
+            throw  MemberException.NOT_FOUND.get();
+        }
+
         Member me = memberRepository.findByEmail(myEmail);
         log.info("me ={}", me);
-        ChatRoom chatRoomFromStorage = roomStorage.get(me.getNickname(), partnerName);
+        ChatRoomRequestDTO chatRoomFromStorage = roomStorage.get(me.getNickname(), partnerName);
 
         String myNickname = me.getNickname();
         // 이미 존재하는지 확인
@@ -95,9 +104,15 @@ public class ChatRoomService {
             log.info("이미존재합니다");
             throw ChatRoomException.CHATROOM_ALREADY_EXIST.get();
         }
-
-        ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.builder().member(me).build());
-        roomStorage.put(myNickname, partnerName, chatRoom);
+        ChatRoom chatRoom = ChatRoom.builder().member(me).build();
+        ChatRoom SavedchatRoom = chatRoomRepository.save(chatRoom);
+        roomStorage.put(me.getNickname(), partnerName, ChatRoomRequestDTO.builder()
+                .chatRoomId(SavedchatRoom.getChatRoomId())
+                .memberId(me.getMemberId())
+                .nickName(me.getNickname())
+                .partnerName(partnerName)
+                .createdAt(SavedchatRoom.getCreatedAt())
+                .build());
         log.info("roomStorage ={}", roomStorage);
 
         Member partner = memberRepository.findByNickname(partnerName).orElseThrow(MemberException.NOT_FOUND::get);
@@ -109,7 +124,7 @@ public class ChatRoomService {
                     .memberId(partnerId)
                     .message("[" + me.getNickname() + "]님이 새로운 채팅방을 개설했습니다.")
                     .notificationType(NotificationType.CHAT)
-                    .url("/chat-room/enter/" + chatRoom.getChatRoomId())
+                    .url("/chat-room/enter/" + SavedchatRoom.getChatRoomId())
                     .build();
 
             notificationService.send(notificationSendDTO);
@@ -119,30 +134,47 @@ public class ChatRoomService {
 
             if (emitter != null) {
                 try {
-                    emitter.send(new ChatRoomDTO(chatRoom));
+                    emitter.send(new ChatRoomDTO(SavedchatRoom));
                 } catch (IOException e) {
                     log.error("Error sending chat room notification to client via SSE: {}", e.getMessage());
                     sseEmitters.delete(emitterId);
                 }
             }
         }
-
-        return ChatMessageRequestDTO.builder()
-                .chatRoomId(chatRoom.getChatRoomId())
-                .userCount(chatRoom.getUserCount())
-                .createdAt(chatRoom.getCreatedAt())
+        return ChatRoomRequestDTO.builder()
+                .chatRoomId(SavedchatRoom.getChatRoomId())
+                .partnerName(partnerName)
                 .nickName(me.getNickname())
-                .MemberId(me.getMemberId())
+                .memberId(me.getMemberId())
+                .createdAt(SavedchatRoom.getCreatedAt())
                 .build();
     }
 
     // 채팅방 삭제
-    public Boolean deleteChatRoom(Long chatRoomId) {
+    public Boolean deleteChatRoom(Long chatRoomId, String partnerName, String meEmail) {
+
+        Optional<Member> byNickname = memberRepository.findByNickname(partnerName);
+        if (byNickname.isEmpty()) {
+            throw  MemberException.NOT_FOUND.get();
+        }
+
+        Member me = memberRepository.findByEmail(meEmail);
+
         ChatRoom foundChatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomException.NOT_FOUND::get);
 
         if (foundChatRoom == null) {
             return false;
+        }
+        if ((roomStorage.get(partnerName, me.getNickname())==null)
+                &&(roomStorage.get(me.getNickname(),partnerName)==null)){
+            return false;
+        }
+        if (roomStorage.get(partnerName, me.getNickname())!=null){
+            roomStorage.delete(partnerName, me.getNickname());
+        }
+        else if (roomStorage.get(me.getNickname(),partnerName)!=null){
+            roomStorage.delete(me.getNickname(), partnerName);
         }
         chatRoomRepository.delete(foundChatRoom);
         return true;
