@@ -13,6 +13,14 @@ import CreateNoticePage from './notice/CreateNoticePage';
 import ChatRoomList  from "./chat-room/ChatRoomList";
 import CreateChatRoom from "./chat-room/CreateChatRoom";
 import ChatRoomDetail from "./chat-room/ChatRoomDetail";
+import WordLearningPage from "./word/WordLearningPage";
+import WordManagementPage from "./word/WordManagementPage";
+import WordListPage from "./word/WordListPage";
+import WordViewPage from "./word/WordViewPage";
+import WordRegisterPage from "./word/WordRegisterPage";
+import WordEditPage from "./word/WordEditPage";
+import LevelSelectPage from "./word/LevelSelectPage";
+import LearningPage from "./word/LearningPage";
 
 
 const App = () => {
@@ -53,6 +61,17 @@ const AppContent = ({ token, setToken }) => {
                         <Route path="/chat-rooms/list" element={<ChatRoomList />} />
                         <Route path="/chat-room/create" element={<CreateChatRoom />} />
                         <Route path="/chat-room/:chatRoomId" element={<ChatRoomDetail />} />
+
+                        {/* 단어 관리 시스템 라우트 추가 */}
+                        <Route path="/word-management" element={<WordManagementPage />} />
+                        <Route path="/word-learning" element={<WordLearningPage />} />
+                        <Route path="/word-list" element={<WordListPage />} />
+                        <Route path="/word-view" element={<WordViewPage />} />
+                        <Route path="/word-register" element={<WordRegisterPage />} />
+                        <Route path="/word-edit" element={<WordEditPage />} />
+                        <Route path="/word-learning/levelSelect" element={<LevelSelectPage />} />
+                        <Route path="/word-learning/start" element={<LearningPage />} />
+
                     </>
                 ) : (
                     <Route path="*" element={<Navigate to="/login" />} />
