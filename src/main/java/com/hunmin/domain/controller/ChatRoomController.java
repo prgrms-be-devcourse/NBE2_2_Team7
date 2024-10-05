@@ -1,12 +1,13 @@
 package com.hunmin.domain.controller;
 
-import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
+import com.hunmin.domain.dto.chat.ChatRoomRequestDTO;
 import com.hunmin.domain.service.ChatRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +24,17 @@ public class ChatRoomController {
     //채팅방 생성
     @PostMapping("/{nickName}")
     @Operation(summary = "채팅방 생성", description = "채팅방을 이름으로 생성하는 API")
-    public ChatMessageRequestDTO createRoomByNickName(@PathVariable("nickName") String nickName
+    public ResponseEntity<ChatRoomDTO> createRoomByNickName(@PathVariable("nickName") String nickName
                                                         , Authentication authentication) {
         log.info("nickName={}", nickName);
         String currentMemberEmail = authentication.getName();
         log.info("Email={}", currentMemberEmail);
-        return chatRoomService.createChatRoomByNickName(nickName, currentMemberEmail);
+        return ResponseEntity.ok(chatRoomService.createChatRoomByNickName(nickName, currentMemberEmail));
     }
 
     //나랑 관련된 채팅방만 조회
     @GetMapping("/list")
-    public List<ChatRoomDTO> myRooms(Authentication authentication) {
+    public List<ChatRoomRequestDTO> myRooms(Authentication authentication) {
         String currentMemberEmail = authentication.getName();
         return chatRoomService.findRoomByEmail(currentMemberEmail);
     }

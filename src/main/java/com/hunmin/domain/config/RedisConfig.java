@@ -3,6 +3,7 @@ package com.hunmin.domain.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hunmin.domain.dto.chat.ChatMessageDTO;
+import com.hunmin.domain.dto.chat.ChatRoomRequestDTO;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.pubsub.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
@@ -45,8 +46,8 @@ public class RedisConfig {
     }
     // chatRoom 직렬화
     @Bean
-    public RedisTemplate<String, ChatRoom> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
-        RedisTemplate<String, ChatRoom> template = new RedisTemplate<>();
+    public RedisTemplate<String, ChatRoomRequestDTO> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
+        RedisTemplate<String, ChatRoomRequestDTO> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
         // GenericJackson2JsonRedisSerializer 설정
@@ -64,8 +65,9 @@ public class RedisConfig {
         template.afterPropertiesSet();
         return template;
     }
+
     @Bean
-    public HashOperations<String, String, ChatRoom> hashOperations(RedisTemplate<String, ChatRoom> redisTemplate) {
+    public HashOperations<String, String, ChatRoomRequestDTO> hashOperations(RedisTemplate<String, ChatRoomRequestDTO> redisTemplate) {
         return redisTemplate.opsForHash();
     }
 }
