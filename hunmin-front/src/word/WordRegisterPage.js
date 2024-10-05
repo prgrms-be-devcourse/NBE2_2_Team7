@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { Box, Container, Typography, Button, TextField, Alert } from '@mui/material';
+import {
+    Box,
+    Container,
+    Typography,
+    Button,
+    TextField,
+    Alert,
+    InputLabel,
+    Select,
+    MenuItem,
+    FormControl
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import api from '../axios'; // axios 인스턴스 import
 
@@ -64,16 +75,23 @@ const WordRegisterPage = () => {
                     />
                 </Box>
 
-                <Box sx={{ marginBottom: 2 }}>
-                    <TextField
-                        fullWidth
-                        required
-                        label="언어"
-                        variant="outlined"
+                <FormControl fullWidth required sx={{ marginBottom: 2 }}>
+                    <InputLabel>언어 선택</InputLabel>
+                    <Select
                         value={lang}
                         onChange={(e) => setLang(e.target.value)}
-                    />
-                </Box>
+                        label="언어 선택"
+                    >
+                        <MenuItem value="">
+                            <em>언어 선택</em>
+                        </MenuItem>
+                        <MenuItem value="영어">영어</MenuItem>
+                        <MenuItem value="일본어">일본어</MenuItem>
+                        <MenuItem value="중국어">중국어</MenuItem>
+                        <MenuItem value="베트남어">베트남어</MenuItem>
+                        <MenuItem value="프랑스어">프랑스어</MenuItem>
+                    </Select>
+                </FormControl>
 
                 <Box sx={{ marginBottom: 2 }}>
                     <TextField
