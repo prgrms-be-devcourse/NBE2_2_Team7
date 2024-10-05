@@ -118,7 +118,7 @@ const BoardListPage = () => {
     };
 
     const isValidProfileImage = (image) => {
-        return image && !image.includes('null'); // 이미지가 존재하고 'null'이 포함되지 않은 경우
+        return image && !image.includes('null');
     };
 
     // 로그아웃 처리 함수
