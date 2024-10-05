@@ -3,17 +3,20 @@ package com.hunmin.domain.controller;
 import com.hunmin.domain.dto.word.WordResponseDTO;
 import com.hunmin.domain.service.WordLearningService;
 import java.util.Collections;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/words/learning")
+@RequestMapping("api/words/learning")
 public class WordLearningController {
     private final WordLearningService wordLearningService;
 
@@ -34,19 +37,18 @@ public class WordLearningController {
     }
 
     @GetMapping("/start")
-    public String getRandomWords(@RequestParam String lang, @RequestParam int level, Model model) {
-        // 선택한 언어와 레벨에 따른 랜덤 단어 가져오기
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getRandomWords(@RequestParam String lang, @RequestParam int level) {
         List<WordResponseDTO> randomWords = wordLearningService.getRandomWords(lang, level);
 
-        // 모든 단어의 displayTime을 모델에 추가
-        model.addAttribute("words", randomWords); // 가져온 단어들을 모델에 추가
-        model.addAttribute("level", level); // 선택한 레벨을 모델에 추가
-        model.addAttribute("lang", lang); // 선택한 언어를 모델에 추가
-
-        // 단어의 displayTime을 별도로 전달
         long displayTime = randomWords.isEmpty() ? 0 : randomWords.get(0).getDisplayTime();
-        model.addAttribute("displayTime", displayTime); // displayTime 추가
 
-        return "word/learningWord"; // 단어 표시 페이지로 이동
+        Map<String, Object> response = new HashMap<>();
+        response.put("words", randomWords);
+        response.put("level", level);
+        response.put("lang", lang);
+        response.put("displayTime", displayTime);
+
+        return ResponseEntity.ok(response);
     }
 }
