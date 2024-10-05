@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import api from '../axios'; // API 요청을 위해 정의된 axios 인스턴스
 import {
     Box,
@@ -26,10 +26,10 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const ChatRoomCard = ({ room, onEnter, onRightClick }) => {
+const ChatRoomCard = ({room, onEnter, onRightClick}) => {
     return (
         <Card
-            sx={{ marginBottom: 2, cursor: 'pointer', width: '100%' }}
+            sx={{marginBottom: 2, cursor: 'pointer', width: '100%'}}
             onClick={() => onEnter(room.chatRoomId)}
             onContextMenu={(e) => onRightClick(e, room.chatRoomId)}
         >
@@ -37,7 +37,7 @@ const ChatRoomCard = ({ room, onEnter, onRightClick }) => {
                 title={`대화방 (${room.nickName}, ${room.partnerName || 'N/A'})`}
                 action={
                     <IconButton onClick={(e) => onRightClick(e, room.chatRoomId)}>
-                        <MoreVertIcon />
+                        <MoreVertIcon/>
                     </IconButton>
                 }
             />
@@ -54,7 +54,7 @@ const ChatRoomList = () => {
     const [chatRooms, setChatRooms] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedChatRoom, setSelectedChatRoom] = useState(null);
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [snackbar, setSnackbar] = useState({open: false, message: '', severity: 'success'});
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);  // 삭제 Dialog 상태 추가
     const [openCreateDialog, setOpenCreateDialog] = useState(false);  // 생성 Dialog 상태 추가
     const [newNickName, setNewNickName] = useState('');
@@ -107,28 +107,38 @@ const ChatRoomList = () => {
         }
         if (selectedChatRoom) {
             api.delete(`/chat-room/${selectedChatRoom}/${partnerName}`)
-                .then(() => {
-                    setChatRooms(chatRooms.filter(room => room.chatRoomId !== selectedChatRoom));
-                    setSnackbar({
-                        open: true,
-                        message: '채팅방이 성공적으로 삭제되었습니다.',
-                        severity: 'success',
-                    });
-                    handleCloseDeleteDialog(); // 다이얼로그 닫기
+                .then((response) => {
+                    if (response.data === true) { // 서버에서 true를 반환하면 성공 처리
+                        setChatRooms(chatRooms.filter(room => room.chatRoomId !== selectedChatRoom));
+                        setSnackbar({
+                            open: true,
+                            message: '채팅방이 성공적으로 삭제되었습니다.',
+                            severity: 'success',
+                        });
+                        handleCloseDeleteDialog(); // 다이얼로그 닫기
+                    } else {
+                        setSnackbar({
+                            open: true,
+                            message: '닉네임이 일치하지 않습니다.',
+                            severity: 'error',
+                        });
+                        handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
+                    }
                 })
                 .catch(error => {
                     setSnackbar({
                         open: true,
-                        message: '닉네임이 일치하지 않습니다.',
+                        message: '채팅방 삭제에 실패했습니다.',
                         severity: 'error',
                     });
+                    handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
                 });
             handleMenuClose();
         }
     };
 
     const handleCloseSnackbar = () => {
-        setSnackbar({ ...snackbar, open: false });
+        setSnackbar({...snackbar, open: false});
     };
 
     // 삭제 다이얼로그 닫기
@@ -169,18 +179,20 @@ const ChatRoomList = () => {
                     message: '채팅방 생성에 실패했습니다.',
                     severity: 'error',
                 });
+                handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
             });
     };
 
     return (
-        <Box sx={{ maxWidth: 700, margin: 'auto', padding: 2 }}>
+        <Box sx={{maxWidth: 700, margin: 'auto', padding: 2}}>
             <Typography variant="h4" gutterBottom>
                 채팅방 목록
             </Typography>
-            <Button variant="contained" color="primary" onClick={() => setOpenCreateDialog(true)} sx={{ marginBottom: 2 }}>
+            <Button variant="contained" color="primary" onClick={() => setOpenCreateDialog(true)}
+                    sx={{marginBottom: 2}}>
                 채팅방 생성
             </Button>
-            <List sx={{ width: '100%' }}>
+            <List sx={{width: '100%'}}>
                 {chatRooms.map(room => (
                     <React.Fragment key={room.chatRoomId}> {/* chatRoomId가 고유한지 확인 */}
                         <ListItem>
@@ -190,7 +202,7 @@ const ChatRoomList = () => {
                                 onRightClick={handleMenuOpen}
                             />
                         </ListItem>
-                        <Divider component="li" />
+                        <Divider component="li"/>
                     </React.Fragment>
                 ))}
             </List>
@@ -208,7 +220,7 @@ const ChatRoomList = () => {
                 }}
             >
                 <MenuItem onClick={openPartnerNameDialog}>
-                    <DeleteIcon fontSize="small" sx={{ marginRight: 1 }} />
+                    <DeleteIcon fontSize="small" sx={{marginRight: 1}}/>
                     채팅방 삭제
                 </MenuItem>
             </Menu>
@@ -218,9 +230,9 @@ const ChatRoomList = () => {
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
             >
-                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{width: '100%'}}>
                     {snackbar.message}
                 </Alert>
             </Snackbar>

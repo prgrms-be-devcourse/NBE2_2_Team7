@@ -54,7 +54,7 @@ public class ChatRoomController {
     //채팅방 삭제
     @DeleteMapping("/{chatRoomId}/{partnerName}")
     @Operation(summary = "채팅방 삭제", description = "삭제하고 싶은 채팅방을 삭제하는 API")
-    public Boolean deleteRoom(@PathVariable Long chatRoomId, @PathVariable String partnerName) {
-        return chatRoomService.deleteChatRoom(chatRoomId,partnerName);
+    public Boolean deleteRoom(@PathVariable Long chatRoomId, @PathVariable String partnerName,Authentication authentication) {
+        return chatRoomService.deleteChatRoom(chatRoomId,partnerName,authentication.getName());
     }
 }
