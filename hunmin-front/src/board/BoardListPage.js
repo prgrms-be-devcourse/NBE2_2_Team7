@@ -18,27 +18,29 @@ import {
     Pagination,
     Grid, // Grid 컴포넌트 임포트
 } from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat'; // 채팅 아이콘 임포트
 
 const BoardListPage = () => {
-    const navigate = useNavigate(); // navigate 함수 추가
-    const memberId = localStorage.getItem('memberId');
-    const nickname = localStorage.getItem('nickname');
-    const profileImage = localStorage.getItem('image');
+    const navigate = useNavigate(); // useNavigate 훅 사용
+    const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
+    const nickname = localStorage.getItem('nickname'); // 로컬 스토리지에서 닉네임 가져오기
+    const profileImage = localStorage.getItem('image'); // 로컬 스토리지에서 프로필 이미지 가져오기
     const [boards, setBoards] = useState([]);
     const [filteredBoards, setFilteredBoards] = useState([]);
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
     const [totalPages, setTotalPages] = useState(0);
     const [searchLocation, setSearchLocation] = useState('');
-    const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 });
-    const [mapLevel, setMapLevel] = useState(9);
-    const [showMyBoards, setShowMyBoards] = useState(false);
+    const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 }); // 초기 지도 중심 설정
+    const [mapLevel, setMapLevel] = useState(9); // 지도 레벨 상태 추가
+    const [showMyBoards, setShowMyBoards] = useState(false); // 내 작성글 보기 상태
+    const [kakaoLoaded, setKakaoLoaded] = useState(false); // Kakao Maps SDK 로드 상태
 
     useEffect(() => {
         if (showMyBoards) {
-            fetchMyBoards();
+            fetchMyBoards(); // 내 게시글 목록 가져오기
         } else {
-            fetchBoards();
+            fetchBoards(); // 전체 게시글 목록 가져오기
         }
     }, [page, size, showMyBoards]);
 
@@ -46,13 +48,33 @@ const BoardListPage = () => {
         setFilteredBoards(boards);
     }, [boards]);
 
+    useEffect(() => {
+        console.log('Kakao API Key:', process.env.REACT_APP_KAKAO_API_KEY); // 추가
+        if (!window.kakao) {
+            const script = document.createElement('script');
+            script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.REACT_APP_KAKAO_API_KEY}&libraries=services,clusterer,drawing`;
+            script.async = true;
+            script.onload = () => {
+                console.log('Kakao Maps SDK loaded.');
+                setKakaoLoaded(true);
+            };
+            script.onerror = () => {
+                console.error('Kakao Maps SDK script failed to load.');
+            };
+            document.head.appendChild(script);
+        } else {
+            console.log('Kakao Maps SDK already loaded.');
+            setKakaoLoaded(true);
+        }
+    }, []);
+
     const fetchBoards = async () => {
         try {
             const response = await api.get('/board', {
                 params: { page, size },
             });
             setBoards(response.data.content);
-            setTotalPages(response.data.totalPages);
+            setTotalPages(response.data.totalPages); // 전체 페이지 수 설정
         } catch (error) {
             console.error('Error fetching boards:', error);
         }
@@ -64,20 +86,25 @@ const BoardListPage = () => {
                 params: { page, size },
             });
             setBoards(response.data.content);
-            setTotalPages(response.data.totalPages);
+            setTotalPages(response.data.totalPages); // 전체 페이지 수 설정
         } catch (error) {
             console.error('Error fetching my boards:', error);
         }
     };
 
     const handleSearch = async () => {
+        if (!kakaoLoaded || !window.kakao.maps) {
+            console.error('Kakao Maps SDK is not loaded yet.');
+            return;
+        }
+
         const kakao = window.kakao;
         const ps = new kakao.maps.services.Places();
 
         ps.keywordSearch(searchLocation, (data, status) => {
             if (status === kakao.maps.services.Status.OK) {
                 const firstPlace = data[0];
-                const center = { lat: firstPlace.y, lng: firstPlace.x };
+                const center = { lat: parseFloat(firstPlace.y), lng: parseFloat(firstPlace.x) };
 
                 const nearbyBoards = boards.filter(board => {
                     const distance = getDistance(board.latitude, board.longitude, center.lat, center.lng);
@@ -86,10 +113,10 @@ const BoardListPage = () => {
 
                 setFilteredBoards(nearbyBoards);
                 setMapCenter(center);
-                setMapLevel(5);
+                setMapLevel(5); // 검색 후 지도 확대
             } else {
                 setFilteredBoards([]);
-                setMapLevel(9);
+                setMapLevel(9); // 초기 레벨로 설정
             }
         });
     };
@@ -115,7 +142,7 @@ const BoardListPage = () => {
     };
 
     const isValidProfileImage = (image) => {
-        return image && !image.includes('null');
+        return image && !image.includes('null'); // 이미지가 존재하고 'null'이 포함되지 않은 경우
     };
 
     // 로그아웃 처리 함수
@@ -137,31 +164,43 @@ const BoardListPage = () => {
         }
     }
 
+    // 채팅하기 버튼 클릭 핸들러
+    const handleChatClick = () => {
+        navigate('/chat-rooms/list'); // 채팅 목록 페이지로 이동
+    };
+
     return (
         <Container>
             <AppBar position="static">
-                <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    <Link to="/update-member" style={{ textDecoration: 'none', color: 'inherit' }}>
-                        {isValidProfileImage(profileImage) ? (
-                            <img
-                                src={profileImage}
-                                alt="프로필"
-                                style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '50%',
-                                    objectFit: 'cover',
-                                    border: '2px solid #fff',
-                                }}
-                            />
-                        ) : (
-                            <FaUserCircle size={30} style={{ color: '#fff' }} />
-                        )}
-                    </Link>
-                    <Typography variant="h6" style={{ marginLeft: '20px' }}>
-                        {nickname}
-                    </Typography>
-                    <Button color="inherit" onClick={handleLogout} style={{ marginLeft: '10px' }}>
+                <Toolbar style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {/* 왼쪽: 프로필 이미지 및 닉네임 */}
+                    <Box display="flex" alignItems="center">
+                        <Link to="/update-member" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            {isValidProfileImage(profileImage) ? (
+                                <img
+                                    src={profileImage}
+                                    alt="프로필"
+                                    style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        borderRadius: '50%',
+                                        objectFit: 'cover',
+                                        border: '2px solid #fff', // 이미지에 테두리 추가 (선택적)
+                                    }}
+                                />
+                            ) : (
+                                <FaUserCircle size={30} style={{ color: '#fff' }} /> // 프로필 아이콘 표시
+                            )}
+                        </Link>
+                        <Typography variant="h6" style={{ marginLeft: '20px' }}>
+                            {nickname} {/* 로컬 스토리지에서 가져온 닉네임 표시 */}
+                        </Typography>
+                    </Box>
+                    {/* 오른쪽: 채팅하기 버튼 */}
+                    <Button color="inherit" startIcon={<ChatIcon />} onClick={handleChatClick}>
+                        채팅하기
+                    </Button>
+                    <Button color="inherit" onClick={handleLogout}>
                         로그아웃
                     </Button>
                 </Toolbar>
@@ -169,7 +208,7 @@ const BoardListPage = () => {
 
             <Box mt={2}>
                 <Typography variant="h4">{showMyBoards ? '내 글' : '전체 글'}</Typography>
-                <Link to="/create-board">
+                <Link to="/create-board" style={{ textDecoration: 'none' }}>
                     <Button variant="contained" color="primary">게시글 작성</Button>
                 </Link>
                 <Button

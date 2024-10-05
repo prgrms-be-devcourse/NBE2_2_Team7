@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../axios';
 import ChatRoomList from './ChatRoomList';
 import './styles.css';
 
@@ -12,7 +12,7 @@ const CreateChatRoom = () => {
             return;
         }
 
-        axios.post('/api/chat-room', null, {
+        api.post('/api/chat-room', null, {
             params: { nickName: nickname }
         })
             .then(response => {
