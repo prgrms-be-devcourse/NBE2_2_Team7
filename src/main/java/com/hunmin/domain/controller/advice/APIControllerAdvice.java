@@ -54,4 +54,12 @@ public class APIControllerAdvice {
 
         return ResponseEntity.status(e.getCode()).body(map);
     }
+
+    // 단어 예외 처리
+    @ExceptionHandler(WordTaskException.class)
+    public ResponseEntity<Map<String, String>> handleWordTaskException(WordTaskException e) {
+        Map<String, String> map = Map.of("error", e.getMessage());
+
+        return ResponseEntity.status(e.getCode()).body(map);
+    }
 }

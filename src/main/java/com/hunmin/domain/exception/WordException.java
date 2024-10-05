@@ -2,27 +2,24 @@ package com.hunmin.domain.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-
-import static org.springframework.http.HttpStatus.*;
 
 @Getter
 @RequiredArgsConstructor
 public enum WordException {
-    MEMBER_NOT_FOUND(NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
-    MEMBER_NOT_MATCHED(BAD_REQUEST, "회원 정보가 일치하지 않습니다."),
-    MEMBER_NOT_REMOVED(CONFLICT, "회원 삭제에 실패했습니다."),
-    MEMBER_NOT_REGISTERED(CONFLICT, "회원 등록에 실패했습니다."),
-    MEMBER_NOT_MODIFIED(CONFLICT, "회원 정보 수정에 실패했습니다."),
-    MEMBER_NOT_VALID(BAD_REQUEST, "유효하지 않은 관리자 코드입니다."),
-    MEMBER_NOT_ADMIN(BAD_REQUEST, "관리자 권한이 필요합니다."),
 
-    WORD_NOT_FOUND(NOT_FOUND, "단어 정보를 찾을 수 없습니다."),
-    WORD_BAD_REQUEST(BAD_REQUEST, "단어 요청이 잘못되었습니다."),
-    WORD_NOT_REMOVED(CONFLICT, "단어 삭제에 실패했습니다."),
-    WORD_NOT_REGISTERED(CONFLICT, "단어 등록에 실패했습니다."),
-    WORD_NOT_MODIFIED(CONFLICT, "단어 수정에 실패했습니다.");
+    WORD_NOT_FOUND("단어가 존재하지 않습니다.", 404),
+    MEMBER_NOT_VALID("관리자 권한이 필요합니다.", 400),
+    WORD_NOT_CREATED("단어 작성에 실패하였습니다.", 400),
+    WORD_NOT_UPDATED("단어 수정에 실패하였습니다.", 400),
+    WORD_NOT_DELETED("단어 삭제에 실패하였습니다.", 400);
 
-    private final HttpStatus status;
-    private final String message;
+    private WordTaskException wordTaskException;
+
+    WordException(String message, int code){
+        wordTaskException = new WordTaskException(message, code);
+    }
+
+    public WordTaskException get(){
+        return wordTaskException;
+    }
 }
