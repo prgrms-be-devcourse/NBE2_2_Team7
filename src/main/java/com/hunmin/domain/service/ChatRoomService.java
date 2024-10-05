@@ -3,9 +3,13 @@ package com.hunmin.domain.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
+import com.hunmin.domain.dto.notification.NotificationSendDTO;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
+import com.hunmin.domain.entity.NotificationType;
 import com.hunmin.domain.exception.ChatRoomException;
+import com.hunmin.domain.exception.MemberException;
+import com.hunmin.domain.handler.SseEmitters;
 import com.hunmin.domain.repository.ChatRoomRepository;
 import com.hunmin.domain.repository.MemberRepository;
 import jakarta.annotation.Resource;
@@ -13,8 +17,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.*;
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,9 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
+
+    private final NotificationService notificationService;
+    private final SseEmitters sseEmitters;
 
     // 단일 채팅방 조회
     public ChatRoomDTO findRoomById(Long id) {
@@ -90,6 +99,33 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.builder().member(me).build());
         roomStorage.put(myNickname, partnerName, chatRoom);
         log.info("roomStorage ={}", roomStorage);
+
+        Member partner = memberRepository.findByNickname(partnerName).orElseThrow(MemberException.NOT_FOUND::get);
+
+        if (partner != null) {
+            Long partnerId = partner.getMemberId();
+
+            NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
+                    .memberId(partnerId)
+                    .message("[" + me.getNickname() + "]님이 새로운 채팅방을 개설했습니다.")
+                    .notificationType(NotificationType.CHAT)
+                    .url("/chat-room/enter/" + chatRoom.getChatRoomId())
+                    .build();
+
+            notificationService.send(notificationSendDTO);
+
+            String emitterId = partnerId + "_";
+            SseEmitter emitter = sseEmitters.findSingleEmitter(emitterId);
+
+            if (emitter != null) {
+                try {
+                    emitter.send(new ChatRoomDTO(chatRoom));
+                } catch (IOException e) {
+                    log.error("Error sending chat room notification to client via SSE: {}", e.getMessage());
+                    sseEmitters.delete(emitterId);
+                }
+            }
+        }
 
         return ChatMessageRequestDTO.builder()
                 .chatRoomId(chatRoom.getChatRoomId())
