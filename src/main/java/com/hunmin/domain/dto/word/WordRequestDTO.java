@@ -1,5 +1,6 @@
 package com.hunmin.domain.dto.word;
 
+import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.Word;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,9 +13,6 @@ import lombok.NoArgsConstructor;
 public class WordRequestDTO {
 
     private Long wordId;
-
-    @NotNull
-    private Long memberId;
 
     @NotEmpty(message = "명칭은 필수 입력값입니다.")
     private String title;
@@ -31,6 +29,16 @@ public class WordRequestDTO {
     public Word toEntity() {
         return Word.builder()
                 .wordId(wordId)
+                .title(title)
+                .translation(translation)
+                .definition(definition)
+                .lang(lang)
+                .build();
+    }
+
+    public Word toEntity(Member member){
+        return Word.builder()
+                .member(member)
                 .title(title)
                 .translation(translation)
                 .definition(definition)
