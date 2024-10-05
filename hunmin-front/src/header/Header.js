@@ -23,6 +23,7 @@ const Header = () => {
         try {
             const response = await api.get(`/notification/${memberId}`); // memberId를 URL에 포함
             const validNotifications = response.data.filter(notification => notification.message);
+            console.log(validNotifications);
             setNotifications(validNotifications);
         } catch (error) {
             console.error('Error fetching notifications:', error);
@@ -31,14 +32,15 @@ const Header = () => {
 
     useEffect(() => {
         fetchNotifications();
-        const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
-        const eventSource = new EventSource(`http://localhost:8080/api/notification/subscribe/${memberId}`); // memberId를 URL에 포함
+        const memberId = localStorage.getItem('memberId');
+        const eventSource = new EventSource(`http://localhost:8080/api/notification/subscribe/${memberId}`);
 
         eventSource.onmessage = (event) => {
             const newNotification = JSON.parse(event.data);
             setNotifications(prev => [newNotification, ...prev]);
             if (!newNotification.isRead) {
-                displayPopup(newNotification.message);
+                displayPopup(newNotification.message); // 최신 알림 메시지를 팝업에 표시
+                console.log(newNotification.message);
             }
         };
 
@@ -155,10 +157,12 @@ const Header = () => {
                     position: 'fixed',
                     top: '20px',
                     right: '50px',
-                    backgroundColor: 'white',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // 투명한 검은색 배경으로 변경
+                    color: 'white', // 텍스트 색상을 흰색으로 변경
                     border: '1px solid black',
                     padding: '10px',
                     zIndex: 1000,
+                    borderRadius: '5px' // 둥근 모서리 추가
                 }}>
                     {popupMessage}
                 </div>

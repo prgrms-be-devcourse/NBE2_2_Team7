@@ -1,5 +1,3 @@
-// src/board/BoardListPage.js
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../axios';
@@ -31,7 +29,7 @@ const BoardListPage = () => {
     const [filteredBoards, setFilteredBoards] = useState([]);
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
-    const [totalPages, setTotalPages] = useState(0); // 전체 페이지 수 상태 추가
+    const [totalPages, setTotalPages] = useState(0);
     const [searchLocation, setSearchLocation] = useState('');
     const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 }); // 초기 지도 중심 설정
     const [mapLevel, setMapLevel] = useState(9); // 지도 레벨 상태 추가
@@ -143,10 +141,28 @@ const BoardListPage = () => {
         return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     };
 
-    // 프로필 이미지가 유효한지 확인하는 함수
     const isValidProfileImage = (image) => {
         return image && !image.includes('null'); // 이미지가 존재하고 'null'이 포함되지 않은 경우
     };
+
+    // 로그아웃 처리 함수
+    const handleLogout = async () => {
+        try {
+            // 현재 쿠키 상태 로그
+            console.log('Current cookies:', document.cookie);
+
+            // 로그아웃 요청
+            const response = await api.post('/members/logout', {}, { withCredentials: true });
+            console.log('Logout response:', response); // 응답 확인
+
+            // 로컬 스토리지 초기화
+            localStorage.clear();
+            // 로그인 페이지로 이동
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed:', error); // 오류 출력
+        }
+    }
 
     // 채팅하기 버튼 클릭 핸들러
     const handleChatClick = () => {
@@ -155,7 +171,6 @@ const BoardListPage = () => {
 
     return (
         <Container>
-            {/* AppBar에 프로필과 채팅하기 버튼 추가 */}
             <AppBar position="static">
                 <Toolbar style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {/* 왼쪽: 프로필 이미지 및 닉네임 */}
@@ -180,13 +195,13 @@ const BoardListPage = () => {
                         <Typography variant="h6" style={{ marginLeft: '20px' }}>
                             {nickname} {/* 로컬 스토리지에서 가져온 닉네임 표시 */}
                         </Typography>
-                        <Button color="inherit" onClick={() => setShowMyBoards(!showMyBoards)} style={{ marginLeft: '10px' }}>
-                            {showMyBoards ? '전체 글 보기' : '내 글 보기'}
-                        </Button>
                     </Box>
                     {/* 오른쪽: 채팅하기 버튼 */}
                     <Button color="inherit" startIcon={<ChatIcon />} onClick={handleChatClick}>
                         채팅하기
+                    </Button>
+                    <Button color="inherit" onClick={handleLogout}>
+                        로그아웃
                     </Button>
                 </Toolbar>
             </AppBar>
@@ -196,6 +211,14 @@ const BoardListPage = () => {
                 <Link to="/create-board" style={{ textDecoration: 'none' }}>
                     <Button variant="contained" color="primary">게시글 작성</Button>
                 </Link>
+                <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={() => setShowMyBoards(!showMyBoards)}
+                    style={{ marginLeft: '10px' }}
+                >
+                    {showMyBoards ? '전체 글 보기' : '내 글 보기'}
+                </Button>
             </Box>
 
             <Grid container spacing={2} mt={2}>
@@ -273,7 +296,6 @@ const BoardListPage = () => {
             </Grid>
         </Container>
     );
-
 };
 
 export default BoardListPage;
