@@ -1,6 +1,6 @@
-// src/components/ChatRoomList.js
+// src/components/chat-room/ChatRoomList.js
 import React, { useState, useEffect } from 'react';
-import api from '../axios'; // Axios 인스턴스 경로 확인
+import api from '../axios'; // 정확한 경로로 임포트
 import {
     Box,
     Card,
@@ -68,6 +68,7 @@ const ChatRoomList = () => {
         // 인증된 사용자인지 확인 후 요청
         api.get('/chat-room/list')
             .then(response => {
+                console.log('Chat Rooms:', response.data); // 데이터 출력
                 setChatRooms(response.data);
             })
             .catch(error => {
@@ -171,7 +172,7 @@ const ChatRoomList = () => {
             </Button>
             <List>
                 {chatRooms.map(room => (
-                    <React.Fragment key={room.chatRoomId}>
+                    <React.Fragment key={room.chatRoomId}> {/* chatRoomId가 고유한지 확인 */}
                         <ListItem>
                             <ChatRoomCard
                                 room={room}
