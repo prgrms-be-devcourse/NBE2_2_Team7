@@ -14,10 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +39,9 @@ public class ChatRoomService {
         Member me = memberRepository.findByEmail(email);
         List<ChatRoom> partnerNameAndChatRoom = roomStorage.values(me.getNickname());
         log.info("partnerNameAndChatRoom={}", partnerNameAndChatRoom);
+
         List<ChatRoomDTO> chatRoomDTOList = new ArrayList<>();
+        Set<Long> chatRoomIdInSet = new HashSet<>();
         for (Object rawChatRoom : partnerNameAndChatRoom) {
             ChatRoom chatRoom;
             if (rawChatRoom instanceof LinkedHashMap) {
@@ -50,7 +49,7 @@ public class ChatRoomService {
             } else {
                 chatRoom = (ChatRoom) rawChatRoom;
             }
-
+            chatRoomIdInSet.add(chatRoom.getChatRoomId());
             chatRoomDTOList.add(new ChatRoomDTO(chatRoom));
         }
 
@@ -67,7 +66,9 @@ public class ChatRoomService {
                     chatRoom = (ChatRoom) rawChatRoom;
                     log.info("chatRoom={}", chatRoom);
                 }
-                chatRoomDTOList.add(new ChatRoomDTO(chatRoom));
+                if (!chatRoomIdInSet.contains(chatRoom.getChatRoomId())){
+                    chatRoomDTOList.add(new ChatRoomDTO(chatRoom));
+                }
             }
         }
         return chatRoomDTOList;

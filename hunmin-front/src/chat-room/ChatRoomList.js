@@ -1,118 +1,240 @@
-// // ChatRoomList.js
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import './styles.css';  // CSS 파일 import
+// src/components/chat-room/ChatRoomList.js
+import React, { useState, useEffect } from 'react';
+import api from '../axios'; // 정확한 경로로 임포트
+import {
+    Box,
+    Card,
+    CardHeader,
+    CardContent,
+    CardActions,
+    Typography,
+    IconButton,
+    Menu,
+    MenuItem,
+    List,
+    ListItem,
+    Divider,
+    Snackbar,
+    Alert,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    TextField,
+} from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const ChatRoomCard = ({ room, onEnter, onRightClick }) => {
-    const cardRef = useRef(null);
-
     return (
-        <div
-            key={room.chatRoomId}
-            className="chatroom-card"
+        <Card
+            sx={{ marginBottom: 2, cursor: 'pointer' }}
             onClick={() => onEnter(room.chatRoomId)}
-            onContextMenu={(e) => onRightClick(e, room.chatRoomId, cardRef)}
-            ref={cardRef}
+            onContextMenu={(e) => onRightClick(e, room.chatRoomId)}
         >
-
-            <div className="chatroom-header">
-                <h6>{room.nickname}</h6>
-            </div>
-            <div className="chatroom-body">
-                <p>최근 메시지: {room.latestMessageContent || 'No recent messages.'}</p>
-            </div>
-            <div className="chatroom-footer">
-                <small>최근 활동: {room.latestMessageDate || 'N/A'}</small>
-            </div>
-        </div>
+            <CardHeader
+                title={room.nickname}
+                action={
+                    <IconButton onClick={(e) => onRightClick(e, room.chatRoomId)}>
+                        <MoreVertIcon />
+                    </IconButton>
+                }
+            />
+            <CardContent>
+                <Typography variant="body2" color="text.secondary">
+                    최근 메시지: {room.latestMessageContent || '최근 메시지가 없습니다.'}
+                </Typography>
+            </CardContent>
+            <CardActions>
+                <Typography variant="caption" color="text.secondary">
+                    최근 활동: {room.latestMessageDate ? new Date(room.latestMessageDate).toLocaleString() : 'N/A'}
+                </Typography>
+            </CardActions>
+        </Card>
     );
 };
 
 const ChatRoomList = () => {
     const [chatRooms, setChatRooms] = useState([]);
-    const [popupVisible, setPopupVisible] = useState(false);
-    const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+    const [anchorEl, setAnchorEl] = useState(null);
     const [selectedChatRoom, setSelectedChatRoom] = useState(null);
-    const containerRef = useRef(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newNickName, setNewNickName] = useState('');
 
     useEffect(() => {
-        axios.get('/api/chat-room/list')
+        // 인증된 사용자인지 확인 후 요청
+        api.get('/chat-room/list')
             .then(response => {
+                console.log('Chat Rooms:', response.data); // 데이터 출력
                 setChatRooms(response.data);
             })
             .catch(error => {
-                console.error('Error fetching chat rooms:', error);
+                console.error('채팅방 가져오기 오류:', error);
+                setSnackbar({
+                    open: true,
+                    message: '채팅방 목록을 불러오는데 실패했습니다.',
+                    severity: 'error',
+                });
             });
-
-        const handleClickOutside = (event) => {
-            if (popupVisible && containerRef.current && !containerRef.current.contains(event.target)) {
-                setPopupVisible(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [popupVisible]);
+    }, []);
 
     const enterRoom = (chatRoomId) => {
         window.location.href = `/chat-room/${chatRoomId}`;
     };
 
-    const handleRightClick = (event, chatRoomId, cardRef) => {
-        event.preventDefault(); // Prevent the default context menu
-        setPopupPosition({
-            x: event.clientX,  // Use event.clientX for horizontal position
-            y: event.clientY   // Use event.clientY for vertical position
-        });
+    const handleMenuOpen = (event, chatRoomId) => {
+        event.stopPropagation(); // onClick 트리거 방지
+        setAnchorEl(event.currentTarget);
         setSelectedChatRoom(chatRoomId);
-        setPopupVisible(true);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        setSelectedChatRoom(null);
     };
 
     const deleteChatRoom = () => {
         if (selectedChatRoom) {
-            axios.delete(`/api/chat-room/${selectedChatRoom}`)
+            api.delete(`/chat-room/${selectedChatRoom}`)
                 .then(() => {
                     setChatRooms(chatRooms.filter(room => room.chatRoomId !== selectedChatRoom));
-                    alert('Chat room deleted successfully.');
+                    setSnackbar({
+                        open: true,
+                        message: '채팅방이 성공적으로 삭제되었습니다.',
+                        severity: 'success',
+                    });
                 })
                 .catch(error => {
-                    console.error('Error deleting chat room:', error);
-                    alert('Failed to delete chat room.');
+                    console.error('채팅방 삭제 오류:', error);
+                    setSnackbar({
+                        open: true,
+                        message: '채팅방 삭제에 실패했습니다.',
+                        severity: 'error',
+                    });
                 });
-            setPopupVisible(false);
+            handleMenuClose();
         }
     };
 
-    const handleClosePopup = () => {
-        setPopupVisible(false);
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
+
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setNewNickName('');
+    };
+
+    const handleCreateChatRoom = () => {
+        if (newNickName.trim() === '') {
+            setSnackbar({
+                open: true,
+                message: '닉네임을 입력해주세요.',
+                severity: 'warning',
+            });
+            return;
+        }
+
+        api.post(`/chat-room/${newNickName}`)
+            .then(response => {
+                setChatRooms([...chatRooms, response.data]);
+                setSnackbar({
+                    open: true,
+                    message: '채팅방이 성공적으로 생성되었습니다.',
+                    severity: 'success',
+                });
+                handleCloseDialog();
+            })
+            .catch(error => {
+                console.error('채팅방 생성 오류:', error);
+                setSnackbar({
+                    open: true,
+                    message: '채팅방 생성에 실패했습니다.',
+                    severity: 'error',
+                });
+            });
     };
 
     return (
-        <div className="container" ref={containerRef}>
-            <div className="d-flex justify-content-between align-items-center mb-3">
-            </div>
-            {chatRooms.map(room => (
-                <ChatRoomCard
-                    key={room.chatRoomId}
-                    room={room}
-                    onEnter={enterRoom}
-                    onRightClick={handleRightClick}
-                />
-            ))}
-            {popupVisible && (
-                <div
-                    className="popup-menu"
-                    style={{
-                        top: popupPosition.y,
-                        left: popupPosition.x
-                    }}
-                >
-                    <button onClick={deleteChatRoom}>채팅방 삭제</button>
-                </div>
-            )}
-        </div>
+        <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2 }}>
+            <Typography variant="h4" gutterBottom>
+                채팅방 목록
+            </Typography>
+            <Button variant="contained" color="primary" onClick={handleOpenDialog} sx={{ marginBottom: 2 }}>
+                채팅방 생성
+            </Button>
+            <List>
+                {chatRooms.map(room => (
+                    <React.Fragment key={room.chatRoomId}> {/* chatRoomId가 고유한지 확인 */}
+                        <ListItem>
+                            <ChatRoomCard
+                                room={room}
+                                onEnter={enterRoom}
+                                onRightClick={handleMenuOpen}
+                            />
+                        </ListItem>
+                        <Divider component="li" />
+                    </React.Fragment>
+                ))}
+            </List>
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+            >
+                <MenuItem onClick={deleteChatRoom}>
+                    <DeleteIcon fontSize="small" sx={{ marginRight: 1 }} />
+                    채팅방 삭제
+                </MenuItem>
+            </Menu>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <DialogTitle>채팅방 생성</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        생성할 채팅방의 닉네임을 입력해주세요.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="닉네임"
+                        type="text"
+                        fullWidth
+                        variant="standard"
+                        value={newNickName}
+                        onChange={(e) => setNewNickName(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>취소</Button>
+                    <Button onClick={handleCreateChatRoom}>생성</Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
     );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../axios'; // 올바른 상대 경로
 import { useParams } from 'react-router-dom';
 import './styles.css';
 
@@ -9,7 +9,7 @@ const ChatRoomDetail = () => {
     const [chatRoom, setChatRoom] = useState(null);
 
     useEffect(() => {
-        axios.get(`/api/chat-room/${chatRoomId}`)
+        api.get(`/api/chat-room/${chatRoomId}`)
             .then(response => {
                 setChatRoom(response.data);
             })
