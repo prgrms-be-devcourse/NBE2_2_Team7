@@ -1,10 +1,7 @@
 package com.hunmin.domain.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.hunmin.domain.dto.chat.ChatMessageDTO;
 import com.hunmin.domain.dto.chat.ChatRoomRequestDTO;
-import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.pubsub.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +14,6 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @RequiredArgsConstructor
@@ -65,7 +61,6 @@ public class RedisConfig {
         template.afterPropertiesSet();
         return template;
     }
-
     @Bean
     public HashOperations<String, String, ChatRoomRequestDTO> hashOperations(RedisTemplate<String, ChatRoomRequestDTO> redisTemplate) {
         return redisTemplate.opsForHash();

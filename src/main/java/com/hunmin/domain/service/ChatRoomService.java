@@ -1,13 +1,9 @@
 package com.hunmin.domain.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hunmin.domain.dto.chat.ChatMessageRequestDTO;
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
-<<<<<<< HEAD
 import com.hunmin.domain.dto.chat.ChatRoomRequestDTO;
-=======
 import com.hunmin.domain.dto.notification.NotificationSendDTO;
->>>>>>> 9ecf831bd2a244879f6788f675aedac768f212ac
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.NotificationType;
@@ -47,6 +43,7 @@ public class ChatRoomService {
         return new ChatRoomDTO(chatRoom);
     }
 
+    // 나랑 관련된 모든 채팅방 조회
     public List<ChatRoomRequestDTO> findRoomByEmail(String email) {
         Member me = memberRepository.findByEmail(email);
         List<ChatRoomRequestDTO> partnerNameAndChatRoom = roomStorage.values(me.getNickname());
@@ -112,9 +109,6 @@ public class ChatRoomService {
                 .build());
         log.info("roomStorage ={}", roomStorage);
 
-<<<<<<< HEAD
-        return new ChatRoomDTO(chatRoom);
-=======
         Member partner = memberRepository.findByNickname(partnerName).orElseThrow(MemberException.NOT_FOUND::get);
 
         if (partner != null) {
@@ -141,15 +135,7 @@ public class ChatRoomService {
                 }
             }
         }
-
-        return ChatMessageRequestDTO.builder()
-                .chatRoomId(chatRoom.getChatRoomId())
-                .userCount(chatRoom.getUserCount())
-                .createdAt(chatRoom.getCreatedAt())
-                .nickName(me.getNickname())
-                .MemberId(me.getMemberId())
-                .build();
->>>>>>> 9ecf831bd2a244879f6788f675aedac768f212ac
+        return new ChatRoomDTO(chatRoom);
     }
 
     // 채팅방 삭제
