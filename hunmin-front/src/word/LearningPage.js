@@ -19,14 +19,14 @@ const LearningPage = () => {
     // 레벨에 따라 시간을 설정하는 함수
     const getTimeForLevel = (level) => {
         switch (level) {
-            case '1': // Level 1
-                return 30; // 1분
-            case '2': // Level 2
-                return 20; // 50초
-            case '3': // Level 3
-                return 10; // 40초
+            case '1':
+                return 30; // 30초
+            case '2':
+                return 20; // 20초
+            case '3':
+                return 10; // 10초
             default:
-                return 30; // 기본값 1분
+                return 30; // 기본값 30초
         }
     };
 
@@ -37,7 +37,10 @@ const LearningPage = () => {
                     params: { lang, level },
                 });
                 setWords(response.data.words);
-                setTimeLeft(getTimeForLevel(level)); // 레벨에 따른 초기화
+                const initialTimeLeft = getTimeForLevel(level); // 레벨에 따른 초기화
+                setTimeLeft(initialTimeLeft); // 초기 시간 설정
+                setShowTranslation(false);
+                setShowEndMessage(false);
             } catch (error) {
                 console.error("Error fetching words:", error);
             }
@@ -47,22 +50,18 @@ const LearningPage = () => {
     }, [lang, level]);
 
     useEffect(() => {
-        // 타이머가 설정되면 시작
-        const countdown = setInterval(() => {
-            if (timeLeft <= 1) {
-                setShowTranslation(true);
-                setShowEndMessage(true);
-                clearInterval(countdown);
-            } else {
+        if (timeLeft > 0) {
+            const countdown = setInterval(() => {
                 setTimeLeft(prevTime => prevTime - 1);
-            }
-        }, 1000);
+            }, 1000);
 
-        // 타이머가 변경될 때마다 클리어
-        return () => {
-            clearInterval(countdown);
-        };
-    }, [timeLeft]);
+            return () => clearInterval(countdown);
+        } else if (timeLeft === 0 && !showEndMessage) {
+            console.log("Time's up!");
+            setShowTranslation(true);
+            setShowEndMessage(true);
+        }
+    }, [timeLeft, showEndMessage]);
 
     const handleRetry = () => {
         window.location.reload();
