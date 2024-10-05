@@ -51,7 +51,7 @@ const AppContent = ({ token, setToken }) => {
 
                         {/* 채팅 기능 라우트 */}
                         <Route path="/chat-rooms/list" element={<ChatRoomList />} />
-                        <Route path="chat-room/" element={<CreateChatRoom />} />
+                        <Route path="/chat-room/create" element={<CreateChatRoom />} />
                         <Route path="/chat-room/:chatRoomId" element={<ChatRoomDetail />} />
                     </>
                 ) : (

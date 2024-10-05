@@ -1,6 +1,6 @@
 // // ChatRoomList.js
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api from '../axios'; // 올바른 상대 경로
 import './styles.css';  // CSS 파일 import
 
 const ChatRoomCard = ({ room, onEnter, onRightClick }) => {
@@ -36,7 +36,7 @@ const ChatRoomList = () => {
     const containerRef = useRef(null);
 
     useEffect(() => {
-        axios.get('/api/chat-room/list')
+        api.get('/api/chat-room/list')
             .then(response => {
                 setChatRooms(response.data);
             })
@@ -72,7 +72,7 @@ const ChatRoomList = () => {
 
     const deleteChatRoom = () => {
         if (selectedChatRoom) {
-            axios.delete(`/api/chat-room/${selectedChatRoom}`)
+            api.delete(`/api/chat-room/${selectedChatRoom}`)
                 .then(() => {
                     setChatRooms(chatRooms.filter(room => room.chatRoomId !== selectedChatRoom));
                     alert('Chat room deleted successfully.');
