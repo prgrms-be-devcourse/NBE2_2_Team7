@@ -85,10 +85,10 @@ const ChatRoomDetail = () => {
                     {messages.map((msg) => (
                         <li
                             key={msg.chatMessageId ? msg.chatMessageId : uuidv4()} // chatMessageId가 없으면 UUID 사용
-                            className={msg.memberId === currentUserId ? 'my-message' : 'other-message'}>
+                            className={msg.memberId == currentUserId ? 'my-message' : 'other-message'}>
                             <div className="message-content">
                                 <strong className="sender-name">
-                                    {msg.memberId === currentUserId ? '나' : (msg.nickName || '상대방')}
+                                    {msg.memberId == currentUserId ? '나' : (msg.nickName || '상대방')}
                                 </strong>
                                 <div className="message-text">
                                     {msg.message}

@@ -50,25 +50,24 @@ public class ChatRoomService {
         log.info("partnerNameAndChatRoom={}", partnerNameAndChatRoom);
 
         List<ChatRoomRequestDTO> chatRoomRequestDTOList = new ArrayList<>();
+
         Set<Long> chatRoomIdInSet = new HashSet<>();
         for (Object rawChatRoom : partnerNameAndChatRoom) {
             ChatRoomRequestDTO chatRoomRequestDTO;
-            if (rawChatRoom instanceof LinkedHashMap) {
-                chatRoomRequestDTO = objectMapper.convertValue(rawChatRoom, ChatRoomRequestDTO.class);
-            } else {
-                chatRoomRequestDTO = (ChatRoomRequestDTO) rawChatRoom;
+            chatRoomRequestDTO = objectMapper.convertValue(rawChatRoom, ChatRoomRequestDTO.class);
+            if (chatRoomRequestDTO != null) {
+                chatRoomIdInSet.add(chatRoomRequestDTO.getChatRoomId());
+                chatRoomRequestDTOList.add(chatRoomRequestDTO);
+                log.info("chatRoomIdInSet={}", chatRoomIdInSet);
+                log.info("chatRoomRequestDTOList={}", chatRoomRequestDTOList);
             }
-            chatRoomIdInSet.add(chatRoomRequestDTO.getChatRoomId());
-            chatRoomRequestDTOList.add(chatRoomRequestDTO);
-            log.info("chatRoomIdInSet={}", chatRoomIdInSet);
-            log.info("chatRoomRequestDTOList={}", chatRoomRequestDTOList);
-
         }
 
         Set<String> partnerNames = roomStorage.keys(me.getNickname());
         for (String partnerName : partnerNames) {
             log.info("partnerName={}", partnerName);
-            ChatRoomRequestDTO chatRoomRequestDTO = roomStorage.get(partnerName, me.getNickname());
+            Object rawChatRoom = roomStorage.get(partnerName, me.getNickname());
+            ChatRoomRequestDTO chatRoomRequestDTO = objectMapper.convertValue(rawChatRoom, ChatRoomRequestDTO.class);
             if (chatRoomRequestDTO != null) {
                 log.info("chatRoomRequestDTO={}", chatRoomRequestDTO);
                 if (!chatRoomIdInSet.contains(chatRoomRequestDTO.getChatRoomId())) {
