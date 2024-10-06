@@ -8,27 +8,27 @@ const CreateChatRoom = () => {
 
     const createRoom = () => {
         if (!nickname) {
-            alert('Please enter a nickname.');
+            alert('닉네임을 입력해주세요.');
             return;
         }
 
-        api.post('/api/chat-room', null, {
-            params: { nickName: nickname }
-        })
+        // 경로 파라미터로 닉네임 전달
+        api.post(`/api/chat-room/${nickname}`)
             .then(response => {
-                alert(`Room [${response.data.nickName}] has been created.`);
+                alert(`채팅방 [${response.data.partnerName}]이 생성되었습니다.`);
                 setNickname('');
+                // 새로운 채팅방 목록을 갱신하기 위해 ChatRoomList 컴포넌트에 props로 함수를 전달하거나 상태 관리를 추가할 수 있습니다.
             })
             .catch(error => {
-                alert('Failed to create chat room.');
+                alert('채팅방 생성에 실패했습니다.');
                 console.error('Error creating chat room:', error);
             });
     };
 
     return (
-        <div className="container" style={{maxWidth: '800px', marginTop: '20px'}}>
+        <div className="container" style={{ maxWidth: '800px', marginTop: '20px' }}>
             <div className="header">
-                <a className="btn-home" href="/">Home</a> {/* Aligned to the right */}
+                <a className="btn-home" href="/">Home</a>
             </div>
             <h1>채팅방 목록</h1>
             <div className="input-group">
@@ -41,7 +41,7 @@ const CreateChatRoom = () => {
                 />
                 <button className="btn btn-primary" onClick={createRoom}>채팅방 개설</button>
             </div>
-            <ChatRoomList/>
+            <ChatRoomList />
         </div>
     );
 };

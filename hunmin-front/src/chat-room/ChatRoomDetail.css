@@ -92,6 +92,7 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 80px; /* 입력창을 위한 공간 확보 */
+    max-height: calc(100vh - 150px);
 }
 
 /* 채팅 메시지 리스트 */
@@ -230,5 +231,33 @@
 
 .chat-send-button:hover {
     background-color: #115293; /* Darker shade on hover */
+}
+
+/* 메시지 메타 정보 컨테이너 */
+.message-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 메시지 액션 버튼 컨테이너 */
+.message-actions {
+    display: flex;
+    gap: 5px;
+}
+
+/* 수정 버튼 */
+.message-edit-button,
+.message-delete-button {
+    background-color: transparent;
+    border: none;
+    color: #dddddd;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.message-edit-button:hover,
+.message-delete-button:hover {
+    color: #ff1a1a;
 }
 

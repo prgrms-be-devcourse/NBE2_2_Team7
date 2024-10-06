@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ChatComponent from './ChatComponent'; // WebSocket 연결 컴포넌트
 import ChatRoomInfo from './ChatRoomInfo'; // 채팅방 정보 가져오는 컴포넌트
+import ChatEditComponent from './ChatEditComponent'; // 채팅 수정 컴포넌트 import
+import ChatDeleteComponent from './ChatDeleteComponent'; // 채팅 삭제 컴포넌트 import
 import api from '../axios'; // Axios 인스턴스 import
 import './ChatRoomDetail.css'; // 스타일 파일 import
 import moment from 'moment'; // 날짜와 시간을 포맷하기 위한 라이브러리 import
@@ -15,6 +17,8 @@ const ChatRoomDetail = () => {
     const [nickname, setNickname] = useState(''); // 대화 상대방의 닉네임을 저장하는 상태
     const [currentUserId, setCurrentUserId] = useState(''); // 현재 사용자의 ID
     const [currentUserName, setCurrentUserName] = useState(''); // 현재 사용자의 이름
+    const [editingMessageId, setEditingMessageId] = useState(null); // 현재 수정 중인 메시지 ID
+    const [deletingMessageId, setDeletingMessageId] = useState(null); // 현재 삭제 중인 메시지 ID
     const messagesEndRef = useRef(null); // 스크롤을 위한 ref
 
     // 과거 메시지 불러오기 함수
@@ -65,42 +69,100 @@ const ChatRoomDetail = () => {
         return moment(dateTime).format('YYYY-MM-DD HH:mm'); // 날짜 및 시간을 포맷
     };
 
+    // 메시지 업데이트 처리 함수
+    const handleUpdateMessage = (updatedMessage) => {
+        setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+                msg.chatMessageId === updatedMessage.chatMessageId ? updatedMessage : msg
+            )
+        );
+        setEditingMessageId(null);
+    };
+
+    // 메시지 삭제 처리 함수
+    const handleDeleteMessage = (deletedMessageId) => {
+        setMessages((prevMessages) =>
+            prevMessages.filter((msg) => msg.chatMessageId !== deletedMessageId)
+        );
+        setDeletingMessageId(null);
+    };
+
     return (
-        <div className="chat-room-container"> {/* 전체 컨테이너 스타일 적용 */}
+        <div className="chat-room-container">
             {/* 채팅방 헤더 */}
             <div className="chat-room-header">
-                <h1 className="chat-room-title">{currentUserName}과 {nickname}의 대화</h1>
-                <button className="leave-button" onClick={() => navigate(-1)}>채팅방 나가기</button>
+                <h1 className="chat-room-title">
+                    {currentUserName}과 {nickname}의 대화
+                </h1>
+                <button className="leave-button" onClick={() => navigate(-1)}>
+                    채팅방 나가기
+                </button>
             </div>
 
             {/* 채팅방 정보 */}
-            <ChatRoomInfo
-                chatRoomId={chatRoomId}
-                setNickname={setNickname} // nickname을 설정하는 함수 전달
-            />
+            <ChatRoomInfo chatRoomId={chatRoomId} setNickname={setNickname} />
 
             {/* 채팅 메시지 목록 */}
             <div className="chat-messages-container">
                 <ul className="chat-messages-list">
                     {messages.map((msg) => (
                         <li
-                            key={msg.chatMessageId ? msg.chatMessageId : uuidv4()} // chatMessageId가 없으면 UUID 사용
-                            className={msg.memberId == currentUserId ? 'my-message' : 'other-message'}>
+                            key={msg.chatMessageId ? msg.chatMessageId : uuidv4()}
+                            className={msg.memberId == currentUserId ? 'my-message' : 'other-message'}
+                        >
                             <div className="message-content">
                                 <strong className="sender-name">
-                                    {msg.memberId == currentUserId ? '나' : (msg.nickName || '상대방')}
+                                    {msg.memberId == currentUserId ? '나' : msg.nickName || '상대방'}
                                 </strong>
-                                <div className="message-text">
-                                    {msg.message}
-                                </div>
-                            </div>
-                            <div className="message-time">
-                                {formatDateTime(msg.createdAt)}
+
+                                {/* 메시지 수정 또는 일반 메시지 표시 */}
+                                {editingMessageId === msg.chatMessageId ? (
+                                    <ChatEditComponent
+                                        chatMessageId={msg.chatMessageId}
+                                        originalMessage={msg.message}
+                                        onUpdateSuccess={handleUpdateMessage}
+                                        onCancel={() => setEditingMessageId(null)}
+                                    />
+                                ) : (
+                                    <>
+                                        <div className="message-text">{msg.message}</div>
+
+                                        {/* 메시지 시간 및 수정/삭제 버튼 */}
+                                        <div className="message-meta">
+                                            <span className="message-time">{formatDateTime(msg.createdAt)}</span>
+                                            {msg.memberId == currentUserId && (
+                                                <div className="message-actions">
+                                                    <button
+                                                        onClick={() => setEditingMessageId(msg.chatMessageId)}
+                                                        className="message-edit-button"
+                                                    >
+                                                        수정
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setDeletingMessageId(msg.chatMessageId)}
+                                                        className="message-delete-button"
+                                                    >
+                                                        삭제
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* 삭제 확인 모달 */}
+                                {deletingMessageId === msg.chatMessageId && (
+                                    <ChatDeleteComponent
+                                        chatMessageId={msg.chatMessageId}
+                                        onDeleteSuccess={handleDeleteMessage}
+                                        onCancel={() => setDeletingMessageId(null)}
+                                    />
+                                )}
                             </div>
                         </li>
                     ))}
                 </ul>
-                <div ref={messagesEndRef} /> {/* 스크롤을 맨 아래로 이동시키기 위한 요소 */}
+                <div ref={messagesEndRef} />
             </div>
 
             {/* 채팅 입력 컴포넌트 */}
@@ -111,7 +173,6 @@ const ChatRoomDetail = () => {
             />
         </div>
     );
-
 };
 
 export default ChatRoomDetail;
