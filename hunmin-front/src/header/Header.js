@@ -23,7 +23,6 @@ const Header = () => {
         try {
             const response = await api.get(`/notification/${memberId}`); // memberId를 URL에 포함
             const validNotifications = response.data.filter(notification => notification.message);
-            console.log(validNotifications);
             setNotifications(validNotifications);
         } catch (error) {
             console.error('Error fetching notifications:', error);
@@ -39,8 +38,7 @@ const Header = () => {
             const newNotification = JSON.parse(event.data);
             setNotifications(prev => [newNotification, ...prev]);
             if (!newNotification.isRead) {
-                displayPopup(newNotification.message); // 최신 알림 메시지를 팝업에 표시
-                console.log(newNotification.message);
+                displayPopup(newNotification.message);
             }
         };
 
@@ -78,7 +76,12 @@ const Header = () => {
 
     const handleNotificationClick = (notification) => {
         markAsRead(notification.notificationId);
-        window.location.href = notification.url;
+
+        if (notification.url.includes('/chat-room')) {
+            window.location.href = notification.url;
+        } else {
+            window.location.href = notification.url;
+        }
     };
 
     return (

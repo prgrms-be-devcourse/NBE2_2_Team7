@@ -114,9 +114,9 @@ public class ChatRoomService {
 
             NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
                     .memberId(partnerId)
-                    .message("[" + me.getNickname() + "]님이 새로운 채팅방을 개설했습니다.")
+                    .message("[" + me.getNickname() + "]님이 새로운 채팅방을 개설")
                     .notificationType(NotificationType.CHAT)
-                    .url("/chat-room/enter/" + SavedchatRoom.getChatRoomId())
+                    .url("/chat-room/" + SavedchatRoom.getChatRoomId())
                     .build();
 
             notificationService.send(notificationSendDTO);
