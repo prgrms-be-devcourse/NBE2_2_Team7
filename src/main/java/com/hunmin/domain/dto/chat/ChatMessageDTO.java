@@ -1,9 +1,12 @@
 package com.hunmin.domain.dto.chat;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hunmin.domain.entity.ChatMessage;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,8 +18,10 @@ public class ChatMessageDTO {
     private Long chatMessageId;
     private Long chatRoomId;
     private Long memberId;
+    private String nickName;
     private String message;
     private MessageType type;
+    private LocalDateTime createdAt;
 
     public ChatMessageDTO(ChatMessage chatMessage) {
         this.chatMessageId = chatMessage.getChatMessageId();
@@ -24,6 +29,8 @@ public class ChatMessageDTO {
         this.memberId = chatMessage.getMember().getMemberId();
         this.message = chatMessage.getMessage();
         this.type = chatMessage.getType();
+        this.createdAt = chatMessage.getCreatedAt();
+        this.nickName = chatMessage.getMember().getNickname();
     }
     public ChatMessage toEntity(){
        ChatRoom chatRoom = ChatRoom.builder().chatRoomId(chatRoomId).build();

@@ -2,7 +2,9 @@ package com.hunmin.domain.config;
 
 import com.hunmin.domain.handler.StompHandler;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -38,5 +40,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(stompHandler);
+    }
+    @Bean
+    public MappingJackson2MessageConverter mappingJackson2MessageConverter() {
+        MappingJackson2MessageConverter jackson2MessageConverter = new MappingJackson2MessageConverter();
+        jackson2MessageConverter.setStrictContentTypeMatch(false);
+        return jackson2MessageConverter;
     }
 }

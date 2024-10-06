@@ -49,6 +49,7 @@ public class ChatRoomController {
     @GetMapping("/{chatRoomId}")
     @Operation(summary = "단일 채팅방 정보 조회", description = "검색하고 싶은 채팅방을 조회하는 API")
     public ChatRoomDTO roomInfo(@PathVariable Long chatRoomId) {
+        log.info(" chatRoomId in controller={}",chatRoomId);
         return chatRoomService.findRoomById(chatRoomId);
     }
     //채팅방 삭제

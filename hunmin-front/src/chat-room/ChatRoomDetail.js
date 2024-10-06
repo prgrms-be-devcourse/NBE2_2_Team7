@@ -1,204 +1,117 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-    AppBar,
-    Toolbar,
-    IconButton,
-    Typography,
-    Box,
-    TextField,
-    Button,
-    Container,
-    List,
-    ListItem,
-    Card,
-    CardContent
-} from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SendIcon from '@mui/icons-material/Send';
 import { useParams, useNavigate } from 'react-router-dom';
-import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
-import api from '../axios';
+import ChatComponent from './ChatComponent'; // WebSocket 연결 컴포넌트
+import ChatRoomInfo from './ChatRoomInfo'; // 채팅방 정보 가져오는 컴포넌트
+import api from '../axios'; // Axios 인스턴스 import
+import './ChatRoomDetail.css'; // 스타일 파일 import
+import moment from 'moment'; // 날짜와 시간을 포맷하기 위한 라이브러리 import
+import { v4 as uuidv4 } from 'uuid'; // UUID 생성 라이브러리 추가
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // 아이콘 import
 
 const ChatRoomDetail = () => {
-    const { chatRoomId } = useParams();
-    const navigate = useNavigate();
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState('');
-    const [roomName, setRoomName] = useState('');
-    const [isConnected, setIsConnected] = useState(false);
-    const ws = useRef(null);
-    const chatInputRef = useRef(null);
+    const { chatRoomId } = useParams(); // URL에서 chatRoomId를 가져옴
+    const navigate = useNavigate(); // navigate 함수
+    const [messages, setMessages] = useState([]); // 실시간 채팅 메시지를 관리하는 상태
+    const [nickname, setNickname] = useState(''); // 대화 상대방의 닉네임을 저장하는 상태
+    const [currentUserId, setCurrentUserId] = useState(''); // 현재 사용자의 ID
+    const [currentUserName, setCurrentUserName] = useState(''); // 현재 사용자의 이름
+    const messagesEndRef = useRef(null); // 스크롤을 위한 ref
 
-    useEffect(() => {
-        // 채팅방 세부 정보 및 이전 메시지 로드
-        const fetchRoomDetails = async () => {
-            try {
-                const response = await api.get(`/chat-room/${chatRoomId}`);
-                setRoomName(response.data.nickname);
-            } catch (error) {
-                console.error('Failed to load chat room details:', error);
-            }
-
-            try {
-                const response = await api.get(`/chat/messages/${chatRoomId}`);
-                setMessages(response.data);
-            } catch (error) {
-                console.error('Failed to load chat messages:', error);
-            }
-        };
-
-        fetchRoomDetails();
-
-        // SockJS 및 STOMP 초기화
-        const sock = new SockJS('/ws-stomp');
-        ws.current = Stomp.over(sock);
-        const token = localStorage.getItem('wschat.token');
-
-        ws.current.configure({
-            reconnectDelay: 5000, // 재연결 지연 시간 (5초)
-            heartbeatIncoming: 4000, // 서버로부터의 Heartbeat 체크
-            heartbeatOutgoing: 4000, // 클라이언트로부터의 Heartbeat 체크
-            onConnect: () => {
-                console.log('WebSocket connected');
-                setIsConnected(true);
-                ws.current.subscribe(`/sub/chat/room/${chatRoomId}`, (message) => {
-                    const recv = JSON.parse(message.body);
-                    setMessages((prevMessages) => [recv, ...prevMessages]);
-                });
-            },
-            onDisconnect: () => {
-                console.log('WebSocket disconnected');
-                setIsConnected(false);
-            },
-            onStompError: (frame) => {
-                console.error('Broker reported error: ', frame.headers['message']);
-                console.error('Additional details: ', frame.body);
-                alert('서버 연결에 실패 하였습니다. 다시 접속해 주십시요.');
-                navigate('/');
-            },
-            connectHeaders: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        // WebSocket 연결 활성화
-        ws.current.activate();
-
-        // 컴포넌트 언마운트 시 WebSocket 연결 종료
-        return () => {
-            if (ws.current) {
-                ws.current.deactivate(() => {
-                    console.log('WebSocket disconnected');
-                });
-            }
-        };
-    }, [chatRoomId, navigate]);
-
-    // 메시지 전송 함수
-    const sendMessage = () => {
-        if (newMessage.trim() == '' || !isConnected) return;
-
-        const messageData = {
-            type: 'TALK',
-            chatRoomId: chatRoomId,
-            message: newMessage,
-            memberId: roomName,
-        };
-
-        ws.current.publish({
-            destination: '/pub/api/chat/message',
-            body: JSON.stringify(messageData),
-        });
-
-        setNewMessage('');
-        chatInputRef.current.focus();
+    // 과거 메시지 불러오기 함수
+    const fetchPastMessages = async () => {
+        try {
+            // API를 호출하여 과거 채팅 메시지를 가져옴
+            const response = await api.get(`/chat/messages/${chatRoomId}`);
+            // ****** 메시지 순서를 오래된 순으로 변경
+            setMessages(response.data); // ****** ********
+            console.log('과거 메시지 불러오기 성공:', response.data);
+        } catch (error) {
+            console.error('과거 메시지 불러오기에 실패했습니다:', error);
+            // ****** 추가 에러 핸들링 코드 필요
+        }
     };
 
-    // 메시지 삭제 함수
-    const deleteMessage = (index) => {
-        const message = messages[index];
-        if (!message || message.memberId !== roomName) {
-            alert('본인의 메시지만 삭제할 수 있습니다.');
-            return;
+    // 현재 사용자 정보 가져오기
+    const fetchCurrentUserInfo = async () => {
+        try {
+            const response = await api.get('/chat/user-info'); // 사용자 정보 API 호출
+            setCurrentUserId(response.data.memberId);
+            setCurrentUserName(response.data.nickname); // API가 nickname을 반환한다고 가정
+            console.log('현재 사용자 ID:', response.data.memberId);
+            console.log('현재 사용자 이름:', response.data.nickname);
+        } catch (error) {
+            console.error('현재 사용자 정보를 가져오는 데 실패했습니다:', error);
+            // ****** 추가 에러 핸들링 코드 필요
         }
+    };
 
-        api.delete(`/chat/${message.chatMessageId}`)
-            .then(() => {
-                setMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
-            })
-            .catch((error) => {
-                console.error('메시지 삭제에 실패하였습니다.', error);
-                alert('메세지 삭제에 실패하였습니다.');
-            });
+    useEffect(() => {
+        fetchPastMessages(); // 컴포넌트가 마운트되면 과거 메시지를 불러옴
+        fetchCurrentUserInfo(); // 현재 사용자 정보 가져오기
+    }, [chatRoomId]); // chatRoomId가 변경될 때마다 다시 실행
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    // 메시지 작성 시간을 포맷하는 함수
+    const formatDateTime = (dateTime) => {
+        return moment(dateTime).format('YYYY-MM-DD HH:mm'); // 날짜 및 시간을 포맷
     };
 
     return (
-        <Container maxWidth="sm">
-            {/* 상단 앱바: 방 제목과 뒤로가기 버튼 */}
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton edge="start" color="inherit" onClick={() => navigate(-1)}>
-                        <ArrowBackIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div">
-                        {roomName}
-                    </Typography>
-                </Toolbar>
-            </AppBar>
+        <div className="chat-room-container"> {/* 전체 컨테이너 스타일 적용 */}
+            {/* 채팅방 헤더 */}
+            <div className="chat-room-header">
+                <h1 className="chat-room-title">{currentUserName}과 {nickname}의 대화</h1>
+                <button className="leave-button" onClick={() => navigate(-1)}>채팅방 나가기</button>
+            </div>
 
-            {/* 채팅 메시지 리스트 */}
-            <Box mt={2} mb={2} sx={{ height: '60vh', overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse' }}>
-                <List>
-                    {messages.map((message, index) => (
-                        <ListItem key={message.chatMessageId || index}>
-                            <Card sx={{ width: '100%', backgroundColor: message.memberId == roomName ? '#dcf8c6' : '#f1f0f0' }}>
-                                <CardContent>
-                                    <Typography variant="body1">
-                                        <strong>{message.memberId == roomName ? '나' : '상대방'}</strong>: {message.message}
-                                        {message.memberId == roomName && (
-                                            <Button
-                                                color="error"
-                                                size="small"
-                                                onClick={() => deleteMessage(index)}
-                                                sx={{ float: 'right' }}
-                                            >
-                                                삭제
-                                            </Button>
-                                        )}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </ListItem>
+            {/* 채팅방 정보 */}
+            <ChatRoomInfo
+                chatRoomId={chatRoomId}
+                setNickname={setNickname} // nickname을 설정하는 함수 전달
+            />
+
+            {/* 채팅 메시지 목록 */}
+            <div className="chat-messages-container">
+                <ul className="chat-messages-list">
+                    {messages.map((msg) => (
+                        <li
+                            key={msg.chatMessageId ? msg.chatMessageId : uuidv4()} // chatMessageId가 없으면 UUID 사용
+                            className={msg.memberId == currentUserId ? 'my-message' : 'other-message'}>
+                            <div className="message-content">
+                                <strong className="sender-name">
+                                    {msg.memberId == currentUserId ? '나' : (msg.nickName || '상대방')}
+                                </strong>
+                                <div className="message-text">
+                                    {msg.message}
+                                </div>
+                            </div>
+                            <div className="message-time">
+                                {formatDateTime(msg.createdAt)}
+                            </div>
+                        </li>
                     ))}
-                </List>
-            </Box>
+                </ul>
+                <div ref={messagesEndRef} /> {/* 스크롤을 맨 아래로 이동시키기 위한 요소 */}
+            </div>
 
-            {/* 입력 필드 및 전송 버튼 */}
-            <Box display="flex" mt={2} mb={4}>
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    label="메시지를 입력하세요"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => {
-                        if (e.key === 'Enter') sendMessage();
-                    }}
-                    inputRef={chatInputRef}
-                />
-                <Button
-                    variant="contained"
-                    color="primary"
-                    endIcon={<SendIcon />}
-                    onClick={sendMessage}
-                    sx={{ ml: 1 }}
-                >
-                    전송
-                </Button>
-            </Box>
-        </Container>
+            {/* 채팅 입력 컴포넌트 */}
+            <ChatComponent
+                chatRoomId={chatRoomId} // chatRoomId를 props로 전달
+                setMessages={setMessages} // WebSocket 메시지를 업데이트하는 함수 전달
+                memberId={currentUserId} // 현재 사용자 ID를 memberId로 전달
+            />
+        </div>
     );
+
 };
 
 export default ChatRoomDetail;
