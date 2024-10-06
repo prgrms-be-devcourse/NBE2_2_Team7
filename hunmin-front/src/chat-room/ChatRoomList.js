@@ -5,7 +5,6 @@ import {
     Card,
     CardHeader,
     CardContent,
-    CardActions,
     Typography,
     IconButton,
     Menu,
@@ -34,7 +33,7 @@ const ChatRoomCard = ({room, onEnter, onRightClick}) => {
             onContextMenu={(e) => onRightClick(e, room.chatRoomId)}
         >
             <CardHeader
-                title={`채팅방 (${room.nickName}, ${room.partnerName || 'N/A'})`}
+                title={`채팅방 (${room.nickName || 'Unknown'}, ${room.partnerName || 'N/A'})`}
                 action={
                     <IconButton onClick={(e) => onRightClick(e, room.chatRoomId)}>
                         <MoreVertIcon/>
@@ -64,9 +63,11 @@ const ChatRoomList = () => {
         // 인증된 사용자인지 확인 후 요청
         api.get('/chat-room/list')
             .then(response => {
+                console.log(response.data); // 데이터 구조 확인용 로그
                 setChatRooms(response.data);
             })
             .catch(error => {
+                console.error("Error fetching chat rooms:", error); // 오류 발생 시 로그 출력
                 setSnackbar({
                     open: true,
                     message: '채팅방 목록을 불러오는데 실패했습니다.',
@@ -126,6 +127,7 @@ const ChatRoomList = () => {
                     }
                 })
                 .catch(error => {
+                    console.error("Error deleting chat room:", error); // 삭제 오류 로그
                     setSnackbar({
                         open: true,
                         message: '채팅방 삭제에 실패했습니다.',
@@ -174,6 +176,7 @@ const ChatRoomList = () => {
                 handleCloseCreateDialog();
             })
             .catch(error => {
+                console.error("Error creating chat room:", error); // 생성 오류 로그
                 setSnackbar({
                     open: true,
                     message: '채팅방 생성에 실패했습니다.',
@@ -242,13 +245,13 @@ const ChatRoomList = () => {
                 <DialogTitle>채팅방 삭제하기</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        채팅방의 두번째 유저 닉네임을 입력해주세요.
+                        채팅방의 상대방 유저의 닉네임을 입력해주세요.
                     </DialogContentText>
                     <TextField
                         autoFocus
                         margin="dense"
                         label="삭제"
-                        placeholder="두번째 닉네임"
+                        placeholder="상대방 닉네임"
                         type="text"
                         fullWidth
                         variant="standard"

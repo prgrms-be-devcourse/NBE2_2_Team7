@@ -88,7 +88,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 채팅창과 제목 구분을 위한 그림자 */
     display: flex;
     flex-direction: column;
-    margin-bottom: 80px; /* 입력창을 위한 공간 확보 */
 }
 
 /* 채팅 메시지 리스트 */

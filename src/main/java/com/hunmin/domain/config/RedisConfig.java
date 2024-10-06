@@ -15,7 +15,6 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 
 @RequiredArgsConstructor
 @Configuration
@@ -41,10 +40,9 @@ public class RedisConfig {
     public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber, "sendMessage");
     }
-    // chatRoom 직렬화
-    @Bean
-    public RedisTemplate<String, ChatRoomRequestDTO> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
-        RedisTemplate<String, ChatRoomRequestDTO> template = new RedisTemplate<>();
+    @Bean(name = "redisTemplate")
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
         // GenericJackson2JsonRedisSerializer 설정
@@ -62,8 +60,9 @@ public class RedisConfig {
         template.afterPropertiesSet();
         return template;
     }
-    @Bean
-    public HashOperations<String, String, ChatRoomRequestDTO> hashOperations(RedisTemplate<String, ChatRoomRequestDTO> redisTemplate) {
+
+    @Bean(name = "roomStorage")
+    public HashOperations<String, String, Object> hashOperations(RedisTemplate<String, Object> redisTemplate) {
         return redisTemplate.opsForHash();
     }
 }

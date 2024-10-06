@@ -26,9 +26,7 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 생성", description = "채팅방을 이름으로 생성하는 API")
     public ResponseEntity<ChatRoomRequestDTO> createRoomByNickName(@PathVariable("nickName") String nickName
                                                         , Authentication authentication) {
-        log.info("nickName={}", nickName);
         String currentMemberEmail = authentication.getName();
-        log.info("Email={}", currentMemberEmail);
         return ResponseEntity.ok(chatRoomService.createChatRoomByNickName(nickName, currentMemberEmail));
     }
 
