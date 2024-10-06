@@ -56,7 +56,7 @@ public class CommentService {
             if (!boardMemberId.equals(comment.getMember().getMemberId())) {
                 NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
                         .memberId(boardMemberId)
-                        .message("[" + board.getTitle() + "] 새로운 댓글이 작성되었습니다!")
+                        .message("[" + board.getTitle() + "] 새로운 댓글")
                         .notificationType(NotificationType.COMMENT)
                         .url("/board/" + boardId)
                         .build();
@@ -99,7 +99,7 @@ public class CommentService {
             if (!parentMemberId.equals(children.getMember().getMemberId())) {
                 NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
                         .memberId(parentMemberId)
-                        .message("[" + board.getTitle() + "] 에 작성한 " + "'" + parent.getContent() +"'에 새로운 대댓글이 작성되었습니다!")
+                        .message("[" + board.getTitle() + "] 에 작성한 " + "'" + parent.getContent() +"'에 새로운 대댓글")
                         .notificationType(NotificationType.COMMENT)
                         .url("/board/" + boardId)
                         .build();

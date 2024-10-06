@@ -45,7 +45,6 @@ public class ChatMessageService {
         log.info("sender={}", sender);
         log.info("chatRoom={}", chatRoom);
 
-
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatRoom(chatRoom)
                 .member(sender)
@@ -70,12 +69,12 @@ public class ChatMessageService {
             }
         }
 
-        if (receiverId != null) {
+        if (!receiverId.equals(senderId)) {
             NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
                     .memberId(receiverId)
                     .message(sender.getNickname() + "님 : " + chatMessageDTO.getMessage())
                     .notificationType(NotificationType.CHAT)
-                    .url("/chat-room/enter/" + chatMessageDTO.getChatRoomId())
+                    .url("/chat-room/" + chatMessageDTO.getChatRoomId())
                     .build();
 
             notificationService.send(notificationSendDTO);
