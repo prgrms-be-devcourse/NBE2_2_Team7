@@ -20,7 +20,7 @@ public class ChatMessage extends BaseTimeEntity{
     @JoinColumn(name="chat_room_id")
     private ChatRoom chatRoom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="member_id")
     private Member member;
 

@@ -1,7 +1,6 @@
 package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.chat.ChatMessageDTO;
-import com.hunmin.domain.dto.chat.MessageType;
 import com.hunmin.domain.dto.notification.NotificationSendDTO;
 import com.hunmin.domain.entity.ChatMessage;
 import com.hunmin.domain.entity.ChatRoom;
@@ -9,6 +8,7 @@ import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.NotificationType;
 import com.hunmin.domain.exception.ChatMessageException;
 import com.hunmin.domain.exception.ChatRoomException;
+import com.hunmin.domain.exception.MemberException;
 import com.hunmin.domain.handler.SseEmitters;
 import com.hunmin.domain.pubsub.RedisSubscriber;
 import com.hunmin.domain.repository.ChatMessageRepository;
@@ -16,7 +16,6 @@ import com.hunmin.domain.repository.ChatRoomRepository;
 import com.hunmin.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
 @Log4j2
 public class ChatMessageService {
 
-    private final RedisTemplate redisTemplate;
     private final MemberRepository memberRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -41,23 +39,23 @@ public class ChatMessageService {
 
     // 채팅방에 메시지 발송
     public void sendChatMessage(ChatMessageDTO chatMessageDTO) {
-        Member sender = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(ChatRoomException.NOT_FOUND::get);
+        log.info("chatMessageDTO,email= {}", chatMessageDTO);
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDTO.getChatRoomId()).orElseThrow(ChatRoomException.NOT_FOUND::get);
+        Member sender = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
+        log.info("sender={}", sender);
+        log.info("chatRoom={}", chatRoom);
 
-        if (MessageType.ENTER.equals(chatMessageDTO.getType())) {
-            chatMessageDTO.setMessage(sender.getNickname() + "님이 방에 입장했습니다.");
-        } else if (MessageType.QUIT.equals(chatMessageDTO.getType())) {
-            chatMessageDTO.setMessage(sender.getNickname() + "님이 방에서 나갔습니다.");
-        }
 
-        log.info("채팅방에서 메시지 발송 member{}", chatMessageDTO.toString());
-
-        ChatMessage chatMessage = chatMessageDTO.toEntity();
-        chatMessage.setChatRoom(chatRoom);
-        chatMessageRepository.save(chatMessage);
+        ChatMessage chatMessage = ChatMessage.builder()
+                .chatRoom(chatRoom)
+                .member(sender)
+                .message(chatMessageDTO.getMessage())
+                .type(chatMessageDTO.getType())
+                .build();
+        ChatMessage savedChatMessage = chatMessageRepository.save(chatMessage);
 
         ChannelTopic topic = ChannelTopic.of("" + chatMessageDTO.getChatRoomId());
-        redisSubscriber.sendMessage(chatMessageDTO);
+        redisSubscriber.sendMessage(new ChatMessageDTO(savedChatMessage));
         log.info("채팅방에서 메시지 발송 topic: {}", topic.getTopic());
 
         Long senderId = sender.getMemberId();
@@ -110,8 +108,7 @@ public class ChatMessageService {
         List<ChatMessageDTO> chatLists = chatRoom.getChatMessage().stream()
                 .map(ChatMessageDTO::new)
                 .collect(Collectors.toList());
-
-        Collections.reverse(chatLists);
+        log.info("ALL chatList {}=",chatLists);
         return chatLists;
     }
 

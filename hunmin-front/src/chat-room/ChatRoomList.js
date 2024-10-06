@@ -34,7 +34,7 @@ const ChatRoomCard = ({room, onEnter, onRightClick}) => {
             onContextMenu={(e) => onRightClick(e, room.chatRoomId)}
         >
             <CardHeader
-                title={`대화방 (${room.nickName}, ${room.partnerName || 'N/A'})`}
+                title={`채팅방 (${room.nickName}, ${room.partnerName || 'N/A'})`}
                 action={
                     <IconButton onClick={(e) => onRightClick(e, room.chatRoomId)}>
                         <MoreVertIcon/>
@@ -100,7 +100,7 @@ const ChatRoomList = () => {
         if (!partnerName) {
             setSnackbar({
                 open: true,
-                message: '대화상대 닉네임을 입력해주세요.',
+                message: '채팅상대 닉네임을 입력해주세요.',
                 severity: 'warning',
             });
             return;
@@ -239,15 +239,16 @@ const ChatRoomList = () => {
 
             {/* 삭제 다이얼로그 */}
             <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-                <DialogTitle>대화상대 닉네임 입력</DialogTitle>
+                <DialogTitle>채팅방 삭제하기</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        채팅방 삭제를 위해 대화상대 닉네임을 입력해주세요.
+                        채팅방의 두번째 유저 닉네임을 입력해주세요.
                     </DialogContentText>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="파트너 이름"
+                        label="삭제"
+                        placeholder="두번째 닉네임"
                         type="text"
                         fullWidth
                         variant="standard"
@@ -266,7 +267,7 @@ const ChatRoomList = () => {
                 <DialogTitle>채팅방 생성</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        대화상대 닉네임을 입력해주세요.
+                        채팅 상대 닉네임을 입력해주세요.
                     </DialogContentText>
                     <TextField
                         autoFocus

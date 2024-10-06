@@ -60,25 +60,18 @@ public class ChatRoomService {
             }
             chatRoomIdInSet.add(chatRoomRequestDTO.getChatRoomId());
             chatRoomRequestDTOList.add(chatRoomRequestDTO);
-            log.info("chatRoomIdInSet={}",chatRoomIdInSet);
-            log.info("chatRoomRequestDTOList={}",chatRoomRequestDTOList);
+            log.info("chatRoomIdInSet={}", chatRoomIdInSet);
+            log.info("chatRoomRequestDTOList={}", chatRoomRequestDTOList);
 
         }
 
         Set<String> partnerNames = roomStorage.keys(me.getNickname());
         for (String partnerName : partnerNames) {
             log.info("partnerName={}", partnerName);
-            Object rawChatRoom = roomStorage.get(partnerName, me.getNickname());
-            if (rawChatRoom != null) {
-                ChatRoomRequestDTO chatRoomRequestDTO;
-                log.info("rawChatRoom={}", rawChatRoom);
-                if (rawChatRoom instanceof LinkedHashMap) {
-                    chatRoomRequestDTO = objectMapper.convertValue(rawChatRoom, ChatRoomRequestDTO.class);
-                } else {
-                    chatRoomRequestDTO = (ChatRoomRequestDTO) rawChatRoom;
-                    log.info("chatRoomRequestDTO={}", chatRoomRequestDTO);
-                }
-                if (!chatRoomIdInSet.contains(chatRoomRequestDTO.getChatRoomId())){
+            ChatRoomRequestDTO chatRoomRequestDTO = roomStorage.get(partnerName, me.getNickname());
+            if (chatRoomRequestDTO != null) {
+                log.info("chatRoomRequestDTO={}", chatRoomRequestDTO);
+                if (!chatRoomIdInSet.contains(chatRoomRequestDTO.getChatRoomId())) {
                     chatRoomRequestDTOList.add(chatRoomRequestDTO);
                 }
             }
@@ -91,7 +84,7 @@ public class ChatRoomService {
 
         Optional<Member> byNickname = memberRepository.findByNickname(partnerName);
         if (byNickname.isEmpty()) {
-            throw  MemberException.NOT_FOUND.get();
+            throw MemberException.NOT_FOUND.get();
         }
 
         Member me = memberRepository.findByEmail(myEmail);
@@ -153,30 +146,14 @@ public class ChatRoomService {
     // 채팅방 삭제
     public Boolean deleteChatRoom(Long chatRoomId, String partnerName, String meEmail) {
 
-        Optional<Member> byNickname = memberRepository.findByNickname(partnerName);
-        if (byNickname.isEmpty()) {
-            throw  MemberException.NOT_FOUND.get();
-        }
-
         Member me = memberRepository.findByEmail(meEmail);
 
-        ChatRoom foundChatRoom = chatRoomRepository.findById(chatRoomId)
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomException.NOT_FOUND::get);
 
-        if (foundChatRoom == null) {
-            return false;
-        }
-        if ((roomStorage.get(partnerName, me.getNickname())==null)
-                &&(roomStorage.get(me.getNickname(),partnerName)==null)){
-            return false;
-        }
-        if (roomStorage.get(partnerName, me.getNickname())!=null){
-            roomStorage.delete(partnerName, me.getNickname());
-        }
-        else if (roomStorage.get(me.getNickname(),partnerName)!=null){
-            roomStorage.delete(me.getNickname(), partnerName);
-        }
-        chatRoomRepository.delete(foundChatRoom);
+        roomStorage.delete(me.getNickname(), partnerName);
+
+        chatRoomRepository.delete(chatRoom);
         return true;
     }
 }

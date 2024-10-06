@@ -16,11 +16,11 @@ public class ChatRoom extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.EAGER) // @JoinColumn 제거
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY) // @JoinColumn 제거
     private List<ChatMessage> chatMessage;
 
     private long userCount=1;
