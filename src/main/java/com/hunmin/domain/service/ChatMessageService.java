@@ -69,9 +69,6 @@ public class ChatMessageService {
             }
         }
 
-        log.info("++++++++++++++++");
-        log.info(receiverId);
-
         if (!receiverId.equals(senderId)) {
             NotificationSendDTO notificationSendDTO = NotificationSendDTO.builder()
                     .memberId(receiverId)
