@@ -2,11 +2,13 @@ package com.hunmin.domain.dto.member;
 
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.MemberLevel;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
 public class MemberDTO {
     private Long memberId;
     private String email;
