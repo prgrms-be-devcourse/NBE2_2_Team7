@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -16,6 +17,8 @@ import com.querydsl.core.types.Path;
 public class QWord extends EntityPathBase<Word> {
 
     private static final long serialVersionUID = 1984622939L;
+
+    private static final PathInits INITS = PathInits.DIRECT2;
 
     public static final QWord word = new QWord("word");
 
@@ -28,6 +31,8 @@ public class QWord extends EntityPathBase<Word> {
 
     public final StringPath lang = createString("lang");
 
+    public final QMember member;
+
     public final StringPath title = createString("title");
 
     public final StringPath translation = createString("translation");
@@ -38,15 +43,24 @@ public class QWord extends EntityPathBase<Word> {
     public final NumberPath<Long> wordId = createNumber("wordId", Long.class);
 
     public QWord(String variable) {
-        super(Word.class, forVariable(variable));
+        this(Word.class, forVariable(variable), INITS);
     }
 
     public QWord(Path<? extends Word> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QWord(PathMetadata metadata) {
-        super(Word.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QWord(PathMetadata metadata, PathInits inits) {
+        this(Word.class, metadata, inits);
+    }
+
+    public QWord(Class<? extends Word> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }
 
 }

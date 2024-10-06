@@ -25,6 +25,10 @@ public class Word extends BaseTimeEntity {
     @Column(length = 1000)
     private String definition;      // 정의
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
 
     public void changeWord(String title){
         this.title = title;
