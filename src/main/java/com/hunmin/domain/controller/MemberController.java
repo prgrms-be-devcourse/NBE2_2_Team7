@@ -6,6 +6,7 @@ import com.hunmin.domain.jwt.JWTUtil;
 import com.hunmin.domain.service.MemberService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/members")
 @Log4j2
+@Tag(name = "회원", description = "회원 CRUD")
 public class MemberController {
 
     private final MemberService memberService;
