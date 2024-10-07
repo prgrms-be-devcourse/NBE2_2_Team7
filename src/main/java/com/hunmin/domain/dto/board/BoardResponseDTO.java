@@ -1,5 +1,9 @@
 package com.hunmin.domain.dto.board;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.hunmin.domain.dto.comment.CommentResponseDTO;
 import com.hunmin.domain.entity.Board;
 import lombok.Getter;
@@ -21,8 +25,15 @@ public class BoardResponseDTO {
     private Double latitude;
     private Double longitude;
     private List<String> imageUrls;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
+
     private List<CommentResponseDTO> comments;
 
     public BoardResponseDTO(Board board) {
