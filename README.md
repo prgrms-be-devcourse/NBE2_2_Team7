@@ -138,19 +138,22 @@
 
 ## 다이어그램
 ### ERD
-![image](https://github.com/user-attachments/assets/5272b604-2ad8-4b7c-9639-5931f419d294)
+![image](https://github.com/user-attachments/assets/7fd35a00-f121-44e2-9c33-302baefb44bd)
+
 
 ###
 <details>
 <summary>클래스 다이어그램 (클릭하여 펼치기/접기)</summary>
 
-![hunmin](https://github.com/user-attachments/assets/25c7e641-3fa7-46da-a989-58b74f1774c6)
+![hunmin](https://github.com/user-attachments/assets/566f6dd3-dcaf-4e60-ab9e-0138137f2aa6)
+
 </details>
 
 <details>
 <summary>유스케이스 다이어그램 (클릭하여 펼치기/접기)</summary>
   
-![image](https://github.com/user-attachments/assets/e3c4b13e-e75c-41d8-a5ae-1a54bc5e7637)
+![USECASE  ](https://github.com/user-attachments/assets/61339a9e-571f-4370-8dbf-33f72ad329d0)
+
 </details>
 
 
