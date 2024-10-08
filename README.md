@@ -20,10 +20,10 @@
 ## 기술 스택
 
 ### Backend <br/>
-![Java](https://img.shields.io/badge/Java-007396?style=flat-square&logo=java&logoColor=white)
+![Java](https://img.shields.io/badge/Java%2017-007396?style=flat-square&logo=java&logoColor=white)
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=flat-square&logo=spring&logoColor=white)
-<img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=flat-square&logo=Spring%20Boot&logoColor=white"/>
-<img src="https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?style=flat-square&logo=&logoColor=white"/>
+<img src="https://img.shields.io/badge/Spring%20Boot%203.3.4 -6DB33F?style=flat-square&logo=Spring%20Boot&logoColor=white"/>
+<img src="https://img.shields.io/badge/Spring%20Data%20JPA%203.3.2-6DB33F?style=flat-square&logo=&logoColor=white"/>
 <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat-square&logo=Spring Security&logoColor=white">
 <img src="https://img.shields.io/badge/JUnit5-25A162?style=flat-square&logo=JUnit5&logoColor=white">
 <img src="https://img.shields.io/badge/Lombok-FF0000?style=flat-square&logo=Lombok&logoColor=white">
@@ -31,7 +31,7 @@
 <img src="https://img.shields.io/badge/Gradle-0?style=flat-square&logo=gradle&logoColor=white&color=%2302303A">
 
 ### DB / Infra
-<img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=MySQL&logoColor=white">  <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=Redis&logoColor=white"> <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white">
+<img src="https://img.shields.io/badge/MySQL%208.0.39-4479A1?style=flat-square&logo=MySQL&logoColor=white">  <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=Redis&logoColor=white"> <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white">
 
 
 ### 성능테스트
@@ -44,7 +44,12 @@
 
 ## 구조
 전체 시스템 구조
-![image](https://github.com/user-attachments/assets/67f841c7-956d-4bb5-8ff3-846347a9b888)
+![image](https://github.com/user-attachments/assets/1181647e-2c4f-4a40-81f0-3cc22a8c3922)
+
+채팅 시스템 구조
+![image](https://github.com/user-attachments/assets/e2844e3c-09db-4d9a-b6b2-04b132e37f21)
+
+
 
 <details>
   <summary>📦 패키지 구조 (클릭하여 펼치기/접기)</summary>
@@ -95,42 +100,37 @@
 <details>
 <summary>로그인 (클릭하여 펼치기/접기)</summary>
   
-![image](https://github.com/user-attachments/assets/0ceb4a61-8d92-4060-9b39-8580e5c9f539)
+![image](https://github.com/user-attachments/assets/4e3c2e4c-2deb-4515-83b6-f901742ac990)
+
 
 </details>
 
 <details>
 <summary>게시판 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/383d7b52-0fd2-41dc-959f-70fe3e57c870)
+![image](https://github.com/user-attachments/assets/6e2df253-3810-477b-aaab-e1f70ac1bddf)
+
 
 </details>
 
 <details>
 <summary>댓글 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/64ec9216-461a-4fb8-beef-45089d3705f8)
+![image](https://github.com/user-attachments/assets/f18c3e47-5c45-47e5-8b5f-87c2766771cb)
 
 </details>
 
 <details>
 <summary>단어학습 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/0d89dc99-43df-4819-83ad-fda491ff33a1)
+![image](https://github.com/user-attachments/assets/6a3f9cac-728a-4b52-8af5-8fc29396fc00)
 
 </details>
 
 <details>
 <summary>공지사항 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/e7e836ee-47f6-4a91-832e-dabbc5d7295b)
-
-</details>
-
-<details>
-<summary>채팅 (클릭하여 펼치기/접기)</summary>
-
-![image](https://github.com/user-attachments/assets/f6e39bec-3351-49fe-a1e0-e23064a7dbda)
+![image](https://github.com/user-attachments/assets/2346b9c0-8591-43e4-a4dc-6fa9c0058733)
 
 </details>
 
@@ -203,7 +203,7 @@
     <td><b>김동우</b></td>
   </tr>
   <tr>
-    <td><b>보류</b></td>
+    <td><b></b></td>
     <td><b></b></td>
     <td><b></b></td>
     <td><b></b></td>
