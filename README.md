@@ -44,7 +44,7 @@
 
 ## 구조
 전체 시스템 구조
-![image](https://github.com/user-attachments/assets/16f04014-abb7-4dc1-9cad-38dd51ce9265)
+![image](https://github.com/user-attachments/assets/67f841c7-956d-4bb5-8ff3-846347a9b888)
 
 <details>
   <summary>📦 패키지 구조 (클릭하여 펼치기/접기)</summary>
@@ -93,15 +93,17 @@
 </details>
 
 <details>
-<summary>회원가입 (클릭하여 펼치기/접기)</summary>
+<summary>로그인 (클릭하여 펼치기/접기)</summary>
   
-![image](https://github.com/user-attachments/assets/34063d60-5e66-42b2-a051-f8146493740e)
+![image](https://github.com/user-attachments/assets/0ceb4a61-8d92-4060-9b39-8580e5c9f539)
+
 </details>
 
 <details>
 <summary>게시판 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/bd66506a-0db8-4c98-959e-8dcf84d8f074)
+![image](https://github.com/user-attachments/assets/383d7b52-0fd2-41dc-959f-70fe3e57c870)
+
 </details>
 
 <details>
@@ -113,25 +115,29 @@
 <details>
 <summary>단어학습 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/4f000bcf-3b77-4728-842a-c50c6f3764f4)
+![image](https://github.com/user-attachments/assets/0d89dc99-43df-4819-83ad-fda491ff33a1)
+
 </details>
 
 <details>
 <summary>공지사항 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/a829802a-22bb-4c3d-bc42-a728fbc5c7e4)
+![image](https://github.com/user-attachments/assets/e7e836ee-47f6-4a91-832e-dabbc5d7295b)
+
 </details>
 
 <details>
 <summary>채팅 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/f5868954-869c-475b-b15b-aa7951b982ba)
+![image](https://github.com/user-attachments/assets/f6e39bec-3351-49fe-a1e0-e23064a7dbda)
+
 </details>
 
 <details>
 <summary>알림 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/ac0649e5-3f2e-4585-be12-761d10e20fb6)
+![image](https://github.com/user-attachments/assets/69e09a9f-e7a7-4d0f-a57b-80c7cc63c513)
+
 </details>
 
 
