@@ -215,13 +215,7 @@
 ## 프로젝트 협업 규칙
 
 <details>
-<summary>Code Convention (클릭하여 펼치기/접기)</summary>
-
-보류
-</details>
-
-<details>
-<summary>Git Convention (클릭하여 펼치기/접기)</summary>
+<summary>Convention (클릭하여 펼치기/접기)</summary>
 <aside>
 💡
 
@@ -296,5 +290,47 @@ ex)
     ```java
     [type] 작업 내용 간단히
     ```
+
+### 패키지명
+
+- 소문자
+
+### 패키지 구조
+
+com>도메인 명>www>
+
+- config
+- controller>advice
+- dto
+- entity
+- exception
+- repository>search
+- security
+- service
+- jwt
+
+= <Test 패키지는 main과 대칭>
+
+- ctrl+shift+t
+- 자바 컨벤션 준수
+
+### 기타
+
+- if 중괄호 필수
+    
+    ```java
+    if (condition) {
+        // 한 줄이라도
+    }
+    ```
+    
+- 클래스, 메서드 주석
+    
+    ```java
+    //간단한 설명
+    ```
+    
+
+- 로그 : 필요 시 규칙없이 작성
 </details>
 
