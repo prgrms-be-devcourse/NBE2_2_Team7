@@ -2,6 +2,7 @@ package com.hunmin.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ChatRoom extends BaseTimeEntity{
     @JoinColumn(name="member_id")
     private Member member;
 
+    @BatchSize( size = 50 )
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.EAGER) // @JoinColumn 제거
     private List<ChatMessage> chatMessage;
 

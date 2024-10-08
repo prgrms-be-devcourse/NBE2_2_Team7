@@ -12,13 +12,9 @@ import com.hunmin.domain.exception.MemberException;
 import com.hunmin.domain.handler.SseEmitters;
 import com.hunmin.domain.repository.ChatRoomRepository;
 import com.hunmin.domain.repository.MemberRepository;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -43,19 +39,16 @@ public class ChatRoomService {
         return new ChatRoomDTO(chatRoom);
     }
 
+    //관련 채팅방 조회
     public List<ChatRoomRequestDTO> findRoomByEmail(String email) {
         Member me = memberRepository.findByEmail(email);
 
-        // Redis에서 해당 사용자의 모든 채팅방 정보를 가져옵니다.
         List<Object> partnerNameAndChatRoom = roomStorage.values(me.getNickname());
-        log.info("partnerNameAndChatRoom={}", partnerNameAndChatRoom.toString());
 
         Set<Long> chatRoomIds = new HashSet<>();
         List<ChatRoomRequestDTO> chatRoomRequestDTOList = new ArrayList<>();
-        log.info("chatRoomRequestDTOList1={}", chatRoomRequestDTOList);
 
         for (Object chatRoomRequestDTO : partnerNameAndChatRoom) {
-            log.info("chatRoomRequestDTO1={}", chatRoomRequestDTO.toString());
             ChatRoomRequestDTO chatRoomRequest = objectMapper.convertValue(chatRoomRequestDTO, ChatRoomRequestDTO.class);
             chatRoomIds.add(chatRoomRequest.getChatRoomId());
             chatRoomRequestDTOList.add(chatRoomRequest);
@@ -63,11 +56,9 @@ public class ChatRoomService {
 
         List<Member> allMembers = memberRepository.findAll();
         for (Member memberIndex : allMembers) {
-            log.info("member number={}", memberIndex.toString());
             Object rawChatRoom = roomStorage.get(memberIndex.getNickname(), me.getNickname());
-            ChatRoomRequestDTO chatRoomRequestDTO=objectMapper.convertValue(rawChatRoom, ChatRoomRequestDTO.class);
+            ChatRoomRequestDTO chatRoomRequestDTO = objectMapper.convertValue(rawChatRoom, ChatRoomRequestDTO.class);
             if (chatRoomRequestDTO != null) {
-                log.info("chatRoomRequestDTO2={}", chatRoomRequestDTO.toString());
                 if (!chatRoomIds.contains(chatRoomRequestDTO.getChatRoomId())) {
                     chatRoomIds.add(chatRoomRequestDTO.getChatRoomId());
                     chatRoomRequestDTOList.add(chatRoomRequestDTO);
@@ -78,7 +69,7 @@ public class ChatRoomService {
     }
 
 
-    // 채팅방 생성 : 이름으로 상대방 검색 후 채팅방 개설  -> 새로운
+    // 채팅방 생성
     public ChatRoomRequestDTO createChatRoomByNickName(String partnerName, String myEmail) {
 
         Optional<Member> byNickname = memberRepository.findByNickname(partnerName);
@@ -90,7 +81,7 @@ public class ChatRoomService {
         log.info("me ={}", me);
 
         String myNickname = me.getNickname();
-        // 이미 존재하는지 확인
+
         if (roomStorage.get(myNickname, partnerName) != null || roomStorage.get(partnerName, myNickname) != null) {
             log.info("이미존재합니다");
             throw ChatRoomException.CHATROOM_ALREADY_EXIST.get();

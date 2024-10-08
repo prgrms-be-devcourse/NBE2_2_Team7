@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 public class ChatMessageListRequestDTO {
+    private Long chatMessageId;
+    private Long memberId;
     private String message;
     private LocalDateTime createdAt;
     private MessageType type;

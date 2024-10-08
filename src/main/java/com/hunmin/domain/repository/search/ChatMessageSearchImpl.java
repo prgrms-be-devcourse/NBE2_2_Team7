@@ -24,18 +24,20 @@ public class ChatMessageSearchImpl extends QuerydslRepositorySupport implements 
         QChatRoom chatRoom = QChatRoom.chatRoom;
 
         JPQLQuery<ChatMessage> query
-                = from(chatMessage).leftJoin(chatMessage.chatRoom, chatRoom)  //조인
+                = from(chatMessage).leftJoin(chatMessage.chatRoom, chatRoom)
                 .where(chatRoom.chatRoomId.eq(chatRoomId));
 
         JPQLQuery<ChatMessageListRequestDTO> dtoQuery = query.select(Projections.bean(
-                ChatMessageListRequestDTO.class,
-                chatMessage.message,
-                chatMessage.createdAt,
+                ChatMessageListRequestDTO.class
+                ,chatMessage.message
+                ,chatMessage.chatMessageId.as("chatMessageId")
+                ,chatMessage.member.memberId.as("memberId")
+                ,chatMessage.createdAt,
                 chatMessage.type));
 
-        getQuerydsl().applyPagination(pageable, dtoQuery);      //페이징
-        List<ChatMessageListRequestDTO> chatMessageList = dtoQuery.fetch();    //쿼리 실행
-        long count = dtoQuery.fetchCount();         //레코드 수 조회
+        getQuerydsl().applyPagination(pageable, dtoQuery);
+        List<ChatMessageListRequestDTO> chatMessageList = dtoQuery.fetch();
+        long count = dtoQuery.fetchCount();
 
         return new PageImpl<>(chatMessageList, pageable, count);
     }

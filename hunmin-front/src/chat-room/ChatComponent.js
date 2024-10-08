@@ -1,9 +1,11 @@
+// src/chat-room/ChatComponent.jsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import api from '../axios'; // 사용자 정보 가져오는 API 추가
 
-const ChatComponent = ({ chatRoomId, setMessages }) => { // chatRoomId를 props로 받음
+const ChatComponent = ({ chatRoomId, setMessages, onMessageSend  }) => { // onMessageSend prop 추가
     const [message, setMessage] = useState(''); // 메시지 입력 상태
     const stompClientRef = useRef(null);
     const [type, setType] = useState('TALK');
@@ -21,34 +23,51 @@ const ChatComponent = ({ chatRoomId, setMessages }) => { // chatRoomId를 props�
         }
     };
 
+    // 새로운 메시지 추가 시 중복 확인
+    const handleNewMessage = (newMessage) => {
+        setMessages((prevMessages) => {
+            if (prevMessages.some(msg => msg.chatMessageId === newMessage.chatMessageId)) {
+                return prevMessages; // 메시지가 이미 존재하면 추가하지 않음
+            }
+            return [...prevMessages, newMessage];
+        });
+        if (onMessageSend) {
+            onMessageSend(); // 메시지 수신 시 스크롤 아래로 설정
+        }
+    };
+
     // 웹소켓 연결
     const stompConnect = () => {
         try {
             const token = localStorage.getItem('token'); // 토큰을 가져옴
             const sock = new SockJS("http://localhost:8080/ws-stomp"); // SockJS 연결 설정
             const client = new Client({
-                webSocketFactory: () => sock, // WebSocket 설정
+                webSocketFactory: () => sock,
                 connectHeaders: {
-                    Authorization: `${token}`, // 토큰 추가 (Bearer 스킴 사용)
+                    Authorization: `${token}`,
                 },
-                debug: (str) => console.log(str), // 디버깅용 로그
+                debug: (str) => console.log(str),
                 onConnect: () => {
                     console.log('STOMP 연결 성공');
                     setIsConnected(true); // 연결 상태 업데이트
 
                     // 채팅방 구독
-                    client.subscribe(`/sub/chat/room/${chatRoomId}`, (message) => {
-                        console.log('메시지 수신 중...');
-                        if (message.body) {
-                            const newMessage = JSON.parse(message.body);
-                            console.log('수신한 메시지:', newMessage);
-                            setMessages((prevMessages) => [ ...prevMessages, newMessage]);
-                        } else {
-                            console.log('수신한 메시지의 body가 없습니다.');
+                    client.subscribe(
+                        `/sub/chat/room/${chatRoomId}`,
+                        (message) => {
+                            console.log('메시지 수신 중...');
+                            if (message.body) {
+                                const newMessage = JSON.parse(message.body);
+                                console.log('수신한 메시지:', newMessage);
+                                handleNewMessage(newMessage); // 중복 확인 후 메시지 추가
+                            } else {
+                                console.log('수신한 메시지의 body가 없습니다.');
+                            }
+                        },
+                        (error) => {
+                            console.error('구독 실패:', error);
                         }
-                    }, (error) => {
-                        console.error('구독 실패:', error);
-                    });
+                    );
                 },
                 onStompError: (frame) => {
                     console.error('Broker error:', frame.headers['message']);
@@ -111,10 +130,11 @@ const ChatComponent = ({ chatRoomId, setMessages }) => { // chatRoomId를 props�
                     destination: '/pub/api/chat/message', // 메시지 발행 경로
                     body: JSON.stringify(chatMessageDTO), // 메시지를 JSON으로 변환하여 전송
                     headers: {
-                        Authorization: `${token}`, // 토큰을 헤더에 포함하여 전송
+                        Authorization: `Bearer ${token}`, // Bearer 토큰 형식으로 변경
                     },
                 });
                 console.log('메시지 전송 완료');
+                onMessageSend(); // 메시지 전송 후 스크롤 설정
             } catch (error) {
                 console.error('메시지 전송 중 오류 발생:', error);
             }

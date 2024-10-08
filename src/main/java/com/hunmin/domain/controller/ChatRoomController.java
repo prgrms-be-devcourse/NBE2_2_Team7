@@ -32,6 +32,7 @@ public class ChatRoomController {
 
     //나랑 관련된 채팅방만 조회
     @GetMapping("/list")
+    @Operation(summary = "채팅방 조회", description = "사용자와 관련된 채팅방 조회하는 API")
     public List<ChatRoomRequestDTO> myRooms(Authentication authentication) {
         String currentMemberEmail = authentication.getName();
         return chatRoomService.findRoomByEmail(currentMemberEmail);
@@ -39,6 +40,7 @@ public class ChatRoomController {
 
     //채팅방 안으로 입장
     @GetMapping("/enter/{chatRoomId}")
+    @Operation(summary = "채팅방 입장", description = "채팅방으로 입장하는 API")
     public String RoomEnter(@PathVariable String chatRoomId) {
         log.info("room/enter/chatRoomId:{}",chatRoomId);
         return chatRoomId;

@@ -1,13 +1,16 @@
 package com.hunmin.domain.controller;
 
 import com.hunmin.domain.dto.chat.ChatMessageDTO;
+import com.hunmin.domain.dto.chat.ChatMessageListRequestDTO;
 import com.hunmin.domain.dto.member.MemberDTO;
+import com.hunmin.domain.dto.page.ChatMessagePageRequestDTO;
 import com.hunmin.domain.service.ChatMessageService;
 import com.hunmin.domain.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -33,15 +36,6 @@ public class ChatMessageController {
         log.info("클라로부터온 메세지: {}", message.toString());
         chatMessageService.sendChatMessage(message);
     }
-    //채팅 이력 조회
-    @GetMapping("/messages/{chatRoomId}")
-    @ResponseBody
-    @Operation(summary = "과거 채팅 조회", description = "과거 채팅 내역을 조회하는 API")
-    public List<ChatMessageDTO> readPastMessages(@PathVariable Long chatRoomId) {
-        List<ChatMessageDTO> chatMessageDTOS = chatMessageService.readAllMessages(chatRoomId);
-        log.info("->결과 chatMessageDTOS {}", chatMessageDTOS.toString());
-        return chatMessageDTOS;
-    }
     //채팅 조회
     @GetMapping("/{chatMessageId}")
     @ResponseBody
@@ -65,8 +59,19 @@ public class ChatMessageController {
     }
     @GetMapping("/user-info")
     @ResponseBody
+    @Operation(summary = "사용자 정보", description = "사용자 정보 호출하는 API")
     public MemberDTO getUserInfo(Authentication authentication) {
         String email = authentication.getName();
         return memberService.readUserInfo(email);
+    }
+    @GetMapping("/messages/{chatRoomId}")
+    @ResponseBody
+    @Operation(summary = "채팅 기록 조회", description = "채팅 기록 호출 API")
+    public ResponseEntity<Page<ChatMessageListRequestDTO>> loadMessageList(@PathVariable Long chatRoomId,
+                                                                           @RequestParam(value = "page", defaultValue = "1") int page,
+                                                                           @RequestParam(value = "size", defaultValue = "10") int size) {
+        ChatMessagePageRequestDTO chatMessagePageRequestDTO = ChatMessagePageRequestDTO.builder().page(page).size(size).build();
+        log.info("/loadMessageList {}", chatMessagePageRequestDTO.toString());
+        return ResponseEntity.ok(chatMessageService.getList(chatMessagePageRequestDTO, chatRoomId));
     }
 }

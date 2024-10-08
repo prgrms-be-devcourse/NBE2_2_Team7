@@ -1,7 +1,9 @@
 package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.chat.ChatMessageDTO;
+import com.hunmin.domain.dto.chat.ChatMessageListRequestDTO;
 import com.hunmin.domain.dto.notification.NotificationSendDTO;
+import com.hunmin.domain.dto.page.ChatMessagePageRequestDTO;
 import com.hunmin.domain.entity.ChatMessage;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
@@ -16,6 +18,9 @@ import com.hunmin.domain.repository.ChatRoomRepository;
 import com.hunmin.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -132,5 +137,16 @@ public class ChatMessageService {
                 .orElseThrow(ChatMessageException.NOT_FOUND::get);
         chatMessageRepository.deleteById(chatMessageId);
         return true;
+    }
+    //채팅목록 페이징
+    public Page<ChatMessageListRequestDTO> getList(ChatMessagePageRequestDTO chatMessagePageRequestDTO, Long chatRoomId) { //목록
+        try {
+            Sort sort = Sort.by("createdAt").descending();
+            Pageable pageable = chatMessagePageRequestDTO.getPageable(sort);
+            return chatMessageRepository.chatMessageList(pageable, chatRoomId);
+        } catch (Exception e) {
+            log.error("쳇서비스 페이징 실패 ={}",e.getMessage());
+            throw ChatMessageException.NOT_FETCHED.get();
+        }
     }
 }

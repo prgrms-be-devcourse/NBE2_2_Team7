@@ -1,72 +1,156 @@
-import React, { useState, useEffect, useRef } from 'react';
+// src/chat-room/ChatRoomDetail.jsx
+
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import ChatComponent from './ChatComponent'; // WebSocket 연결 컴포넌트
-import ChatRoomInfo from './ChatRoomInfo'; // 채팅방 정보 가져오는 컴포넌트
-import ChatEditComponent from './ChatEditComponent'; // 채팅 수정 컴포넌트 import
-import ChatDeleteComponent from './ChatDeleteComponent'; // 채팅 삭제 컴포넌트 import
-import api from '../axios'; // Axios 인스턴스 import
-import './ChatRoomDetail.css'; // 스타일 파일 import
-import moment from 'moment'; // 날짜와 시간을 포맷하기 위한 라이브러리 import
-import { v4 as uuidv4 } from 'uuid'; // UUID 생성 라이브러리 추가
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // 아이콘 import
+import ChatComponent from './ChatComponent';
+import ChatRoomInfo from './ChatRoomInfo';
+import ChatEditComponent from './ChatEditComponent';
+import ChatDeleteComponent from './ChatDeleteComponent';
+import api from '../axios';
+import './ChatRoomDetail.css';
+import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
 
 const ChatRoomDetail = () => {
-    const { chatRoomId } = useParams(); // URL에서 chatRoomId를 가져옴
-    const navigate = useNavigate(); // navigate 함수
-    const [messages, setMessages] = useState([]); // 실시간 채팅 메시지를 관리하는 상태
-    const [nickname, setNickname] = useState(''); // 대화 상대방의 닉네임을 저장하는 상태
-    const [currentUserId, setCurrentUserId] = useState(''); // 현재 사용자의 ID
-    const [currentUserName, setCurrentUserName] = useState(''); // 현재 사용자의 이름
-    const [editingMessageId, setEditingMessageId] = useState(null); // 현재 수정 중인 메시지 ID
-    const [deletingMessageId, setDeletingMessageId] = useState(null); // 현재 삭제 중인 메시지 ID
-    const messagesEndRef = useRef(null); // 스크롤을 위한 ref
+    const { chatRoomId } = useParams();
+    const navigate = useNavigate();
 
-    // 과거 메시지 불러오기 함수
-    const fetchPastMessages = async () => {
-        try {
-            // API를 호출하여 과거 채팅 메시지를 가져옴
-            const response = await api.get(`/chat/messages/${chatRoomId}`);
-            // ****** 메시지 순서를 오래된 순으로 변경
-            setMessages(response.data); // ****** ********
-            console.log('과거 메시지 불러오기 성공:', response.data);
-        } catch (error) {
-            console.error('과거 메시지 불러오기에 실패했습니다:', error);
-            // ****** 추가 에러 핸들링 코드 필요
-        }
-    };
+    // 상태 변수 선언
+    const [messages, setMessages] = useState([]);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isFetching, setIsFetching] = useState(false);
+    const [nickname, setNickname] = useState('');
+    const [currentUserId, setCurrentUserId] = useState('');
+    const [currentUserName, setCurrentUserName] = useState('');
+    const [editingMessageId, setEditingMessageId] = useState(null);
+    const [deletingMessageId, setDeletingMessageId] = useState(null);
+    const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
+    const [isPaginating, setIsPaginating] = useState(false);
 
-    // 현재 사용자 정보 가져오기
+    // 참조 변수 선언
+    const messagesContainerRef = useRef(null);
+    const messagesEndRef = useRef(null);
+    const previousScrollHeight = useRef(0);
+
+    // 사용자 정보 가져오기
     const fetchCurrentUserInfo = async () => {
         try {
-            const response = await api.get('/chat/user-info'); // 사용자 정보 API 호출
+            const response = await api.get('/chat/user-info');
             setCurrentUserId(response.data.memberId);
-            setCurrentUserName(response.data.nickname); // API가 nickname을 반환한다고 가정
-            console.log('현재 사용자 ID:', response.data.memberId);
-            console.log('현재 사용자 이름:', response.data.nickname);
+            setCurrentUserName(response.data.nickname);
         } catch (error) {
             console.error('현재 사용자 정보를 가져오는 데 실패했습니다:', error);
-            // ****** 추가 에러 핸들링 코드 필요
         }
     };
 
-    useEffect(() => {
-        fetchPastMessages(); // 컴포넌트가 마운트되면 과거 메시지를 불러옴
-        fetchCurrentUserInfo(); // 현재 사용자 정보 가져오기
-    }, [chatRoomId]); // chatRoomId가 변경될 때마다 다시 실행
+    // 메시지 페이징 불러오기
+    const fetchPastMessages = async (pageNumber) => {
+        if (isFetching || !hasMore) return;
+        setIsFetching(true); // 페이징 시작 시 true로 설정
+        setIsPaginating(true);
+        try {
+            if (messagesContainerRef.current) {
+                previousScrollHeight.current = messagesContainerRef.current.scrollHeight;
+            }
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+            const response = await api.get(`/chat/messages/${chatRoomId}`, {
+                params: {
+                    page: pageNumber,
+                    size: 10,
+                },
+            });
 
+            const newMessages = response.data.content;
+            const lastPage = response.data.last;
+            console.log("여긴 페이징 내부 실행돔");
+
+            // 중복 메시지 제거
+            const uniqueNewMessages = newMessages.filter(msg =>
+                !messages.some(existingMsg => existingMsg.chatMessageId === msg.chatMessageId)
+            );
+
+            if (uniqueNewMessages.length === 0) {
+                setHasMore(false);
+            } else {
+                setMessages((prevMessages) => [...uniqueNewMessages.reverse(), ...prevMessages]);
+                setPage(pageNumber + 1);
+                setHasMore(!lastPage);
+            }
+
+            // 페이지 번호에 따라 setShouldScrollToBottom 설정
+            if (pageNumber === 1) {
+                setShouldScrollToBottom(true);
+            } else {
+                setShouldScrollToBottom(false);
+            }
+        } catch (error) {
+            console.error('과거 메시지 불러오기에 실패했습니다:', error);
+        } finally {
+            setIsFetching(false);
+            setIsPaginating(false);
+        }
+    };
+
+
+    // 초기 마운트 시 사용자 정보와 메시지 페이징 불러오기
+    useEffect(() => {
+        fetchCurrentUserInfo();
+        fetchPastMessages(page);
+        setIsPaginating(false);
+        console.log("여긴 마운트 되고 후 실행됨")
+
+    }, [chatRoomId]);
+
+    // 스크롤을 끝까지 내리는 함수
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            console.log("끝까지 내리는거 실행됨 되고 후 실행됨")
+        }
+    };
+
+    // 과거 메시지 로드 후 스크롤 위치를 약간 아래로 이동시키는 함수
+    const scrollToPreviousPosition = () => {
+        if (messagesContainerRef.current) {
+            const newScrollHeight = messagesContainerRef.current.scrollHeight;
+            const scrollDifference = newScrollHeight - previousScrollHeight.current;
+            // 스크롤을 약간 아래로 이동 (2px)
+            messagesContainerRef.current.scrollTop = scrollDifference + 5;
+        }
+    };
+
+
+    // 메시지가 로드되었을 때의 스크롤 동작 설정
+    useLayoutEffect(() => {
+        if (isPaginating) {
+            scrollToPreviousPosition();
+            console.log("메시지 로드 후 스크롤 동작 설정 !if 내부");
+
+            // scrollToPreviousPosition 이후의 스크롤 위치 설정
+            if (messagesContainerRef.current) {
+                const currentScrollTop = messagesContainerRef.current.scrollTop;
+                console.log("현재 스크롤 위치는 scrollToPreviousPosition 이후의 높이입니다:", currentScrollTop);
+                // 추가적인 스크롤 조정이 필요하다면 여기서 수행
+            }
+        } else if (shouldScrollToBottom) {
+            scrollToBottom();
+            console.log("메시지 로드 후 스크롤 동작 설정 !else if 내부");
+        }
+    }, [messages, isPaginating, shouldScrollToBottom]);
+
+    // 스크롤 이벤트 핸들러
+    const handleScroll = (e) => {
+        const { scrollTop } = e.target;
+        if (scrollTop === 0 && hasMore && !isFetching) {
+            fetchPastMessages(page);
+            console.log("스크롤 이벤트 핸들러 내부")
         }
     };
 
     // 메시지 작성 시간을 포맷하는 함수
     const formatDateTime = (dateTime) => {
-        return moment(dateTime).format('YYYY-MM-DD HH:mm'); // 날짜 및 시간을 포맷
+        return moment(dateTime).format('YYYY-MM-DD HH:mm');
     };
 
     // 메시지 업데이트 처리 함수
@@ -87,6 +171,12 @@ const ChatRoomDetail = () => {
         setDeletingMessageId(null);
     };
 
+    // 컴포넌트 마운트 시 스크롤을 가장 아래로 설정
+    useEffect(() => {
+        setShouldScrollToBottom(true);
+        console.log("컴포넌트 마운트 시 스크롤을 가장아래로 이동 설정!")
+    }, []);
+
     return (
         <div className="chat-room-container">
             {/* 채팅방 헤더 */}
@@ -103,16 +193,16 @@ const ChatRoomDetail = () => {
             <ChatRoomInfo chatRoomId={chatRoomId} setNickname={setNickname} />
 
             {/* 채팅 메시지 목록 */}
-            <div className="chat-messages-container">
+            <div className="chat-messages-container" onScroll={handleScroll} ref={messagesContainerRef}>
                 <ul className="chat-messages-list">
                     {messages.map((msg) => (
                         <li
-                            key={msg.chatMessageId ? msg.chatMessageId : uuidv4()}
-                            className={msg.memberId == currentUserId ? 'my-message' : 'other-message'}
+                            key={msg.chatMessageId || uuidv4()} // 고유 키 사용
+                            className={msg.memberId === currentUserId ? 'my-message' : 'other-message'}
                         >
                             <div className="message-content">
                                 <strong className="sender-name">
-                                    {msg.memberId == currentUserId ? '나' : msg.nickName || '상대방'}
+                                    {msg.memberId === currentUserId ? '나' : msg.nickName || '상대방'}
                                 </strong>
 
                                 {/* 메시지 수정 또는 일반 메시지 표시 */}
@@ -130,7 +220,7 @@ const ChatRoomDetail = () => {
                                         {/* 메시지 시간 및 수정/삭제 버튼 */}
                                         <div className="message-meta">
                                             <span className="message-time">{formatDateTime(msg.createdAt)}</span>
-                                            {msg.memberId == currentUserId && (
+                                            {msg.memberId === currentUserId && (
                                                 <div className="message-actions">
                                                     <button
                                                         onClick={() => setEditingMessageId(msg.chatMessageId)}
@@ -165,14 +255,16 @@ const ChatRoomDetail = () => {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* 채팅 입력 컴포넌트 */}
+            {/* 채팅 입력창 */}
             <ChatComponent
-                chatRoomId={chatRoomId} // chatRoomId를 props로 전달
-                setMessages={setMessages} // WebSocket 메시지를 업데이트하는 함수 전달
-                memberId={currentUserId} // 현재 사용자 ID를 memberId로 전달
+                chatRoomId={chatRoomId}
+                setMessages={setMessages}
+                memberId={currentUserId}
+                onMessageSend={() => setShouldScrollToBottom(true)} // 메시지 전송 시 스크롤을 아래로
             />
         </div>
     );
+
 };
 
 export default ChatRoomDetail;
