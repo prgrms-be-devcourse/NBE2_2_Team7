@@ -109,7 +109,8 @@
 <details>
 <summary>댓글 (클릭하여 펼치기/접기)</summary>
 
-![image](https://github.com/user-attachments/assets/d20c0161-01d2-4ae2-a6c3-d91c5cbcc878)
+![image](https://github.com/user-attachments/assets/64ec9216-461a-4fb8-beef-45089d3705f8)
+
 </details>
 
 <details>
