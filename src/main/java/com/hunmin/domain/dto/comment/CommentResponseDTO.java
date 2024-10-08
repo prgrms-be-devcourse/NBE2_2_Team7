@@ -1,5 +1,9 @@
 package com.hunmin.domain.dto.comment;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.hunmin.domain.entity.Comment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +21,15 @@ public class CommentResponseDTO {
     private Long boardId;
     private Long memberId;
     private String content;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
+
     private String nickname;
     private List<CommentResponseDTO> children;
 

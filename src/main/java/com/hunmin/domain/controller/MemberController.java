@@ -5,6 +5,8 @@ import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.jwt.JWTUtil;
 import com.hunmin.domain.service.MemberService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/members")
 @Log4j2
+@Tag(name = "회원", description = "회원 CRUD")
 public class MemberController {
 
     private final MemberService memberService;
@@ -30,6 +33,7 @@ public class MemberController {
 
 
     @PostMapping("/uploads")
+    @Operation(summary = "프로필 사진 등록", description = "회원 가입 시 프로필 사진을 등록할 때 사용하는 API")
     public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile image) {
         try {
             String imageUrl = memberService.uploadImage(image);
@@ -40,6 +44,7 @@ public class MemberController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "회원 가입", description = "회원 가입할 때 사용하는 API")
     public ResponseEntity<String> registerProcess(@RequestBody MemberDTO memberDTO) {
         try {
             memberService.registerProcess(memberDTO);
@@ -50,12 +55,14 @@ public class MemberController {
     }
 
     @PutMapping("/{memberId}")
+    @Operation(summary = "회원 정보 수정", description = "등록된 회원의 정보를 수정할 때 사용하는 API")
     public ResponseEntity<?> updateMember(@PathVariable Long memberId, @RequestBody MemberDTO memberDTO) {
         memberService.updateMember(memberId, memberDTO);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급", description = "refresh token으로 access token 재발급하는 API")
     public ResponseEntity<?> reissueAccessToken(HttpServletRequest request, HttpServletResponse response) {
 
         log.info("=== MemberController - 토큰 재발급 메서드 호출");
