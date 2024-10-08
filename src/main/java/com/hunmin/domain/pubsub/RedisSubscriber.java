@@ -23,7 +23,7 @@ public class RedisSubscriber implements MessageListener {
     public void sendMessage(ChatMessageDTO publishMessage) {
         try {
             messagingTemplate.convertAndSend("/sub/chat/room/" + publishMessage.getChatRoomId(), publishMessage);
-            log.info("[sendMessage]Sent message to STOMP topic: /sub/chat/room/{}", publishMessage.getChatRoomId());
+            log.info("[sendMessage]Sent message to redis topic: /sub/chat/room/{}", publishMessage.getChatRoomId());
         } catch (Exception e) {
             log.error("Exception {}", e);
         }

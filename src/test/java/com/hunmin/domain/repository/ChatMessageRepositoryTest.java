@@ -6,7 +6,6 @@ import com.hunmin.domain.dto.chat.MessageType;
 import com.hunmin.domain.entity.ChatMessage;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
-import com.hunmin.domain.exception.ChatMessagesException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +79,6 @@ public class ChatMessageRepositoryTest {
         ChatMessage savedChatMessage = chatMessageRepository.save(chatMessage);
         ChatMessageDTO chatMessageDTO = new ChatMessageDTO(savedChatMessage);
         Optional<ChatMessage> foundChatMessage = chatMessageRepository.findById(chatMessageDTO.getChatMessageId());
-        chatMessage = foundChatMessage.orElseThrow(ChatMessagesException.NOT_FOUND::get);
         chatMessageDTO = new ChatMessageDTO(chatMessage);
 
         //then

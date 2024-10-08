@@ -2,20 +2,19 @@ package com.hunmin.domain.repository;
 
 import com.hunmin.domain.dto.chat.ChatRoomDTO;
 import com.hunmin.domain.dto.chat.MessageType;
-import com.hunmin.domain.entity.ChatMessage;
-import com.hunmin.domain.entity.ChatRoom;
-import com.hunmin.domain.entity.Member;
-import com.hunmin.domain.entity.MemberRole;
+import com.hunmin.domain.entity.*;
 import com.hunmin.domain.exception.ChatRoomException;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,6 +26,8 @@ public class ChatRoomRepositoryTest {
 
     @Autowired
     private ChatRoomRepository chatRoomRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Test
     public void createChatRoom() {
@@ -34,7 +35,6 @@ public class ChatRoomRepositoryTest {
         Member member = Member.builder()
                 .nickname("testNickName")
                 .password("1111")
-                .level("intermediate")
                 .image("testImage")
                 .email("test@test.com")
                 .country("ko")
@@ -58,7 +58,6 @@ public class ChatRoomRepositoryTest {
         Member member = Member.builder()
                 .nickname("testNickName")
                 .password("1111")
-                .level("intermediate")
                 .image("testImage")
                 .email("test@test.com")
                 .country("ko")
@@ -85,7 +84,6 @@ public class ChatRoomRepositoryTest {
         Member member = Member.builder()
                 .nickname("testNickName")
                 .password("1111")
-                .level("intermediate")
                 .image("testImage")
                 .email("test@test.com")
                 .country("ko")
@@ -117,7 +115,6 @@ public class ChatRoomRepositoryTest {
         Member member = Member.builder()
                 .nickname("testNickName")
                 .password("1111")
-                .level("intermediate")
                 .image("testImage")
                 .email("test@test.com")
                 .country("ko")
@@ -142,7 +139,6 @@ public class ChatRoomRepositoryTest {
         Member member = Member.builder()
                 .nickname("testNickName")
                 .password("1111")
-                .level("intermediate")
                 .image("testImage")
                 .email("test@test.com")
                 .country("ko")
@@ -153,15 +149,30 @@ public class ChatRoomRepositoryTest {
                 .userCount(1)
                 .build();
 
-        //when
-        List<ChatRoom> foundChatRooms = chatRoomRepository.findByNickname("testNickName").orElseThrow(ChatRoomException.NOT_FOUND::get);
+    }
+    @Test
+    @Commit
+    @Transactional
+    public void putInformation(){
+        IntStream.rangeClosed(0,1000).forEach(i->{
+            Member member = Member.builder()
+                    .nickname("testNickName"+i)
+                    .password("1111"+i)
+                    .image("testImage"+i)
+                    .email("test"+i+"@test.com")
+                    .country("ko")
+                    .level(MemberLevel.INTERMEDIATE)
+                    .memberRole(MemberRole.ADMIN)
+                    .build();
+            memberRepository.save(member);
+        });
+    }
+    @Test
+    @Commit
+    @Transactional
+    public void putChatMessages(){
+        IntStream.rangeClosed(0,100).forEach(i->{
 
-        //then
-        if (foundChatRooms.isEmpty()) {
-            ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-            ChatRoomDTO chatRoomDTO = new ChatRoomDTO(savedChatRoom);
-            assertThat(savedChatRoom).isEqualTo(chatRoom);
-            assertThat(chatRoomDTO.getNickname()).isEqualTo("testNickName");
-        } else log.info("이미 만들어 놓은 챗방이 있습니다.");
+        });
     }
 }
