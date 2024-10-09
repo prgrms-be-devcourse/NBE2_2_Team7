@@ -44,11 +44,8 @@ public class ChatMessageService {
 
     // 채팅방에 메시지 발송
     public void sendChatMessage(ChatMessageDTO chatMessageDTO) {
-        log.info("chatMessageDTO,email= {}", chatMessageDTO);
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDTO.getChatRoomId()).orElseThrow(ChatRoomException.NOT_FOUND::get);
         Member sender = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
-        log.info("sender={}", sender);
-        log.info("chatRoom={}", chatRoom);
 
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatRoom(chatRoom)
@@ -60,7 +57,6 @@ public class ChatMessageService {
 
         ChannelTopic topic = ChannelTopic.of("" + chatMessageDTO.getChatRoomId());
         redisSubscriber.sendMessage(new ChatMessageDTO(savedChatMessage));
-        log.info("채팅방에서 메시지 발송 topic: {}", topic.getTopic());
 
         Long senderId = sender.getMemberId();
         Long receiverId = null;
@@ -102,17 +98,13 @@ public class ChatMessageService {
     public List<ChatMessageDTO> readAllMessages(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomException.NOT_FOUND::get);
-        log.info("readAllMessages ={}", chatRoom.toString());
 
         if (chatRoom == null) {
-            // 채팅방이 없으면 빈 배열 반환
-            log.info("chatRoom이 null", Collections.emptyList());
             return Collections.emptyList();
         }
         List<ChatMessageDTO> chatLists = chatRoom.getChatMessage().stream()
                 .map(ChatMessageDTO::new)
                 .collect(Collectors.toList());
-        log.info("ALL chatList {}=",chatLists);
         return chatLists;
     }
 

@@ -1,6 +1,7 @@
 package com.hunmin.domain.config;
 
 import com.hunmin.domain.handler.StompHandler;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,13 +17,10 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @EnableWebSocket
 @Log4j2
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
-
-    public WebSocketConfig(StompHandler stompHandler) {
-        this.stompHandler = stompHandler;
-    }
 
     //stomp로 pub/sub 주소 생성
     @Override
@@ -35,7 +33,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(final StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
                 .setAllowedOriginPatterns("*")
-                .withSockJS(); // sock.js를 통하여 낮은 버전의 브라우저에서도 websocket이 동작할수 있게 합니다.
+                .withSockJS();
     }
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {

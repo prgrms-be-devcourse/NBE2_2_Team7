@@ -47,7 +47,7 @@ const ChatRoomDetail = () => {
     // 메시지 페이징 불러오기
     const fetchPastMessages = async (pageNumber) => {
         if (isFetching || !hasMore) return;
-        setIsFetching(true); // 페이징 시작 시 true로 설정
+        setIsFetching(true);
         setIsPaginating(true);
         try {
             if (messagesContainerRef.current) {
@@ -63,7 +63,6 @@ const ChatRoomDetail = () => {
 
             const newMessages = response.data.content;
             const lastPage = response.data.last;
-            console.log("여긴 페이징 내부 실행돔");
 
             // 중복 메시지 제거
             const uniqueNewMessages = newMessages.filter(msg =>
@@ -98,7 +97,6 @@ const ChatRoomDetail = () => {
         fetchCurrentUserInfo();
         fetchPastMessages(page);
         setIsPaginating(false);
-        console.log("여긴 마운트 되고 후 실행됨")
 
     }, [chatRoomId]);
 
@@ -115,7 +113,6 @@ const ChatRoomDetail = () => {
         if (messagesContainerRef.current) {
             const newScrollHeight = messagesContainerRef.current.scrollHeight;
             const scrollDifference = newScrollHeight - previousScrollHeight.current;
-            // 스크롤을 약간 아래로 이동 (2px)
             messagesContainerRef.current.scrollTop = scrollDifference + 5;
         }
     };
@@ -125,17 +122,13 @@ const ChatRoomDetail = () => {
     useLayoutEffect(() => {
         if (isPaginating) {
             scrollToPreviousPosition();
-            console.log("메시지 로드 후 스크롤 동작 설정 !if 내부");
 
             // scrollToPreviousPosition 이후의 스크롤 위치 설정
             if (messagesContainerRef.current) {
                 const currentScrollTop = messagesContainerRef.current.scrollTop;
-                console.log("현재 스크롤 위치는 scrollToPreviousPosition 이후의 높이입니다:", currentScrollTop);
-                // 추가적인 스크롤 조정이 필요하다면 여기서 수행
             }
         } else if (shouldScrollToBottom) {
             scrollToBottom();
-            console.log("메시지 로드 후 스크롤 동작 설정 !else if 내부");
         }
     }, [messages, isPaginating, shouldScrollToBottom]);
 
@@ -144,7 +137,6 @@ const ChatRoomDetail = () => {
         const { scrollTop } = e.target;
         if (scrollTop === 0 && hasMore && !isFetching) {
             fetchPastMessages(page);
-            console.log("스크롤 이벤트 핸들러 내부")
         }
     };
 
@@ -174,7 +166,6 @@ const ChatRoomDetail = () => {
     // 컴포넌트 마운트 시 스크롤을 가장 아래로 설정
     useEffect(() => {
         setShouldScrollToBottom(true);
-        console.log("컴포넌트 마운트 시 스크롤을 가장아래로 이동 설정!")
     }, []);
 
     return (
@@ -260,7 +251,7 @@ const ChatRoomDetail = () => {
                 chatRoomId={chatRoomId}
                 setMessages={setMessages}
                 memberId={currentUserId}
-                onMessageSend={() => setShouldScrollToBottom(true)} // 메시지 전송 시 스크롤을 아래로
+                onMessageSend={() => setShouldScrollToBottom(true)}
             />
         </div>
     );

@@ -33,10 +33,9 @@ public class ChatMessageController {
     //클라이언트로 부터 오는 메세지 수신 -> Redis로 송신
     @MessageMapping("/api/chat/message")
     public void sendMessage(ChatMessageDTO message) {
-        log.info("클라로부터온 메세지: {}", message.toString());
         chatMessageService.sendChatMessage(message);
     }
-    //채팅 조회
+    //단일 채팅 조회
     @GetMapping("/{chatMessageId}")
     @ResponseBody
     @Operation(summary = "채팅 검색", description = "검색하고 싶은 채팅을 조회하는 API")
@@ -57,6 +56,7 @@ public class ChatMessageController {
     public ResponseEntity<Boolean> deleteMessage(@PathVariable Long chatMessageId) {
         return ResponseEntity.ok(chatMessageService.deleteChatMessage(chatMessageId));
     }
+    //사용자 정보 호출
     @GetMapping("/user-info")
     @ResponseBody
     @Operation(summary = "사용자 정보", description = "사용자 정보 호출하는 API")
@@ -64,6 +64,7 @@ public class ChatMessageController {
         String email = authentication.getName();
         return memberService.readUserInfo(email);
     }
+    //페이징 채팅 기록 조회
     @GetMapping("/messages/{chatRoomId}")
     @ResponseBody
     @Operation(summary = "채팅 기록 조회", description = "채팅 기록 호출 API")
@@ -71,7 +72,6 @@ public class ChatMessageController {
                                                                            @RequestParam(value = "page", defaultValue = "1") int page,
                                                                            @RequestParam(value = "size", defaultValue = "10") int size) {
         ChatMessagePageRequestDTO chatMessagePageRequestDTO = ChatMessagePageRequestDTO.builder().page(page).size(size).build();
-        log.info("/loadMessageList {}", chatMessagePageRequestDTO.toString());
         return ResponseEntity.ok(chatMessageService.getList(chatMessagePageRequestDTO, chatRoomId));
     }
 }

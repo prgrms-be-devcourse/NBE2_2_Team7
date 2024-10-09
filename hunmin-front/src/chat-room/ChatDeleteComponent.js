@@ -1,15 +1,13 @@
 import React from 'react';
-import api from '../axios'; // Axios 인스턴스 import
+import api from '../axios';
 
 const ChatDeleteComponent = ({ chatMessageId, onDeleteSuccess, onCancel }) => {
     const handleDelete = async () => {
         try {
             const response = await api.delete(`/chat/${chatMessageId}`);
-            console.log('메시지 삭제 성공:', response.data);
             onDeleteSuccess(chatMessageId);
         } catch (error) {
             console.error('메시지 삭제 실패:', error);
-            // 에러 처리 추가 가능
         }
     };
 

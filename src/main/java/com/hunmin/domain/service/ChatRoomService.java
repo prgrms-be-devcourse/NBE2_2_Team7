@@ -78,12 +78,10 @@ public class ChatRoomService {
         }
 
         Member me = memberRepository.findByEmail(myEmail);
-        log.info("me ={}", me);
 
         String myNickname = me.getNickname();
 
         if (roomStorage.get(myNickname, partnerName) != null || roomStorage.get(partnerName, myNickname) != null) {
-            log.info("이미존재합니다");
             throw ChatRoomException.CHATROOM_ALREADY_EXIST.get();
         }
         ChatRoom chatRoom = ChatRoom.builder().member(me).build();
@@ -96,7 +94,6 @@ public class ChatRoomService {
                 .createdAt(SavedchatRoom.getCreatedAt())
                 .build();
         roomStorage.put(me.getNickname(), partnerName, chatRoomRequestDTO);
-        log.info("roomStorage ={}", roomStorage);
 
         Member partner = memberRepository.findByNickname(partnerName).orElseThrow(MemberException.NOT_FOUND::get);
 

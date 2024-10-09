@@ -42,14 +42,12 @@ public class ChatRoomController {
     @GetMapping("/enter/{chatRoomId}")
     @Operation(summary = "채팅방 입장", description = "채팅방으로 입장하는 API")
     public String RoomEnter(@PathVariable String chatRoomId) {
-        log.info("room/enter/chatRoomId:{}",chatRoomId);
         return chatRoomId;
     }
     //단일 채팅방 정보 조회
     @GetMapping("/{chatRoomId}")
     @Operation(summary = "단일 채팅방 정보 조회", description = "검색하고 싶은 채팅방을 조회하는 API")
     public ChatRoomDTO roomInfo(@PathVariable Long chatRoomId) {
-        log.info(" chatRoomId in controller={}",chatRoomId);
         return chatRoomService.findRoomById(chatRoomId);
     }
     //채팅방 삭제
