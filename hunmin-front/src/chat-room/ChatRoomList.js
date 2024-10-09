@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import api from '../axios'; // API 요청을 위해 정의된 axios 인스턴스
+import api from '../axios';
 import {
     Box,
     Card,
@@ -63,11 +63,11 @@ const ChatRoomList = () => {
         // 인증된 사용자인지 확인 후 요청
         api.get('/chat-room/list')
             .then(response => {
-                console.log(response.data); // 데이터 구조 확인용 로그
+                console.log(response.data);
                 setChatRooms(response.data);
             })
             .catch(error => {
-                console.error("Error fetching chat rooms:", error); // 오류 발생 시 로그 출력
+                console.error("Error fetching chat rooms:", error);
                 setSnackbar({
                     open: true,
                     message: '채팅방 목록을 불러오는데 실패했습니다.',
@@ -81,7 +81,7 @@ const ChatRoomList = () => {
     };
 
     const handleMenuOpen = (event, chatRoomId) => {
-        event.stopPropagation(); // onClick 트리거 방지
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
         setSelectedChatRoom(chatRoomId);
     };
@@ -93,7 +93,7 @@ const ChatRoomList = () => {
 
     // 삭제 버튼 클릭 시 파트너 이름 입력 Dialog 열기
     const openPartnerNameDialog = () => {
-        setOpenDeleteDialog(true);  // 삭제 Dialog 열기
+        setOpenDeleteDialog(true);
     };
 
     // 채팅방 삭제 요청
@@ -116,24 +116,24 @@ const ChatRoomList = () => {
                             message: '채팅방이 성공적으로 삭제되었습니다.',
                             severity: 'success',
                         });
-                        handleCloseDeleteDialog(); // 다이얼로그 닫기
+                        handleCloseDeleteDialog();
                     } else {
                         setSnackbar({
                             open: true,
                             message: '닉네임이 일치하지 않습니다.',
                             severity: 'error',
                         });
-                        handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
+                        handleCloseDeleteDialog();
                     }
                 })
                 .catch(error => {
-                    console.error("Error deleting chat room:", error); // 삭제 오류 로그
+                    console.error("Error deleting chat room:", error);
                     setSnackbar({
                         open: true,
                         message: '채팅방 삭제에 실패했습니다.',
                         severity: 'error',
                     });
-                    handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
+                    handleCloseDeleteDialog();
                 });
             handleMenuClose();
         }
@@ -146,13 +146,13 @@ const ChatRoomList = () => {
     // 삭제 다이얼로그 닫기
     const handleCloseDeleteDialog = () => {
         setOpenDeleteDialog(false);
-        setPartnerName('');  // 입력 필드 초기화
+        setPartnerName('');
     };
 
     // 생성 다이얼로그 닫기
     const handleCloseCreateDialog = () => {
         setOpenCreateDialog(false);
-        setNewNickName('');  // 입력 필드 초기화
+        setNewNickName('');
     };
 
     const handleCreateChatRoom = () => {
@@ -176,13 +176,13 @@ const ChatRoomList = () => {
                 handleCloseCreateDialog();
             })
             .catch(error => {
-                console.error("Error creating chat room:", error); // 생성 오류 로그
+                console.error("Error creating chat room:", error);
                 setSnackbar({
                     open: true,
                     message: '채팅방 생성에 실패했습니다.',
                     severity: 'error',
                 });
-                handleCloseDeleteDialog(); // 다이얼로그 닫기 (실패 시에도 닫히도록 수정)
+                handleCloseDeleteDialog();
             });
     };
 
@@ -197,7 +197,7 @@ const ChatRoomList = () => {
             </Button>
             <List sx={{width: '100%'}}>
                 {chatRooms.map(room => (
-                    <React.Fragment key={room.chatRoomId}> {/* chatRoomId가 고유한지 확인 */}
+                    <React.Fragment key={room.chatRoomId}>
                         <ListItem>
                             <ChatRoomCard
                                 room={room}

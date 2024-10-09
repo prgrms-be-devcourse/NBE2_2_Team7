@@ -17,7 +17,6 @@ const CreateChatRoom = () => {
             .then(response => {
                 alert(`채팅방 [${response.data.partnerName}]이 생성되었습니다.`);
                 setNickname('');
-                // 새로운 채팅방 목록을 갱신하기 위해 ChatRoomList 컴포넌트에 props로 함수를 전달하거나 상태 관리를 추가할 수 있습니다.
             })
             .catch(error => {
                 alert('채팅방 생성에 실패했습니다.');

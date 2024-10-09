@@ -23,7 +23,6 @@ public class RedisSubscriber implements MessageListener {
     public void sendMessage(ChatMessageDTO publishMessage) {
         try {
             messagingTemplate.convertAndSend("/sub/chat/room/" + publishMessage.getChatRoomId(), publishMessage);
-            log.info("[sendMessage]Sent message to redis topic: /sub/chat/room/{}", publishMessage.getChatRoomId());
         } catch (Exception e) {
             log.error("Exception {}", e);
         }
@@ -37,7 +36,6 @@ public class RedisSubscriber implements MessageListener {
             ChatMessageDTO chatMessage = objectMapper.readValue(publishMessage, ChatMessageDTO.class);
 
             messagingTemplate.convertAndSend("/sub/chat/room/" + chatMessage.getChatRoomId(), chatMessage);
-            log.info("[onMessage]Sent message to STOMP topic: /sub/chat/room/{}", chatMessage.getChatRoomId());
         } catch (Exception e) {
             log.error(e.getMessage());
         }

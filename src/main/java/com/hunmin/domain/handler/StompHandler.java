@@ -32,13 +32,10 @@ public class StompHandler implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         //websocket 연결시
-        if (StompCommand.CONNECT == accessor.getCommand()) { // websocket 연결요청
+        if (StompCommand.CONNECT == accessor.getCommand()) {
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
-            log.info("StompHandler Token: " + jwtToken);
-            log.info("CONNECT {}", jwtToken);
             if (jwtUtil.isExpired(jwtToken)){
                 String role = jwtUtil.getRole(jwtToken);
-                log.debug("===== Extracted Role: " + role);
                 ChatMessageDTO chatMessageDTO=(ChatMessageDTO)message.getPayload();
                 Member foundMember = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
                 CustomUserDetails customUserDetails = new CustomUserDetails(foundMember);

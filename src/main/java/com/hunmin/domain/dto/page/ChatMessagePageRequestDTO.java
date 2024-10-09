@@ -18,7 +18,7 @@ public class ChatMessagePageRequestDTO {
 
     @Builder.Default
     @Min(1)
-    private int page = 1;   //페이지 번호 - 첫번째 페이지 0부터 시작
+    private int page = 1;
     @Builder.Default
     @Min(10)
     @Max(100)

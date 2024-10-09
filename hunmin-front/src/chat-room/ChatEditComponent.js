@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../axios'; // Axios 인스턴스 import
+import api from '../axios';
 
 const ChatEditComponent = ({ chatMessageId, originalMessage, onUpdateSuccess, onCancel }) => {
     const [editedMessage, setEditedMessage] = useState(originalMessage);
@@ -10,11 +10,9 @@ const ChatEditComponent = ({ chatMessageId, originalMessage, onUpdateSuccess, on
                 chatMessageId: chatMessageId,
                 message: editedMessage,
             });
-            console.log('메시지 수정 성공:', response.data);
             onUpdateSuccess(response.data);
         } catch (error) {
             console.error('메시지 수정 실패:', error);
-            // 에러 처리 추가 가능
         }
     };
 

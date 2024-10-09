@@ -3,23 +3,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import api from '../axios'; // 사용자 정보 가져오는 API 추가
+import api from '../axios';
 
-const ChatComponent = ({ chatRoomId, setMessages, onMessageSend  }) => { // onMessageSend prop 추가
-    const [message, setMessage] = useState(''); // 메시지 입력 상태
+const ChatComponent = ({ chatRoomId, setMessages, onMessageSend  }) => {
+    const [message, setMessage] = useState('');
     const stompClientRef = useRef(null);
     const [type, setType] = useState('TALK');
-    const [memberId, setMemberId] = useState(null); // memberId 상태
-    const [isConnected, setIsConnected] = useState(false); // 연결 상태 관리
+    const [memberId, setMemberId] = useState(null);
+    const [isConnected, setIsConnected] = useState(false);
 
     // 사용자 정보 가져오기 함수
     const fetchUserInfo = async () => {
         try {
-            const response = await api.get('/chat/user-info'); // 사용자 정보 API 호출
-            setMemberId(response.data.memberId); // 사용자 ID 설정
-            console.log('사용자 정보:', response.data); // 사용자 정보 콘솔 출력
+            const response = await api.get('/chat/user-info');
+            setMemberId(response.data.memberId);
         } catch (error) {
-            console.error('사용자 정보를 가져오는 데 실패했습니다:', error);
         }
     };
 
@@ -27,20 +25,20 @@ const ChatComponent = ({ chatRoomId, setMessages, onMessageSend  }) => { // onMe
     const handleNewMessage = (newMessage) => {
         setMessages((prevMessages) => {
             if (prevMessages.some(msg => msg.chatMessageId === newMessage.chatMessageId)) {
-                return prevMessages; // 메시지가 이미 존재하면 추가하지 않음
+                return prevMessages;
             }
             return [...prevMessages, newMessage];
         });
         if (onMessageSend) {
-            onMessageSend(); // 메시지 수신 시 스크롤 아래로 설정
+            onMessageSend();
         }
     };
 
     // 웹소켓 연결
     const stompConnect = () => {
         try {
-            const token = localStorage.getItem('token'); // 토큰을 가져옴
-            const sock = new SockJS("http://localhost:8080/ws-stomp"); // SockJS 연결 설정
+            const token = localStorage.getItem('token');
+            const sock = new SockJS("http://localhost:8080/ws-stomp");
             const client = new Client({
                 webSocketFactory: () => sock,
                 connectHeaders: {
@@ -48,20 +46,16 @@ const ChatComponent = ({ chatRoomId, setMessages, onMessageSend  }) => { // onMe
                 },
                 debug: (str) => console.log(str),
                 onConnect: () => {
-                    console.log('STOMP 연결 성공');
-                    setIsConnected(true); // 연결 상태 업데이트
+                    setIsConnected(true);
 
                     // 채팅방 구독
                     client.subscribe(
                         `/sub/chat/room/${chatRoomId}`,
                         (message) => {
-                            console.log('메시지 수신 중...');
                             if (message.body) {
                                 const newMessage = JSON.parse(message.body);
-                                console.log('수신한 메시지:', newMessage);
-                                handleNewMessage(newMessage); // 중복 확인 후 메시지 추가
+                                handleNewMessage(newMessage);
                             } else {
-                                console.log('수신한 메시지의 body가 없습니다.');
                             }
                         },
                         (error) => {
@@ -71,11 +65,10 @@ const ChatComponent = ({ chatRoomId, setMessages, onMessageSend  }) => { // onMe
                 },
                 onStompError: (frame) => {
                     console.error('Broker error:', frame.headers['message']);
-                    setIsConnected(false); // 오류 시 연결 상태 업데이트
+                    setIsConnected(false);
                 },
                 onWebSocketClose: () => {
-                    console.log('WebSocket 연결 종료');
-                    setIsConnected(false); // 연결 종료 시 상태 업데이트
+                    setIsConnected(false);
                 },
             });
 
@@ -94,55 +87,47 @@ const ChatComponent = ({ chatRoomId, setMessages, onMessageSend  }) => { // onMe
     };
 
     useEffect(() => {
-        fetchUserInfo(); // 컴포넌트 마운트 시 사용자 정보 가져오기
-        stompConnect(); // 웹소켓 연결
+        fetchUserInfo();
+        stompConnect();
 
         return () => {
-            stompDisconnect(); // 컴포넌트 언마운트 시 WebSocket 연결 해제
+            stompDisconnect();
         };
-    }, [chatRoomId]); // chatRoomId가 변경될 때마다 재연결
+    }, [chatRoomId]);
 
     // 메시지 전송
     const sendMessage = () => {
-        console.log('sendMessage 함수 호출'); // 함수 호출 확인
 
         if (message.trim() === '' || !memberId) {
-            console.log('메시지 전송 조건 미충족: message 또는 memberId'); // 조건 미충족 확인
             return;
         }
 
-        const token = localStorage.getItem('token'); // 토큰 가져오기
-        console.log('token send message:', token);
+        const token = localStorage.getItem('token');
 
         const chatMessageDTO = {
-            chatRoomId: Number(chatRoomId), // 숫자 타입으로 변환
-            nickName: '나', // 현재 사용자의 이름 (여기서는 '나'로 설정)
-            memberId: Number(memberId), // 상태 변수 사용
+            chatRoomId: Number(chatRoomId),
+            nickName: '나',
+            memberId: Number(memberId),
             message: message,
             type: type,
         };
 
-        console.log('전송한 메시지:', chatMessageDTO); // 전송할 메시지를 콘솔에 출력
-
-        if (stompClientRef.current && isConnected) { // isConnected 상태 사용
+        if (stompClientRef.current && isConnected) {
             try {
                 stompClientRef.current.publish({
-                    destination: '/pub/api/chat/message', // 메시지 발행 경로
-                    body: JSON.stringify(chatMessageDTO), // 메시지를 JSON으로 변환하여 전송
+                    destination: '/pub/api/chat/message',
+                    body: JSON.stringify(chatMessageDTO),
                     headers: {
-                        Authorization: `Bearer ${token}`, // Bearer 토큰 형식으로 변경
+                        Authorization: `${token}`,
                     },
                 });
-                console.log('메시지 전송 완료');
                 onMessageSend(); // 메시지 전송 후 스크롤 설정
             } catch (error) {
-                console.error('메시지 전송 중 오류 발생:', error);
             }
         } else {
-            console.error('WebSocket 연결이 되어 있지 않습니다.');
         }
 
-        setMessage(''); // 입력 필드를 초기화
+        setMessage('');
     };
 
     return (
