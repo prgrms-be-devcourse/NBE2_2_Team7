@@ -29,7 +29,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final SseEmitters sseEmitters;
 
-    private static final long TIMEOUT = 60 * 1000L;
+    private static final long TIMEOUT = 5 * 60 * 1000L;
 
     //클라이언트의 연결 구독
     public SseEmitter subscribe(Long memberId) {
