@@ -9,9 +9,8 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Setter
-@JsonIgnoreProperties(ignoreUnknown = true)
-/* memberId는 SecurityContext 에서 받아오고 noticeId는 path variable 에서 받아오는데 필요하지 않아서 다 무시
-나머지 불필요한 JSON 데이터 무시*/
+@JsonIgnoreProperties(ignoreUnknown = true) //리액트에서 필요한 데이터만 보내는걸로 수정했지만, 백엔드에서도 이중으로 불필요한 데이터 무시
+
 public class NoticeUpdateDTO {
 
 
