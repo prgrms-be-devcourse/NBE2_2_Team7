@@ -36,7 +36,8 @@ const NoticeForm = () => {
         e.preventDefault();
 
         if (id) {
-            api.put(`/notices/${id}`, notice)
+            const { title, content } = notice; // 필요한 필드만 추출
+            api.put(`/notices/${id}`, { title, content })
                 .then(response => {
                     navigate(`/notices/${id}`);
                 })

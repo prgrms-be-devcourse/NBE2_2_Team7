@@ -53,7 +53,9 @@ const CreateNoticePage = () => {
         e.preventDefault();
 
         if (id) {
-            api.put(`/notices/${id}`, notice)
+            const { title, content } = notice; // 필요한 필드만 추출
+            const noticeData = { title, content };
+            api.put(`/notices/${id}`, noticeData)
             //axios.put(`/api/notices/${id}`, notice)
                 .then(response => {
                     navigate(`/notices/${id}`);
