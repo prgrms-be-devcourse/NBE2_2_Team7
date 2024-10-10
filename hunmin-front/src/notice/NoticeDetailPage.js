@@ -31,11 +31,7 @@ const NoticeDetailPage = () => {
     }, [id]);
 
     const handleDelete = () => {
-        const memberId = localStorage.getItem('memberId'); // 로컬 저장소에서 멤버 ID를 가져옵니다.
-        api.delete(`/notices/${id}`, {
-        //axios.delete(`/api/notices/${id}`, {
-            data: { memberId } // 실제 멤버 ID를 여기에 넣어야 합니다.
-        })
+        api.delete(`/notices/${id}`)
             .then(response => {
                 if (response.data.result === 'success') {
                     alert('공지사항이 삭제되었습니다.');
@@ -46,8 +42,8 @@ const NoticeDetailPage = () => {
             })
             .catch(error => {
                 if (error.response && error.response.data) {
-                    setErrorMessage(`Error: ${error.response.data.error}`); // 에러 메시지를 팝업으로 표시
-                    console.error(error)
+                    setErrorMessage(`Error: ${error.response.data.error}`);
+                    console.error(error);
                 } else {
                     setErrorMessage("There was an error fetching/deleting the notice!");
                 }
