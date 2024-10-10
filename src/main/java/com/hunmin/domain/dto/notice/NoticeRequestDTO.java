@@ -11,7 +11,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Setter
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class NoticeRequestDTO {
 
     @NotEmpty(message = "제목을 입력하세요")
