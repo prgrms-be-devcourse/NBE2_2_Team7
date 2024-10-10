@@ -84,7 +84,9 @@
 <details>
 <summary>로그인 (클릭하여 펼치기/접기)</summary>
   
-![image](https://github.com/user-attachments/assets/96eeda40-6137-411c-9079-340c68ba8ef9)
+[image](https://github.com/user-attachments/assets/96eeda40-6137-411c-9079-340c68ba8ef9)
+[ezgif-5-ed1468eeb1](https://github.com/user-attachments/assets/f6fee17e-135c-4bf8-9afd-ac3dcfc62fbc)
+
 
 </details>
 
