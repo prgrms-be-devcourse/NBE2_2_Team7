@@ -10,8 +10,8 @@ import './ErrorMessage.css';
 const CreateNoticePage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const memberId = localStorage.getItem('memberId'); // 로컬 저장소에서 멤버 ID를 가져옵니다.
-    const [notice, setNotice] = useState({ memberId: memberId, title: '', content: '' });
+    //const memberId = localStorage.getItem('memberId'); // 로컬 저장소에서 멤버 ID를 가져옵니다.
+    const [notice, setNotice] = useState({ title: '', content: '' });
     const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지 상태 추가
 
     useEffect(() => {
