@@ -80,6 +80,7 @@ public class NoticeService {
         try{
             notice.changeTitle(noticeUpdateDTO.getTitle());
             notice.changeContent(noticeUpdateDTO.getContent());
+            notice.changeMember(member); //수정한 관리자에 대한 정보 반영
             return new NoticeResponseDTO(notice);
         }catch (Exception e){
             log.error("updateNotice error: {}",  e.getMessage());
