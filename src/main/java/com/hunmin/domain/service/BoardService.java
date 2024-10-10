@@ -219,11 +219,22 @@ public class BoardService {
             }
         }
 
+        if (boardResponseDTOs.size() < pageable.getPageSize()) {
+            Page<Board> boards = boardRepository.findAll(pageable);
+            List<BoardResponseDTO> newBoardResponseDTOs = boards.map(BoardResponseDTO::new).getContent();
+
+            for (BoardResponseDTO boardResponseDTO : newBoardResponseDTOs) {
+                if (boardResponseDTOs.stream().noneMatch(b -> b.getBoardId().equals(boardResponseDTO.getBoardId()))) {
+                    hashOps.put("board", String.valueOf(boardResponseDTO.getBoardId()), boardResponseDTO);
+                    boardResponseDTOs.add(boardResponseDTO);
+                }
+            }
+        }
+
         boardResponseDTOs.sort((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt()));
 
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), boardResponseDTOs.size());
-
         List<BoardResponseDTO> pagedResponse = boardResponseDTOs.subList(start, end);
 
         return new PageImpl<>(pagedResponse, pageable, boardResponseDTOs.size());

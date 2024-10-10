@@ -80,6 +80,7 @@ public class NoticeService {
         try{
             notice.changeTitle(noticeUpdateDTO.getTitle());
             notice.changeContent(noticeUpdateDTO.getContent());
+            notice.changeMember(member); //수정한 관리자에 대한 정보 반영
             return new NoticeResponseDTO(notice);
         }catch (Exception e){
             log.error("updateNotice error: {}",  e.getMessage());
@@ -90,15 +91,15 @@ public class NoticeService {
 
 
     //공지사항 삭제
-    public boolean deleteNotice(NoticeDeleteDTO noticeDeleteDTO, String username){
+    public boolean deleteNotice(Long noticeId, String username){
         Member member = getMember(username);
         //관리자 아닐경우 예외 발생
         if (!member.getMemberRole().equals(MemberRole.ADMIN)) {
             throw NoticeException.MEMBER_NOT_VALID.get();
         }
-        noticeRepository.findById(noticeDeleteDTO.getNoticeId()).orElseThrow(NoticeException.NOTICE_NOT_FOUND::get);
+        noticeRepository.findById(noticeId).orElseThrow(NoticeException.NOTICE_NOT_FOUND::get);
         try {
-            noticeRepository.deleteById(noticeDeleteDTO.getNoticeId());
+            noticeRepository.deleteById(noticeId);
             return true;
         }catch (Exception e) {
             log.error("deleteNotice error: {}",  e.getMessage());

@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WordRequestDTO {
 
+    private Long memberId;
+
     private Long wordId;
 
     @NotEmpty(message = "명칭은 필수 입력값입니다.")

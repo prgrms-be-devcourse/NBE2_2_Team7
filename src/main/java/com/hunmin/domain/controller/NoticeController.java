@@ -53,9 +53,8 @@ public class NoticeController {
 
     @DeleteMapping("/{noticeId}")
     @Operation(summary = "공지 삭제", description = "공지사항을 삭제할때 사용하는 API")
-    public ResponseEntity<Map<String,String>> deleteNotice(@PathVariable Long noticeId, @Validated @RequestBody NoticeDeleteDTO noticeDeleteDTO, @AuthenticationPrincipal UserDetails username) {
-        noticeDeleteDTO.setNoticeId(noticeId);
-        boolean result = noticeService.deleteNotice(noticeDeleteDTO, username.getUsername());
+    public ResponseEntity<Map<String,String>> deleteNotice(@PathVariable Long noticeId, @AuthenticationPrincipal UserDetails username) {
+        boolean result = noticeService.deleteNotice(noticeId, username.getUsername());
         if (result) {
             return ResponseEntity.ok(Map.of("result","success"));
         }else {

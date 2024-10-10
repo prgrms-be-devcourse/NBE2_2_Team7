@@ -20,33 +20,42 @@ const Header = () => {
 
     const fetchNotifications = async () => {
         const memberId = localStorage.getItem('memberId'); // 로컬 스토리지에서 memberId 가져오기
+        console.log("Fetching notifications for memberId:", memberId); // 디버깅 로그 추가
         try {
             const response = await api.get(`/notification/${memberId}`); // memberId를 URL에 포함
             const validNotifications = response.data.filter(notification => notification.message);
             setNotifications(validNotifications);
+            console.log("Fetched notifications:", validNotifications); // 가져온 알림 로그
         } catch (error) {
             console.error('Error fetching notifications:', error);
         }
     };
 
     useEffect(() => {
-        fetchNotifications();
         const memberId = localStorage.getItem('memberId');
+        if (!memberId) return; // memberId가 없으면 SSE 구독하지 않음
+
+        console.log("Subscribing to notifications for memberId:", memberId); // 디버깅 로그 추가
         const eventSource = new EventSource(`http://localhost:8080/api/notification/subscribe/${memberId}`);
 
+        // SSE 이벤트 핸들링
         eventSource.onmessage = (event) => {
             const newNotification = JSON.parse(event.data);
-            setNotifications(prev => [newNotification, ...prev]);
-            if (!newNotification.isRead) {
+            console.log("New notification received:", newNotification); // 수신한 알림 로그
+            if (newNotification && newNotification.message) {
+                setNotifications(prev => [newNotification, ...prev]);
+                // 최신 알림 메시지로 팝업 표시
                 displayPopup(newNotification.message);
             }
         };
 
-        eventSource.onerror = () => {
-            console.error('EventSource failed');
-            eventSource.close();
+        // 에러 처리
+        eventSource.onerror = (event) => {
+            console.error('EventSource failed:', event);
+            eventSource.close(); // SSE 연결을 닫습니다.
         };
 
+        // 컴포넌트 언마운트 시 연결 종료
         return () => {
             eventSource.close();
         };
@@ -160,12 +169,12 @@ const Header = () => {
                     position: 'fixed',
                     top: '20px',
                     right: '50px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // 투명한 검은색 배경으로 변경
-                    color: 'white', // 텍스트 색상을 흰색으로 변경
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    color: 'white',
                     border: '1px solid black',
                     padding: '10px',
                     zIndex: 1000,
-                    borderRadius: '5px' // 둥근 모서리 추가
+                    borderRadius: '5px'
                 }}>
                     {popupMessage}
                 </div>

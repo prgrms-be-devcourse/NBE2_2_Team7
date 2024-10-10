@@ -1,5 +1,6 @@
 package com.hunmin.domain.dto.notice;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,15 +9,17 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true) //리액트에서 필요한 데이터만 보내는걸로 수정했지만, 백엔드에서도 이중으로 불필요한 데이터 무시
+
 public class NoticeUpdateDTO {
-/*
-RequestDTO와 인스턴스가 같긴 한데 용도는 다르니 혹시몰라서 ..
- */
+
 
     @NotEmpty(message = "제목을 입력하세요")
     private String title;
     @NotEmpty(message = "내용을 입력하세요")
     private String content;
+
+
 
 
 

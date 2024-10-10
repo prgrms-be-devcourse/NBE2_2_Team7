@@ -1,5 +1,6 @@
 package com.hunmin.domain.dto.notice;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.Notice;
 import jakarta.validation.constraints.NotEmpty;
