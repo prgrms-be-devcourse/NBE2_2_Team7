@@ -43,12 +43,19 @@
 <img src="https://img.shields.io/badge/Swagger-0?style=flat-square&logo=Swagger&logoColor=white&color=%2385EA2D">
 
 ## 구조
-전체 시스템 구조
-![image](https://github.com/user-attachments/assets/1181647e-2c4f-4a40-81f0-3cc22a8c3922)
+전체 시스템 구조 - 사용자
+![image](https://github.com/user-attachments/assets/f215a005-0a1f-4965-a7de-cc9c0ed1e705)
 
-채팅 시스템 구조
-![image](https://github.com/user-attachments/assets/e2844e3c-09db-4d9a-b6b2-04b132e37f21)
+전체 시스템 구조 - 관리자
+![image](https://github.com/user-attachments/assets/f6289385-2c9d-4d5c-b785-269c6f55425f)
+
+
+<details>
+<summary>채팅 (클릭하여 펼치기/접기)</summary>
     
+채팅 시스템 구조
+![image](https://github.com/user-attachments/assets/2366cd7f-a491-478d-a456-7da0d1a6f932)
+
 ## 1. 채팅 구현 기술
 
 
@@ -72,8 +79,60 @@
 
  기술 흐름: Publisher -> 웹소캣 -> Stomp -> Redis -> data save -> Stomp -> 웹소캣 -> Subscriber
  
- 
- -------------------------------------------------------------------------------------------------------------------
+ </details>
+
+<details>
+<summary>로그인 (클릭하여 펼치기/접기)</summary>
+  
+![image](https://github.com/user-attachments/assets/96eeda40-6137-411c-9079-340c68ba8ef9)
+
+</details>
+
+<details>
+<summary>게시판 (클릭하여 펼치기/접기)</summary>
+
+![image](https://github.com/user-attachments/assets/c2e09ee3-78ce-43b8-adac-10a4f99e22c7)
+
+</details>
+
+<details>
+<summary>댓글 (클릭하여 펼치기/접기)</summary>
+
+![image](https://github.com/user-attachments/assets/5eee0b1c-330b-4f47-b7ef-b3b62c6610ca)
+
+</details>
+
+<details>
+<summary>단어학습 (클릭하여 펼치기/접기)</summary>
+
+![image](https://github.com/user-attachments/assets/e69f97e1-72d0-48a5-8733-c7f03316762f)
+
+</details>
+
+<details>
+<summary>공지사항 (클릭하여 펼치기/접기)</summary>
+
+![image](https://github.com/user-attachments/assets/2775734c-64c1-4ad9-a127-706fef970f7f)
+
+공지사항 작업(생성, 수정, 삭제)을 수행하기 위한 요청이 들어옵니다.
+컨트롤러는 이 요청을 수신하고 SecurityContext에서 인증된 사용자 세부 정보를 추출합니다.
+컨트롤러는 해당 사용자 이름을 서비스 메서드에 전달합니다.
+서비스 메서드는 데이터베이스에서 해당 사용자의 정보를 조회합니다. 
+서비스 메서드는 사용자가 관리자인지 확인하고 관리자가 아닐경우 예외를 발생시켜 작업을 중단하고 관리자일 경우 요청된 작업을 진행합니다.
+
+</details>
+
+<details>
+<summary>알림 (클릭하여 펼치기/접기)</summary>
+
+![image](https://github.com/user-attachments/assets/9a2a6f92-4cfa-49dd-8116-aeada072c9b3)
+
+![image](https://github.com/user-attachments/assets/e94a41af-4d57-4c2a-ae2b-7aa22b46081f)
+
+
+
+</details>
+
 <details>
   <summary>📦 패키지 구조 (클릭하여 펼치기/접기)</summary>
 
@@ -119,52 +178,6 @@
 └─ uploads
 
 </details>
-
-<details>
-<summary>로그인 (클릭하여 펼치기/접기)</summary>
-  
-![image](https://github.com/user-attachments/assets/4e3c2e4c-2deb-4515-83b6-f901742ac990)
-
-
-</details>
-
-<details>
-<summary>게시판 (클릭하여 펼치기/접기)</summary>
-
-![image](https://github.com/user-attachments/assets/6e2df253-3810-477b-aaab-e1f70ac1bddf)
-
-
-</details>
-
-<details>
-<summary>댓글 (클릭하여 펼치기/접기)</summary>
-
-![image](https://github.com/user-attachments/assets/f18c3e47-5c45-47e5-8b5f-87c2766771cb)
-
-</details>
-
-<details>
-<summary>단어학습 (클릭하여 펼치기/접기)</summary>
-
-![image](https://github.com/user-attachments/assets/6a3f9cac-728a-4b52-8af5-8fc29396fc00)
-
-</details>
-
-<details>
-<summary>공지사항 (클릭하여 펼치기/접기)</summary>
-
-![image](https://github.com/user-attachments/assets/2346b9c0-8591-43e4-a4dc-6fa9c0058733)
-
-</details>
-
-<details>
-<summary>알림 (클릭하여 펼치기/접기)</summary>
-
-![image](https://github.com/user-attachments/assets/69e09a9f-e7a7-4d0f-a57b-80c7cc63c513)
-
-</details>
-
-
 
 ## 다이어그램
 ### ERD
@@ -226,11 +239,11 @@
     <td><b>김동우</b></td>
   </tr>
   <tr>
-    <td><b></b></td>
-    <td><b></b></td>
-    <td><b></b></td>
-    <td><b></b></td>
-    <td><b></b></td>
+    <td><b>게시판, 댓글, 알림</b></td>
+    <td><b>회원</b></td>
+    <td><b>채팅</b></td>
+    <td><b>단어학습</b></td>
+    <td><b>공지사항</b></td>
   </tr>
 </table>
 
