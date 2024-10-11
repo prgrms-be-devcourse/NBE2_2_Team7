@@ -40,7 +40,7 @@
 
 ## 구조
 <details>
-  <summary>📦 패키지 구조 (클릭하여 펼치기/접기)</summary>
+  <summary>📦 패키지 구조</summary>
 
 ├─ src<br/>
 │  ├─ main <br/>
@@ -135,6 +135,7 @@
 <summary>게시판, 카카오맵 api</summary>
 
 ![image](https://github.com/user-attachments/assets/c2e09ee3-78ce-43b8-adac-10a4f99e22c7)
+![2-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/de56f762-6238-406a-b4d1-f6c2848e99c5)
 
 </details>
 
@@ -142,6 +143,7 @@
 <summary>댓글</summary>
 
 ![image](https://github.com/user-attachments/assets/5eee0b1c-330b-4f47-b7ef-b3b62c6610ca)
+![ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/d77f8df5-d258-4002-9cb6-491f8951a871)
 
 </details>
 
@@ -171,6 +173,8 @@
 ![image](https://github.com/user-attachments/assets/9a2a6f92-4cfa-49dd-8116-aeada072c9b3)
 
 ![image](https://github.com/user-attachments/assets/e94a41af-4d57-4c2a-ae2b-7aa22b46081f)
+
+![3-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/28753421-d3b6-45e7-bb09-c3b299c94141)
 
 
 
