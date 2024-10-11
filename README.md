@@ -11,11 +11,7 @@
 - **위치 기반 모임 찾기**: 주변에서 진행되는 한국어 학습 모임을 쉽게 찾아 참여할 수 있습니다.
 - **자유로운 1:1 채팅 기능**: 다른 학습자나 튜터와 자유롭게 대화하며 실시간으로 한국어 실력을 향상시킬 수 있습니다.
 
-## 기능 사용
 
-
-
-프론트 영상
 
 ## 기술 스택
 
@@ -51,7 +47,7 @@
 
 
 <details>
-<summary>채팅 (클릭하여 펼치기/접기)</summary>
+<summary>채팅</summary>
     
 채팅 시스템 구조
 ![image](https://github.com/user-attachments/assets/2366cd7f-a491-478d-a456-7da0d1a6f932)
@@ -82,7 +78,7 @@
  </details>
 
 <details>
-<summary>로그인 (클릭하여 펼치기/접기)</summary>
+<summary>로그인</summary>
   
 ![image](https://github.com/user-attachments/assets/96eeda40-6137-411c-9079-340c68ba8ef9)
 ![ezgif com-resize](https://github.com/user-attachments/assets/6a277246-c0db-4a2f-8558-216723b7968c)
@@ -90,28 +86,28 @@
 </details>
 
 <details>
-<summary>게시판 (클릭하여 펼치기/접기)</summary>
+<summary>게시판, 카카오맵 api</summary>
 
 ![image](https://github.com/user-attachments/assets/c2e09ee3-78ce-43b8-adac-10a4f99e22c7)
 
 </details>
 
 <details>
-<summary>댓글 (클릭하여 펼치기/접기)</summary>
+<summary>댓글</summary>
 
 ![image](https://github.com/user-attachments/assets/5eee0b1c-330b-4f47-b7ef-b3b62c6610ca)
 
 </details>
 
 <details>
-<summary>단어학습 (클릭하여 펼치기/접기)</summary>
+<summary>단어학습</summary>
 
 ![image](https://github.com/user-attachments/assets/e69f97e1-72d0-48a5-8733-c7f03316762f)
 
 </details>
 
 <details>
-<summary>공지사항 (클릭하여 펼치기/접기)</summary>
+<summary>공지사항</summary>
 
 ![image](https://github.com/user-attachments/assets/2775734c-64c1-4ad9-a127-706fef970f7f)
 
@@ -124,7 +120,7 @@
 </details>
 
 <details>
-<summary>알림 (클릭하여 펼치기/접기)</summary>
+<summary>알림</summary>
 
 ![image](https://github.com/user-attachments/assets/9a2a6f92-4cfa-49dd-8116-aeada072c9b3)
 
@@ -252,11 +248,9 @@
 ## 프로젝트 협업 규칙
 
 <details>
-<summary>Convention (클릭하여 펼치기/접기)</summary>
-<aside>
-💡
+<summary>Convention </summary>
 
-이슈 생성 → 브랜치 생성 → 해당 브랜치로 이동 → develop pull → 작업 중간중간 커밋 → 해당 이슈에 대한 작업이 다 완료되면 pr 생성
+💡 이슈 생성 → 브랜치 생성 → 해당 브랜치로 이동 → develop pull → 작업 중간중간 커밋 → 해당 이슈에 대한 작업이 다 완료되면 pr 생성
 
 🚨 커밋 메시지도 템플릿을 지켜주세요 (커밋 메시지 push 전까지는 수정할 수 있어요)
 
@@ -268,7 +262,6 @@
 
 🚨 궁금한 점이 있다면 언제든 같이 해결해요 😊
 
-</aside>
 
 ### [type]
 
@@ -298,12 +291,9 @@
     
 
 ### branch
-
-<aside>
   
 💡issue 안에서 바로 branch를 만들어주세요 ❗️
 
-</aside>
 
 ```java
 feature/#(이슈번호 앞에 붙여주세요!
