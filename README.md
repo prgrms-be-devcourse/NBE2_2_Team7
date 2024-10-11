@@ -177,20 +177,22 @@
 </details>
 
 ## 다이어그램
-### ERD
+<details>
+<summary>ERD</summary>
+    
 ![image](https://github.com/user-attachments/assets/7fd35a00-f121-44e2-9c33-302baefb44bd)
 
+</details>
 
-###
 <details>
-<summary>클래스 다이어그램 (클릭하여 펼치기/접기)</summary>
+<summary>클래스 다이어그램</summary>
 
 ![hunmin](https://github.com/user-attachments/assets/566f6dd3-dcaf-4e60-ab9e-0138137f2aa6)
 
 </details>
 
 <details>
-<summary>유스케이스 다이어그램 (클릭하여 펼치기/접기)</summary>
+<summary>유스케이스 다이어그램</summary>
   
 ![USECASE  ](https://github.com/user-attachments/assets/61339a9e-571f-4370-8dbf-33f72ad329d0)
 
