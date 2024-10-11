@@ -39,6 +39,52 @@
 <img src="https://img.shields.io/badge/Swagger-0?style=flat-square&logo=Swagger&logoColor=white&color=%2385EA2D">
 
 ## 구조
+<details>
+  <summary>📦 패키지 구조 (클릭하여 펼치기/접기)</summary>
+
+├─ src<br/>
+│  ├─ main <br/>
+│  │  ├─ java <br/>
+│  │  │  └─ com <br/>
+│  │  │     └─ hunmin <br/>
+│  │  │        └─ domain <br/>
+│  │  │           ├─ config <br/>
+│  │  │           ├─ controller <br/>
+│  │  │           │  └─ advice     <br/>
+│  │  │           ├─ dto<br/>
+│  │  │           │  ├─ board <br/>
+│  │  │           │  ├─ chat  <br/>
+│  │  │           │  ├─ comment <br/>
+│  │  │           │  ├─ member <br/>
+│  │  │           │  ├─ notice <br/>
+│  │  │           │  ├─ notification <br/>
+│  │  │           │  ├─ page<br/>
+│  │  │           │  └─ word<br/>
+│  │  │           ├─ entity<br/>
+│  │  │           ├─ exception<br/>
+│  │  │           ├─ handler<br/>
+│  │  │           ├─ json<br/>
+│  │  │           ├─ jwt<br/>
+│  │  │           ├─ pubsub<br/>
+│  │  │           ├─ repository<br/>
+│  │  │           │  └─ search<br/>
+│  │  │           └─ service<br/>
+│  │  └─ resources<br/>
+│  │     ├─ static<br/>
+│  │     │  ├─ images<br/>
+│  │     └─ templates<br/>
+│  │        └─ message<br/>
+│  └─ test<br/>
+│     └─ java<br/>
+│        └─ com<br/>
+│           └─ hunmin<br/>
+│              └─ domain<br/>
+│                 ├─ repository<br/>
+│                 └─ service<br/>
+└─ uploads
+
+</details>
+
 전체 시스템 구조 - 사용자
 ![image](https://github.com/user-attachments/assets/f215a005-0a1f-4965-a7de-cc9c0ed1e705)
 
@@ -127,52 +173,6 @@
 ![image](https://github.com/user-attachments/assets/e94a41af-4d57-4c2a-ae2b-7aa22b46081f)
 
 
-
-</details>
-
-<details>
-  <summary>📦 패키지 구조 (클릭하여 펼치기/접기)</summary>
-
-├─ src<br/>
-│  ├─ main <br/>
-│  │  ├─ java <br/>
-│  │  │  └─ com <br/>
-│  │  │     └─ hunmin <br/>
-│  │  │        └─ domain <br/>
-│  │  │           ├─ config <br/>
-│  │  │           ├─ controller <br/>
-│  │  │           │  └─ advice     <br/>
-│  │  │           ├─ dto<br/>
-│  │  │           │  ├─ board <br/>
-│  │  │           │  ├─ chat  <br/>
-│  │  │           │  ├─ comment <br/>
-│  │  │           │  ├─ member <br/>
-│  │  │           │  ├─ notice <br/>
-│  │  │           │  ├─ notification <br/>
-│  │  │           │  ├─ page<br/>
-│  │  │           │  └─ word<br/>
-│  │  │           ├─ entity<br/>
-│  │  │           ├─ exception<br/>
-│  │  │           ├─ handler<br/>
-│  │  │           ├─ json<br/>
-│  │  │           ├─ jwt<br/>
-│  │  │           ├─ pubsub<br/>
-│  │  │           ├─ repository<br/>
-│  │  │           │  └─ search<br/>
-│  │  │           └─ service<br/>
-│  │  └─ resources<br/>
-│  │     ├─ static<br/>
-│  │     │  ├─ images<br/>
-│  │     └─ templates<br/>
-│  │        └─ message<br/>
-│  └─ test<br/>
-│     └─ java<br/>
-│        └─ com<br/>
-│           └─ hunmin<br/>
-│              └─ domain<br/>
-│                 ├─ repository<br/>
-│                 └─ service<br/>
-└─ uploads
 
 </details>
 
