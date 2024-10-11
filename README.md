@@ -159,6 +159,9 @@
 
 ![image](https://github.com/user-attachments/assets/2775734c-64c1-4ad9-a127-706fef970f7f)
 
+![공지사항 ](https://github.com/user-attachments/assets/56c49dad-a15b-429e-a922-87e42392db4e)
+
+
 1. 공지사항 작업(생성, 수정, 삭제)을 수행하기 위한 요청이 들어옵니다.<br/>
 2. 컨트롤러는 이 요청을 수신하고 SecurityContext에서 인증된 사용자 세부 정보를 추출합니다.<br/>
 3. 컨트롤러는 해당 사용자 정보를 서비스 메서드에 전달합니다.<br/>
