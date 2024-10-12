@@ -151,6 +151,7 @@
 <summary>단어학습</summary>
 
 ![image](https://github.com/user-attachments/assets/e69f97e1-72d0-48a5-8733-c7f03316762f)
+![단어](https://github.com/user-attachments/assets/05f228b0-6642-4256-a2f3-7d3d8871cada)
 
 </details>
 
