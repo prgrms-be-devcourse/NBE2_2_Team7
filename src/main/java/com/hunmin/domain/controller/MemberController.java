@@ -106,12 +106,21 @@ public class MemberController {
         String email = jwtUtil.getEmail(refresh);
         String role = jwtUtil.getRole(refresh).replace("ROLE_", "");
 
-        // 새로운 access token 발급
-        String newAccess = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 600000L); // 10분
+        // 새로운 access & refresh token 발급
+        String newAccess = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 6000000L); // 100분
+        String newRefresh = jwtUtil.createJwt("refresh", email, MemberRole.valueOf(role), 86400000L); // 24시간
 
         // 상태 정보 반환
         response.setHeader("access", newAccess);
+        response.addCookie(createCookie("refresh", newRefresh));
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24 * 60 * 60);
+        cookie.setHttpOnly(true);
+        return cookie;
     }
 }
