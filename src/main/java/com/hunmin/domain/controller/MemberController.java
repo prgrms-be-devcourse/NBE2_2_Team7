@@ -2,7 +2,9 @@ package com.hunmin.domain.controller;
 
 import com.hunmin.domain.dto.member.MemberDTO;
 import com.hunmin.domain.entity.MemberRole;
+import com.hunmin.domain.entity.RefreshEntity;
 import com.hunmin.domain.jwt.JWTUtil;
+import com.hunmin.domain.repository.RefreshRepository;
 import com.hunmin.domain.service.MemberService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
+
 // 회원 가입, 회원 정보 수정 컨트롤러 구현
 @RestController
 @RequestMapping("/api/members")
@@ -25,10 +29,12 @@ public class MemberController {
 
     private final MemberService memberService;
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
-    public MemberController(MemberService memberService, JWTUtil jwtUtil) {
+    public MemberController(MemberService memberService, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
         this.memberService = memberService;
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
     }
 
 
@@ -63,7 +69,7 @@ public class MemberController {
 
     @PostMapping("/reissue")
     @Operation(summary = "토큰 재발급", description = "refresh token으로 access token 재발급하는 API")
-    public ResponseEntity<?> reissueAccessToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) {
 
         log.info("=== MemberController - 토큰 재발급 메서드 호출");
         log.info("=== Request URI: {}", request.getRequestURI());
@@ -102,6 +108,12 @@ public class MemberController {
             return new ResponseEntity<>("잘못된 refresh token 입니다.", HttpStatus.BAD_REQUEST);
         }
 
+        // DB에 저장되어 있는지 확인
+        Boolean isExist = refreshRepository.existsByRefresh(refresh);
+        if (!isExist) {
+            return new ResponseEntity<>("Refresh Token이 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+        }
+
         // 토큰에서 유저 정보 get
         String email = jwtUtil.getEmail(refresh);
         String role = jwtUtil.getRole(refresh).replace("ROLE_", "");
@@ -110,6 +122,10 @@ public class MemberController {
         String newAccess = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 6000000L); // 100분
         String newRefresh = jwtUtil.createJwt("refresh", email, MemberRole.valueOf(role), 86400000L); // 24시간
 
+        // Refresh Token 저장 DB에 기존 Refresh Token 삭제 후 새 Refresh Token 저장
+        refreshRepository.deleteByRefresh(refresh);
+        addRefreshEntity(email, newRefresh, 86400000L);
+
         // 상태 정보 반환
         response.setHeader("access", newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
@@ -117,10 +133,21 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // 쿠키 생성 메서드
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24 * 60 * 60);
         cookie.setHttpOnly(true);
         return cookie;
+    }
+
+    // Refresh Token 저장 메서드
+    private void addRefreshEntity(String email, String refresh, Long expiredMs) {
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
+        RefreshEntity refreshEntity = new RefreshEntity();
+        refreshEntity.setEmail(email);
+        refreshEntity.setRefresh(refresh);
+        refreshEntity.setExpiration(date.toString());
+        refreshRepository.save(refreshEntity);
     }
 }
