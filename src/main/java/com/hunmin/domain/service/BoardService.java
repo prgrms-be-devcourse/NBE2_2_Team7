@@ -7,6 +7,7 @@ import com.hunmin.domain.dto.page.PageRequestDTO;
 import com.hunmin.domain.entity.Board;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.exception.BoardException;
+import com.hunmin.domain.exception.ChatMessageException;
 import com.hunmin.domain.exception.MemberException;
 import com.hunmin.domain.repository.BoardRepository;
 import com.hunmin.domain.repository.MemberRepository;
@@ -271,5 +272,18 @@ public class BoardService {
         log.info("Total boards loaded from Redis or database: {}", boardResponseDTOs.size());
 
         return new PageImpl<>(boardResponseDTOs, pageable, boardResponseDTOs.size());
+    }
+
+    public Page<BoardResponseDTO> searchBoardByTitle(PageRequestDTO pageable, String title) {
+        if(title == null) title = "";
+        log.info("title321: {}", title);
+        try {
+            Sort sort = Sort.by(Sort.Direction.DESC, "title");
+            log.info("pageable: {}", pageable.toString());
+        return boardRepository.searchBoard(pageable.getPageable(sort), title);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            throw BoardException.NOT_FOUND.get();
+        }
     }
 }
