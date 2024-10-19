@@ -2,6 +2,9 @@ package com.hunmin.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 
@@ -41,6 +44,8 @@ public class Board extends BaseTimeEntity {
     private List<String> imageUrls;
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Comment> comments;
 
     public void changeTitle(String title) {
