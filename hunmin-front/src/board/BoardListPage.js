@@ -35,7 +35,6 @@ const BoardListPage = () => {
     const [mapLevel, setMapLevel] = useState(9); // 지도 레벨 상태 추가
     const [showMyBoards, setShowMyBoards] = useState(false); // 내 작성글 보기 상태
     const [kakaoLoaded, setKakaoLoaded] = useState(false); // Kakao Maps SDK 로드 상태
-    const [title, setTitle] = useState('');
     const [searchTitle, setSearchTitle] = useState('');
 
     useEffect(() => {
