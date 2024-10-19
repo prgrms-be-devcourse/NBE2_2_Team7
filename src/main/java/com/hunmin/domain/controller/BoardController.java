@@ -10,6 +10,7 @@ import com.hunmin.domain.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/board")
@@ -106,5 +107,17 @@ public class BoardController {
                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
         PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
         return ResponseEntity.ok(boardService.readBoardListByMember(memberId, pageRequestDTO));
+    }
+
+    //검색별 게시글 조회
+    @GetMapping("/search")
+    @Operation(summary = "검색 별 작성글 목록", description = "검색별 작성글 목록을 조회할 때 사용하는 API")
+    public ResponseEntity<Page<BoardResponseDTO>> searchBoard(@RequestParam("title") String title
+                                                             ,@RequestParam(value = "page",defaultValue = "1") int page,
+                                                              @RequestParam(value = "size", defaultValue = "10") int size){
+
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().page(page).size(size).build();
+        Page<BoardResponseDTO> boardResponseDTOS = boardService.searchBoardByTitle(pageRequestDTO, title);
+        return ResponseEntity.ok().body(boardResponseDTOS);
     }
 }
