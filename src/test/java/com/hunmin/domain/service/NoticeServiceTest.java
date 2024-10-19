@@ -107,6 +107,7 @@ class NoticeServiceTest {
     void createNotice() {
         //given
         String userEmail = savedMembers.get(1).getEmail();
+        String userEmail2 = savedMembers.get(1).getEmail();
         NoticeRequestDTO noticeRequestDTO = new NoticeRequestDTO();
         noticeRequestDTO.setTitle("Test Notice");
         noticeRequestDTO.setContent("This is a test notice.");
