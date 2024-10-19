@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hunmin.domain.dto.member.CustomUserDetails;
 import com.hunmin.domain.entity.MemberLevel;
 import com.hunmin.domain.entity.MemberRole;
+import com.hunmin.domain.entity.RefreshEntity;
+import com.hunmin.domain.repository.RefreshRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -29,10 +32,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
         setFilterProcessesUrl("/api/members/login");
     }
 
@@ -72,12 +77,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         //유저 정보
         String email = authentication.getName();
-
+        // 사용자 권한 정보 추출하고 "ROLE_" 접두사 제거
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority().replace("ROLE_", "");
+
         log.info("===== Authentication 성공!! email: {}, Role: {}", email, role);
+        // 클라이언트 전송을 위한 추가 사용자 정보 추출
         Long memberId = customUserDetails.getMemberId();
         String nickname = customUserDetails.getNickname();
         String image = "http://localhost:8080" + customUserDetails.getImage();
@@ -85,10 +92,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String country = customUserDetails.getCountry();
 
         //토큰 생성
-        String access = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 86400000L); // 10분
+        String access = jwtUtil.createJwt("access", email, MemberRole.valueOf(role), 6000000L); // 100분
         String refresh = jwtUtil.createJwt("refresh", email, MemberRole.valueOf(role), 86400000L); // 24시간
         log.info("생성된 access 토큰: " + access);
         log.info("생성된 refresh 토큰: " + refresh);
+        
+        // refresh 토큰 저장
+        addRefreshEntity(email, refresh, 86400000L);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -106,6 +116,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpStatus.OK.value());
+    }
+
+    private void addRefreshEntity(String email, String refresh, Long expiredMs) {
+
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
+
+        RefreshEntity refreshEntity = new RefreshEntity();
+        refreshEntity.setEmail(email);
+        refreshEntity.setRefresh(refresh);
+        refreshEntity.setExpiration(date.toString());
+        refreshRepository.save(refreshEntity);
     }
 
     // 로그인 실패 시 HTTP 응답 401로 설정(유효한 자격 증명 미제공 시 요청 거부)

@@ -4,6 +4,7 @@ import com.hunmin.domain.jwt.CustomLogoutFilter;
 import com.hunmin.domain.jwt.JWTFilter;
 import com.hunmin.domain.jwt.JWTUtil;
 import com.hunmin.domain.jwt.LoginFilter;
+import com.hunmin.domain.repository.RefreshRepository;
 import com.hunmin.domain.service.MemberService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
@@ -31,10 +32,12 @@ public class SecurityConfig {
     // AuthenticationConfiguration과 JWT 유틸리티 초기화
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
     }
 
     // AuthenticationManager를 Bean으로 등록
@@ -55,7 +58,7 @@ public class SecurityConfig {
 
         AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
-        LoginFilter loginFilter = new LoginFilter(authManager, jwtUtil);
+        LoginFilter loginFilter = new LoginFilter(authManager, jwtUtil, refreshRepository);
         loginFilter.setFilterProcessesUrl("/api/members/login");
 
         http
