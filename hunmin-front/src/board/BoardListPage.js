@@ -36,6 +36,8 @@ const BoardListPage = () => {
     const [mapLevel, setMapLevel] = useState(9); // 지도 레벨 상태 추가
     const [showMyBoards, setShowMyBoards] = useState(false); // 내 작성글 보기 상태
     const [kakaoLoaded, setKakaoLoaded] = useState(false); // Kakao Maps SDK 로드 상태
+    const [bookmarkedBoards, setBookmarkedBoards] = useState([]); // 북마크한 게시글 목록 상태
+    const [showBookmarkedBoards, setShowBookmarkedBoards] = useState(false); // 북마크한 게시글 보기 상태
 
     useEffect(() => {
         if (showMyBoards) {
@@ -145,6 +147,15 @@ const BoardListPage = () => {
         navigate('/chat-rooms/list'); // 채팅 목록 페이지로 이동
     };
 
+    const fetchBookmarkedBoards = async () => {
+        try {
+            const response = await api.get(`/bookmark/member/${memberId}`);
+            setBookmarkedBoards(response.data);
+        } catch (error) {
+            console.error('Error fetching bookmarked boards:', error);
+        }
+    };
+
     return (
         <Container>
             <AppBar position="static">
@@ -186,7 +197,13 @@ const BoardListPage = () => {
             </AppBar>
 
             <Box mt={2}>
-                <Typography variant="h4">{showMyBoards ? '내 글' : '전체 글'}</Typography>
+                <Typography variant="h4">
+                    {showMyBoards
+                        ? '내 글'
+                        : showBookmarkedBoards
+                            ? '북마크한 글'
+                            : '전체 글'}
+                </Typography>
                 <Link to="/create-board">
                     <Button variant="contained" color="primary">게시글 작성</Button>
                 </Link>
@@ -198,12 +215,23 @@ const BoardListPage = () => {
                 >
                     {showMyBoards ? '전체 글 보기' : '내 글 보기'}
                 </Button>
+                <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={() => {
+                        setShowBookmarkedBoards(!showBookmarkedBoards);
+                        fetchBookmarkedBoards(); // 북마크한 게시글을 조회하는 함수 호출
+                    }}
+                    style={{ marginLeft: '10px' }}
+                >
+                    {showBookmarkedBoards ? '전체 글 보기' : '북마크한 글 보기'}
+                </Button>
             </Box>
 
             <Grid container spacing={2} mt={2}>
                 <Grid item xs={12} md={6}>
                     <List>
-                        {filteredBoards.map((board) => (
+                        {(showBookmarkedBoards ? bookmarkedBoards : filteredBoards).map((board) => (
                             <ListItem key={board.boardId}>
                                 <Grid container alignItems="center">
                                     <Grid item xs={10}>
