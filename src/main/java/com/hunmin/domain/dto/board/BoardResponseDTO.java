@@ -8,11 +8,12 @@ import com.hunmin.domain.dto.comment.CommentResponseDTO;
 import com.hunmin.domain.entity.Board;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@Setter
 @Getter
 @NoArgsConstructor
 public class BoardResponseDTO {

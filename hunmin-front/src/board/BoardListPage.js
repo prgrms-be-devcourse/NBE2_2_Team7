@@ -38,6 +38,7 @@ const BoardListPage = () => {
     const [kakaoLoaded, setKakaoLoaded] = useState(false); // Kakao Maps SDK 로드 상태
     const [bookmarkedBoards, setBookmarkedBoards] = useState([]); // 북마크한 게시글 목록 상태
     const [showBookmarkedBoards, setShowBookmarkedBoards] = useState(false); // 북마크한 게시글 보기 상태
+    const [searchTitle, setSearchTitle] = useState('');
 
     useEffect(() => {
         if (showMyBoards) {
@@ -72,6 +73,17 @@ const BoardListPage = () => {
             setTotalPages(response.data.totalPages);
         } catch (error) {
             console.error('Error fetching my boards:', error);
+        }
+    };
+    const fetchSearchedBoard = async () => {
+        try {
+            const response = await api.get('/board/search', {
+                params: {title: searchTitle, page, size},
+            });
+            setBoards(response.data.content);
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error('Error fetching searched boards:', error);
         }
     };
 
@@ -156,6 +168,15 @@ const BoardListPage = () => {
         }
     };
 
+    const handleInputChange = (e) => {
+        setSearchTitle(e.target.value);
+    };
+
+    const handleSearchSubmit = () => {
+        setPage(1); // 검색 시 페이지를 초기화
+        fetchSearchedBoard();
+    };
+
     return (
         <Container>
             <AppBar position="static">
@@ -226,6 +247,28 @@ const BoardListPage = () => {
                 >
                     {showBookmarkedBoards ? '전체 글 보기' : '북마크한 글 보기'}
                 </Button>
+                {/* 검색 입력 필드와 버튼 */}
+                <TextField
+                    label="제목 검색"
+                    variant="outlined"
+                    value={searchTitle}
+                    onChange={handleInputChange}
+                    size="small"
+                    style={{marginLeft: '10px'}}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSearchSubmit(); // 엔터 키 입력 시 검색 함수 호출
+                        }
+                    }}
+                />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSearchSubmit}
+                    style={{marginLeft: '10px', height: '40px'}}
+                >
+                    검색
+                </Button>
             </Box>
 
             <Grid container spacing={2} mt={2}>
@@ -295,10 +338,10 @@ const BoardListPage = () => {
                         onChange={(e) => setSearchLocation(e.target.value)}
                         fullWidth
                     />
-                    <Button variant="contained" color="primary" onClick={handleSearch} style={{ marginTop: '10px' }}>
+                    <Button variant="contained" color="primary" onClick={handleSearch} style={{marginTop: '10px'}}>
                         검색
                     </Button>
-                    <Map boards={filteredBoards} mapLevel={mapLevel} mapCenter={mapCenter} />
+                    <Map boards={filteredBoards} mapLevel={mapLevel} mapCenter={mapCenter}/>
                 </Grid>
             </Grid>
         </Container>
