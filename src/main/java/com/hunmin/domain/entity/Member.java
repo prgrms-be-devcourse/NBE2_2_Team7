@@ -3,6 +3,8 @@ package com.hunmin.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Setter
 @Getter
@@ -37,6 +39,9 @@ public class Member extends BaseTimeEntity {
 
     @Column(columnDefinition = "TEXT")
     private String image;
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bookmark> bookmarks;
 
     public Member(Long memberId, String nickname) {
         this.memberId = memberId;

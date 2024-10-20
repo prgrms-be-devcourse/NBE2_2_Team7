@@ -1,21 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../axios';
 import Map from './map/KakaoMap'; // Map 컴포넌트 임포트
-import {FaUserCircle} from 'react-icons/fa'; // 프로필 아이콘 임포트
+import { FaUserCircle } from 'react-icons/fa'; // 프로필 아이콘 임포트
 import {
-    AppBar,
     Box,
     Button,
-    Container,
-    Grid,
+    Typography,
     List,
     ListItem,
     ListItemText,
-    Pagination,
     TextField,
+    AppBar,
     Toolbar,
-    Typography,
+    IconButton,
+    Container,
+    Pagination,
+    Grid, // Grid 컴포넌트 임포트
 } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat'; // 채팅 아이콘 임포트
 import EditIcon from '@mui/icons-material/Edit'; // 연필 아이콘 임포트
@@ -31,10 +32,12 @@ const BoardListPage = () => {
     const [size, setSize] = useState(5);
     const [totalPages, setTotalPages] = useState(0);
     const [searchLocation, setSearchLocation] = useState('');
-    const [mapCenter, setMapCenter] = useState({lat: 37.5665, lng: 126.978}); // 초기 지도 중심 설정
+    const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 }); // 초기 지도 중심 설정
     const [mapLevel, setMapLevel] = useState(9); // 지도 레벨 상태 추가
     const [showMyBoards, setShowMyBoards] = useState(false); // 내 작성글 보기 상태
     const [kakaoLoaded, setKakaoLoaded] = useState(false); // Kakao Maps SDK 로드 상태
+    const [bookmarkedBoards, setBookmarkedBoards] = useState([]); // 북마크한 게시글 목록 상태
+    const [showBookmarkedBoards, setShowBookmarkedBoards] = useState(false); // 북마크한 게시글 보기 상태
     const [searchTitle, setSearchTitle] = useState('');
 
     useEffect(() => {
@@ -52,7 +55,7 @@ const BoardListPage = () => {
     const fetchBoards = async () => {
         try {
             const response = await api.get('/board', {
-                params: {page, size},
+                params: { page, size },
             });
             setBoards(response.data.content);
             setTotalPages(response.data.totalPages);
@@ -64,7 +67,7 @@ const BoardListPage = () => {
     const fetchMyBoards = async () => {
         try {
             const response = await api.get(`/board/member/${memberId}`, {
-                params: {page, size},
+                params: { page, size },
             });
             setBoards(response.data.content);
             setTotalPages(response.data.totalPages);
@@ -91,7 +94,7 @@ const BoardListPage = () => {
         ps.keywordSearch(searchLocation, (data, status) => {
             if (status === kakao.maps.services.Status.OK) {
                 const firstPlace = data[0];
-                const center = {lat: firstPlace.y, lng: firstPlace.x};
+                const center = { lat: firstPlace.y, lng: firstPlace.x };
 
                 const nearbyBoards = boards.filter(board => {
                     const distance = getDistance(board.latitude, board.longitude, center.lat, center.lng);
@@ -139,7 +142,7 @@ const BoardListPage = () => {
             console.log('Current cookies:', document.cookie);
 
             // 로그아웃 요청
-            const response = await api.post('/members/logout', {}, {withCredentials: true});
+            const response = await api.post('/members/logout', {}, { withCredentials: true });
             console.log('Logout response:', response); // 응답 확인
 
             // 로컬 스토리지 초기화
@@ -156,6 +159,15 @@ const BoardListPage = () => {
         navigate('/chat-rooms/list'); // 채팅 목록 페이지로 이동
     };
 
+    const fetchBookmarkedBoards = async () => {
+        try {
+            const response = await api.get(`/bookmark/member/${memberId}`);
+            setBookmarkedBoards(response.data);
+        } catch (error) {
+            console.error('Error fetching bookmarked boards:', error);
+        }
+    };
+
     const handleInputChange = (e) => {
         setSearchTitle(e.target.value);
     };
@@ -168,10 +180,10 @@ const BoardListPage = () => {
     return (
         <Container>
             <AppBar position="static">
-                <Toolbar style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Toolbar style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {/* 왼쪽: 프로필 이미지 및 닉네임 */}
                     <Box display="flex" alignItems="center">
-                        <Link to="/update-member" style={{textDecoration: 'none', color: 'inherit'}}>
+                        <Link to="/update-member" style={{ textDecoration: 'none', color: 'inherit' }}>
                             {isValidProfileImage(profileImage) ? (
                                 <img
                                     src={profileImage}
@@ -185,18 +197,18 @@ const BoardListPage = () => {
                                     }}
                                 />
                             ) : (
-                                <FaUserCircle size={30} style={{color: '#fff'}}/> // 프로필 아이콘 표시
+                                <FaUserCircle size={30} style={{ color: '#fff' }} /> // 프로필 아이콘 표시
                             )}
                         </Link>
-                        <Typography variant="h6" style={{marginLeft: '20px'}}>
+                        <Typography variant="h6" style={{ marginLeft: '20px' }}>
                             {nickname} {/* 로컬 스토리지에서 가져온 닉네임 표시 */}
                         </Typography>
                     </Box>
-                    <Button color="inherit" onClick={() => navigate('/word-learning')} startIcon={<EditIcon/>}>
+                    <Button color="inherit" onClick={() => navigate('/word-learning')} startIcon={<EditIcon />}>
                         단어 학습
                     </Button>
                     {/* 오른쪽: 채팅하기 버튼 */}
-                    <Button color="inherit" startIcon={<ChatIcon/>} onClick={handleChatClick}>
+                    <Button color="inherit" startIcon={<ChatIcon />} onClick={handleChatClick}>
                         채팅하기
                     </Button>
                     <Button color="inherit" onClick={handleLogout}>
@@ -206,7 +218,13 @@ const BoardListPage = () => {
             </AppBar>
 
             <Box mt={2}>
-                <Typography variant="h4">{showMyBoards ? '내 글' : '전체 글'}</Typography>
+                <Typography variant="h4">
+                    {showMyBoards
+                        ? '내 글'
+                        : showBookmarkedBoards
+                            ? '북마크한 글'
+                            : '전체 글'}
+                </Typography>
                 <Link to="/create-board">
                     <Button variant="contained" color="primary">게시글 작성</Button>
                 </Link>
@@ -214,9 +232,20 @@ const BoardListPage = () => {
                     variant="contained"
                     color="inherit"
                     onClick={() => setShowMyBoards(!showMyBoards)}
-                    style={{marginLeft: '10px'}}
+                    style={{ marginLeft: '10px' }}
                 >
                     {showMyBoards ? '전체 글 보기' : '내 글 보기'}
+                </Button>
+                <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={() => {
+                        setShowBookmarkedBoards(!showBookmarkedBoards);
+                        fetchBookmarkedBoards(); // 북마크한 게시글을 조회하는 함수 호출
+                    }}
+                    style={{ marginLeft: '10px' }}
+                >
+                    {showBookmarkedBoards ? '전체 글 보기' : '북마크한 글 보기'}
                 </Button>
                 {/* 검색 입력 필드와 버튼 */}
                 <TextField
@@ -245,14 +274,13 @@ const BoardListPage = () => {
             <Grid container spacing={2} mt={2}>
                 <Grid item xs={12} md={6}>
                     <List>
-                        {filteredBoards.map((board) => (
+                        {(showBookmarkedBoards ? bookmarkedBoards : filteredBoards).map((board) => (
                             <ListItem key={board.boardId}>
                                 <Grid container alignItems="center">
                                     <Grid item xs={10}>
                                         <ListItemText
                                             primary={
-                                                <Link to={`/board/${board.boardId}`}
-                                                      style={{textDecoration: 'none', color: 'inherit'}}>
+                                                <Link to={`/board/${board.boardId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                                     <strong>{board.title}</strong> - {board.nickname}
                                                 </Link>
                                             }
@@ -275,7 +303,7 @@ const BoardListPage = () => {
                                             <img
                                                 src={board.imageUrls[0]}
                                                 alt={board.title}
-                                                style={{width: '100%', height: 'auto', borderRadius: '8px'}}
+                                                style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
                                             />
                                         </Grid>
                                     ) : (

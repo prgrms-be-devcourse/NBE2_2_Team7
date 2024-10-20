@@ -6,6 +6,9 @@ import { Typography, Button, TextField, Grid, Paper } from '@mui/material';
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import BoardWrite from '../board/write/BoardWrite'; // BoardWrite 컴포넌트 추가
 import api from '../axios';
+import IconButton from '@mui/material/IconButton';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
 const BoardDetailPage = () => {
     const { boardId } = useParams();
@@ -19,6 +22,7 @@ const BoardDetailPage = () => {
     const [imageUrls, setImageUrls] = useState([]); // 이미지 URL 상태 추가
     const [memberId, setMemberId] = useState(''); // memberId 상태 추가
     const [originalMemberId, setOriginalMemberId] = useState(''); // 원래 memberId 상태 추가
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
     useEffect(() => {
         fetchBoard();
@@ -27,6 +31,7 @@ const BoardDetailPage = () => {
         if (storedMemberId) {
             setMemberId(storedMemberId);
         }
+        checkIfBookmarked();
     }, [boardId]);
 
     const fetchBoard = async () => {
@@ -114,6 +119,29 @@ const BoardDetailPage = () => {
         }
     };
 
+    const checkIfBookmarked = async () => {
+        try {
+            const storedMemberId = localStorage.getItem('memberId');
+            const response = await api.get(`/bookmark/${boardId}/member/${storedMemberId}`);
+            setIsBookmarked(response.data);
+        } catch (error) {
+            console.error('Error checking bookmark:', error);
+        }
+    };
+
+    const toggleBookmark = async () => {
+        try {
+            if (isBookmarked) {
+                await api.delete(`/bookmark/${boardId}`, { params: { memberId } });
+            } else {
+                await api.post(`/bookmark/${boardId}`, null, { params: { memberId } });
+            }
+            setIsBookmarked(!isBookmarked); // 북마크 상태 반전
+        } catch (error) {
+            console.error('Error toggling bookmark:', error);
+        }
+    };
+
     if (!board) {
         return <div>Loading...</div>;
     }
@@ -167,7 +195,14 @@ const BoardDetailPage = () => {
                                     {board.location}
                                 </>
                             )}
-                        </Typography>
+                            <IconButton onClick={toggleBookmark}>
+                                {isBookmarked ? (
+                                    <BookmarkIcon style={{ color: 'inherit' }} />
+                                    ) : (
+                                    <BookmarkBorderIcon style={{ color: 'inherit' }} />
+                            )}
+                        </IconButton>
+                    </Typography>
                         <hr />
                         <Typography variant="body1" dangerouslySetInnerHTML={{ __html: board.content }} />
                         <Grid item xs={12}>
