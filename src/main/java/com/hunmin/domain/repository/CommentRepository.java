@@ -19,5 +19,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     //회원 별 댓글 목록 조회
     @Query("SELECT c FROM Comment c WHERE c.member.memberId = :memberId")
-    Page<Board> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
+    Page<Comment> findByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 }
