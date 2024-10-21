@@ -1,5 +1,6 @@
 package com.hunmin.domain.jwt;
 
+import com.hunmin.domain.repository.RefreshRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,9 +16,11 @@ import java.io.IOException;
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
-    public CustomLogoutFilter(JWTUtil jwtUtil) {
+    public CustomLogoutFilter(JWTUtil jwtUtil, RefreshRepository refreshRepository) {
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        //path and method verify
+        // 로그아웃 경로에서 오는 POST 요청인지 확인(아니라면 다음 필터로 넘어감)
         String requestUri = request.getRequestURI();
         String requestMethod = request.getMethod();
         logger.info("=== Request URI: {}" + requestUri);
@@ -39,7 +42,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
-        // get refresh token
+        // 쿠키에서 리프레시 토큰 확인
         String refresh = null;
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
@@ -71,7 +74,17 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
+        // DB에 토큰이 저정되어 있는지 확인
+        Boolean isExist = refreshRepository.existsByRefresh(refresh);
+        if (!isExist) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
         // 로그아웃 진행
+        // db에서 refresh 토큰 제거
+        refreshRepository.deleteByRefresh(refresh);
+
         // Refresh 토큰 Cookie 값 0
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);
