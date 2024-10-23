@@ -21,6 +21,9 @@ import WordRegisterPage from "./word/WordRegisterPage";
 import WordEditPage from "./word/WordEditPage";
 import LevelSelectPage from "./word/LevelSelectPage";
 import LearningPage from "./word/LearningPage";
+import AdminMembersList from "./admin/AdminMemberList";
+import AdminMemberPostsAndComments from "./admin/AdminMemberPostsAndComments";
+import AdminMemberDetail from "./admin/AdminMemberDetail";
 
 
 const App = () => {
@@ -72,6 +75,12 @@ const AppContent = ({ token, setToken }) => {
                         <Route path="/word-learning/levelSelect" element={<LevelSelectPage />} />
                         <Route path="/word-learning/start" element={<LearningPage />} />
 
+                        {/* 관리자 라우트 추가 */}
+                        <Route path="/admin/members" element={<AdminMembersList />} />
+                        <Route path="/admin/member/:memberId" element={<AdminMemberDetail />} />
+                        <Route path="/admin/member/:memberId/posts-comments" element={<AdminMemberPostsAndComments />} />
+
+                        )
                     </>
                 ) : (
                     <Route path="*" element={<Navigate to="/login" />} />

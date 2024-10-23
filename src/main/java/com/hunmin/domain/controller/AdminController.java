@@ -25,7 +25,7 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @GetMapping("/api/members/admin")
+    @GetMapping("")
     public String adminP() {
         return "ADMIN USER CONTROLLER";
     }
