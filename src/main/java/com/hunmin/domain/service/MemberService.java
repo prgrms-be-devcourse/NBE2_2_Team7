@@ -1,6 +1,8 @@
 package com.hunmin.domain.service;
 
 import com.hunmin.domain.dto.member.MemberDTO;
+import com.hunmin.domain.dto.member.PasswordFindRequestDto;
+import com.hunmin.domain.dto.member.PasswordUpdateRequestDto;
 import com.hunmin.domain.entity.Member;
 import com.hunmin.domain.entity.MemberLevel;
 import com.hunmin.domain.entity.MemberRole;
@@ -8,6 +10,8 @@ import com.hunmin.domain.jwt.JWTUtil;
 import com.hunmin.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +33,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JWTUtil jwtUtil;
 
     // 이미지 업로드
     public String uploadImage(MultipartFile file) throws IOException {
@@ -116,5 +119,37 @@ public class MemberService {
 
     public MemberDTO readUserInfo(String email) {
         return new MemberDTO(memberRepository.findByEmail(email));
+    }
+    
+    // 비밀번호 재설정을 위한 사용자 검증
+    public ResponseEntity<?> verifyUserForPasswordReset(PasswordFindRequestDto passwordFindRequestDto) {
+        boolean userExists = memberRepository.existsByEmailAndNickname(
+                passwordFindRequestDto.getEmail(), passwordFindRequestDto.getNickname());
+
+        if (userExists) {
+            return ResponseEntity.ok("사용자 확인 완료");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+        }
+    }
+
+    // 비밀번호 재설정
+    public ResponseEntity<?> updatePassword(PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        try {
+            Member member = memberRepository.findUserByEmailAndNickname(
+                            passwordUpdateRequestDto.getEmail(), passwordUpdateRequestDto.getNickname())
+                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+            String encodedPassword = bCryptPasswordEncoder.encode(passwordUpdateRequestDto.getNewPassword());
+
+            member.setPassword(encodedPassword);
+            memberRepository.save(member);
+
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }

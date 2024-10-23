@@ -37,6 +37,12 @@ public class JWTFilter extends OncePerRequestFilter {
         log.info("=== JWTFilter - Request Method: {}", request.getMethod());
         log.info("=== JWTFilter - Access Token: {}", request.getHeader("Authorization"));
 
+        // 비밀번호 찾기/변경 관련 요청 필터 제외
+        if (request.getRequestURI().startsWith("/api/members/password/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // reissue 엔드포인트는 필터 적용 제외
         if ("/api/members/reissue".equals(request.getRequestURI())) {
             filterChain.doFilter(request, response);

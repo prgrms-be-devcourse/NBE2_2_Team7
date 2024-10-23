@@ -1,6 +1,8 @@
 package com.hunmin.domain.controller;
 
 import com.hunmin.domain.dto.member.MemberDTO;
+import com.hunmin.domain.dto.member.PasswordFindRequestDto;
+import com.hunmin.domain.dto.member.PasswordUpdateRequestDto;
 import com.hunmin.domain.entity.MemberRole;
 import com.hunmin.domain.entity.RefreshEntity;
 import com.hunmin.domain.jwt.JWTUtil;
@@ -149,5 +151,15 @@ public class MemberController {
         refreshEntity.setRefresh(refresh);
         refreshEntity.setExpiration(date.toString());
         refreshRepository.save(refreshEntity);
+    }
+
+    @PostMapping("/password/verify")
+    public ResponseEntity<?> verifyUser(@RequestBody PasswordFindRequestDto passwordFindRequestDto) {
+        return memberService.verifyUserForPasswordReset(passwordFindRequestDto);
+    }
+
+    @PostMapping("/password/update")
+    public ResponseEntity<?> updatePassword(@RequestBody PasswordUpdateRequestDto passwordUpdateRequestDto) {
+        return memberService.updatePassword(passwordUpdateRequestDto);
     }
 }
