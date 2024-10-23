@@ -3,7 +3,6 @@ package com.hunmin.domain.service;
 import com.hunmin.domain.dto.board.BoardResponseDTO;
 import com.hunmin.domain.dto.comment.CommentResponseDTO;
 import com.hunmin.domain.dto.member.MemberStatusDTO;
-import com.hunmin.domain.dto.notice.NoticePageRequestDTO;
 import com.hunmin.domain.dto.page.PageRequestDTO;
 import com.hunmin.domain.entity.Board;
 import com.hunmin.domain.entity.Comment;
@@ -40,13 +39,28 @@ public class AdminService {
             int commentCount = commentRepository.countByMemberId(member.getMemberId());
             return new MemberStatusDTO(member, boardCount, commentCount);
         } catch (Exception e) {
+            log.error("getMemberByMemberId : {}", e.getMessage());
+            throw MemberException.NOT_FOUND.get();
+        }
+    }
+
+    //회원 닉네임으로 검색
+    public MemberStatusDTO getMemberByNickname(String username) {
+        try {
+            Member member = memberRepository.findByNickname(username).orElseThrow(MemberException.NOT_FOUND::get);
+            int boardCount = boardRepository.countByMemberId(member.getMemberId());
+            int commentCount = commentRepository.countByMemberId(member.getMemberId());
+            return new MemberStatusDTO(member, boardCount, commentCount);
+        } catch (Exception e) {
             log.error("getMemberByNickname : {}", e.getMessage());
             throw MemberException.NOT_FOUND.get();
         }
     }
 
     //회원 목록 조회
-    public Page<MemberStatusDTO> getAllMembers(Pageable pageable) {
+    public Page<MemberStatusDTO> getAllMembers(PageRequestDTO pageRequestDTO) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(pageRequestDTO.getPage() - 1, 10, sort);
         try {
             return memberRepository.findAll(pageable).map(member -> {
                 int boardCount = boardRepository.countByMemberId(member.getMemberId());
@@ -80,6 +94,7 @@ public class AdminService {
             throw AdminException.BOARDS_NOT_FOUND.get();
         }
     }
+
     //회원별 댓글 목록
     public Page<CommentResponseDTO> getCommentsByMemberId(Long memberId, PageRequestDTO pageRequestDTO) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");

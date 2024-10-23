@@ -62,4 +62,20 @@ public class APIControllerAdvice {
 
         return ResponseEntity.status(e.getCode()).body(map);
     }
+
+    // 관리자 예외 처리
+    @ExceptionHandler(AdminTaskException.class)
+    public ResponseEntity<Map<String, String>> handleAdminTaskException(AdminTaskException e) {
+        Map<String, String> map = Map.of("error", e.getMessage());
+
+        return ResponseEntity.status(e.getCode()).body(map);
+    }
+
+    // 멤버 예외 처리
+    @ExceptionHandler(MemberTaskException.class)
+    public ResponseEntity<Map<String, String>> handleMemberTaskException(MemberTaskException e) {
+        Map<String, String> map = Map.of("error", e.getMessage());
+
+        return ResponseEntity.status(e.getCode()).body(map);
+    }
 }
