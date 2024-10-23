@@ -8,7 +8,6 @@ import java.util.List;
 @Entity
 @Setter
 @Getter
-@ToString
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
