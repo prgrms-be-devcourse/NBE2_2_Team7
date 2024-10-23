@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -60,6 +60,11 @@ const LoginForm = ({ setToken }) => {
         }
     };
 
+    // 비밀번호 재설정 페이지로 이동
+    const handlePasswordReset = () => {
+        navigate('/password/verify');
+    };
+
     return (
         <Container component="main" maxWidth="xs">
             <Box sx={{ mt: 8 }}>
@@ -89,6 +94,16 @@ const LoginForm = ({ setToken }) => {
                     {error && <Typography color="error">{error}</Typography>}
                     <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                         로그인
+                    </Button>
+
+                    {/* 비밀번호 재설정 버튼 */}
+                    <Button
+                        onClick={handlePasswordReset}
+                        fullWidth
+                        variant="text"
+                        sx={{ mt: 1, mb: 2 }}
+                    >
+                        비밀번호 재설정
                     </Button>
                 </form>
             </Box>

@@ -21,6 +21,8 @@ import WordRegisterPage from "./word/WordRegisterPage";
 import WordEditPage from "./word/WordEditPage";
 import LevelSelectPage from "./word/LevelSelectPage";
 import LearningPage from "./word/LearningPage";
+import PasswordVerify from './member/PasswordVerify';
+import PasswordUpdate from './member/PasswordUpdate';
 
 
 const App = () => {
@@ -36,7 +38,7 @@ const App = () => {
 
 const AppContent = ({ token, setToken }) => {
     const location = useLocation();
-    const hideHeaderRoutes = ['/login', '/register'];
+    const hideHeaderRoutes = ['/login', '/register', '/password/verify', '/password/update'];
 
     return (
         <>
@@ -44,6 +46,8 @@ const AppContent = ({ token, setToken }) => {
             <Routes>
                 <Route path="/login" element={<LoginForm setToken={setToken} />} />
                 <Route path="/register" element={<RegistrationForm />} />
+                <Route path="/password/verify" element={<PasswordVerify />} />
+                <Route path="/password/update" element={<PasswordUpdate />} />
                 {token ? (
                     <>
                         <Route path="/" element={<BoardListPage />} />
