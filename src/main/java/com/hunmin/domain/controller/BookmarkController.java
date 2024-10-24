@@ -20,7 +20,7 @@ public class BookmarkController {
 
     //북마크 등록
     @PostMapping("/{boardId}")
-    public ResponseEntity<String> addBookmark(@PathVariable Long boardId, Authentication authentication) {
+    public ResponseEntity<String> createBookmark(@PathVariable Long boardId, Authentication authentication) {
         Long memberId = memberRepository.findByEmail(authentication.getName()).getMemberId();
         bookmarkService.createBookmark(boardId, memberId);
         return ResponseEntity.ok("북마크 등록");
@@ -28,7 +28,7 @@ public class BookmarkController {
 
     //북마크 삭제
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<String> removeBookmark(@PathVariable Long boardId, Authentication authentication) {
+    public ResponseEntity<String> deleteBookmark(@PathVariable Long boardId, Authentication authentication) {
         Long memberId = memberRepository.findByEmail(authentication.getName()).getMemberId();
         bookmarkService.deleteBookmark(boardId, memberId);
         return ResponseEntity.ok("북마크 삭제");

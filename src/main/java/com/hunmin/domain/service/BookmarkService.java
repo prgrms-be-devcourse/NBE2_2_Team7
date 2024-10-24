@@ -26,7 +26,6 @@ public class BookmarkService {
     private final MemberRepository memberRepository;
 
     //북마크 등록
-    @Transactional
     public void createBookmark(Long boardId, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(MemberException.NOT_FOUND::get);
         Board board = boardRepository.findById(boardId).orElseThrow(BoardException.NOT_FOUND::get);
@@ -40,7 +39,6 @@ public class BookmarkService {
     }
 
     //북마크 삭제
-    @Transactional
     public void deleteBookmark(Long boardId, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(MemberException.NOT_FOUND::get);
         Board board = boardRepository.findById(boardId).orElseThrow(BoardException.NOT_FOUND::get);
@@ -55,7 +53,6 @@ public class BookmarkService {
     }
 
     //회원 별 북마크 게시글 목록 조회
-    @Transactional(readOnly = true)
     public List<BoardResponseDTO> readBookmarkByMember(Long memberId) {
         List<Board> boards = bookmarkRepository.findByMemberId(memberId);
 
@@ -65,7 +62,6 @@ public class BookmarkService {
     }
 
     //북마크 여부 확인
-    @Transactional(readOnly = true)
     public boolean isBookmarked(Long boardId, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(MemberException.NOT_FOUND::get);
         Board board = boardRepository.findById(boardId).orElseThrow(BoardException.NOT_FOUND::get);
