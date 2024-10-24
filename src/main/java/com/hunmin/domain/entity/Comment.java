@@ -33,6 +33,8 @@ public class Comment extends BaseTimeEntity {
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
     private List<Comment> children = new ArrayList<>();
 
+    private int likeCount;
+
     public void changeContent(String content) {
         this.content = content;
     }
@@ -43,4 +45,9 @@ public class Comment extends BaseTimeEntity {
         this.board = board;
         this.content = content;
     }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+    public void decrementLikeCount() { this.likeCount--; }
 }

@@ -20,10 +20,22 @@ const getCommentsByBoard = (boardId, params) => {
     return api.get(`/board/${boardId}/comment`, { params }); // Get comments by board
 };
 
+const likeComment = (commentId) => {
+    return api.post(`/likeComment/${commentId}`); // 좋아요 추가
+};
+
+const unlikeComment = (commentId) => {
+    return api.delete(`/likeComment/${commentId}`); // 좋아요 취소
+};
+
+
 export {
     createComment,
     createChildComment,
     updateComment,
     deleteComment,
-    getCommentsByBoard
+    getCommentsByBoard,
+    likeComment,
+    unlikeComment,
 };
+
