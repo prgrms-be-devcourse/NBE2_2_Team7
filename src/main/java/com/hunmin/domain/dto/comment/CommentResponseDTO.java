@@ -32,6 +32,7 @@ public class CommentResponseDTO {
 
     private String nickname;
     private List<CommentResponseDTO> children;
+    private int likeCount;
 
     public CommentResponseDTO(Comment comment) {
         this.commentId = comment.getCommentId();
@@ -45,5 +46,6 @@ public class CommentResponseDTO {
                 .sorted(Comparator.comparing(Comment::getCommentId))
                 .map(CommentResponseDTO::new)
                 .collect(Collectors.toList()) : new ArrayList<>();
+        this.likeCount = comment.getLikeCount();
     }
 }

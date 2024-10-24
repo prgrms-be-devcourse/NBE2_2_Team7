@@ -47,6 +47,7 @@ public class CommentService {
                     .member(member)
                     .board(board)
                     .content(commentRequestDTO.getContent())
+                    .likeCount(0)
                     .build();
 
             commentRepository.save(comment);
@@ -90,7 +91,7 @@ public class CommentService {
             Board board = boardRepository.findById(boardId).orElseThrow(BoardException.NOT_FOUND::get);
             Comment parent = commentRepository.findById(commentId).orElseThrow(CommentException.NOT_FOUND::get);
 
-            Comment children = Comment.builder().member(member).board(board).parent(parent).content(commentRequestDTO.getContent()).build();
+            Comment children = Comment.builder().member(member).board(board).parent(parent).content(commentRequestDTO.getContent()).likeCount(0).build();
 
             commentRepository.save(children);
 
