@@ -61,6 +61,7 @@ const BoardListPage = () => {
             });
             setBoards(response.data.content);
             setTotalPages(response.data.totalPages);
+            console.log(response.data)
         } catch (error) {
             console.error('Error fetching boards:', error);
         }
@@ -302,7 +303,21 @@ const BoardListPage = () => {
                                         <ListItemText
                                             primary={
                                                 <Link to={`/board/${board.boardId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                                    <strong>{board.title}</strong> - {board.nickname}
+                                                    <strong>{board.title}</strong> -
+                                                    {isValidProfileImage(board.profileImage) ? (
+                                                        <img
+                                                            src={board.profileImage} // Remove curly braces around board.profileImage
+                                                            alt="프로필"
+                                                            style={{
+                                                                width: '30px',
+                                                                height: '30px',
+                                                                borderRadius: '50%',
+                                                                objectFit: 'cover',
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <FaUserCircle size={30} style={{ color: '#fff' }} /> // 프로필 아이콘 표시
+                                                    )} {board.nickname}
                                                 </Link>
                                             }
                                             secondary={

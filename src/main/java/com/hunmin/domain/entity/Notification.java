@@ -21,7 +21,7 @@ public class Notification extends BaseTimeEntity {
     private String message;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private NotificationType notificationType;
 
     @Column(nullable = false)

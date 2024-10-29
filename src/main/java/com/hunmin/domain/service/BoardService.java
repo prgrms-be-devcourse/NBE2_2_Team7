@@ -243,7 +243,7 @@ public class BoardService {
 
     //회원 별 작성글 목록 조회
     public Page<BoardResponseDTO> readBoardListByMember(Long memberId, PageRequestDTO pageRequestDTO) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "boardId");
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = pageRequestDTO.getPageable(sort);
 
         List<BoardResponseDTO> boardResponseDTOs = new ArrayList<>();
@@ -269,9 +269,13 @@ public class BoardService {
             }
         }
 
-        log.info("Total boards loaded from Redis or database: {}", boardResponseDTOs.size());
+        boardResponseDTOs.sort((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt()));
 
-        return new PageImpl<>(boardResponseDTOs, pageable, boardResponseDTOs.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), boardResponseDTOs.size());
+        List<BoardResponseDTO> pagedResponse = boardResponseDTOs.subList(start, end);
+
+        return new PageImpl<>(pagedResponse, pageable, boardResponseDTOs.size());
     }
 
     public Page<BoardResponseDTO> searchBoardByTitle(PageRequestDTO pageable, String title) {

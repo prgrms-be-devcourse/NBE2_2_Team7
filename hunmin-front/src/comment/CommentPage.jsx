@@ -28,6 +28,7 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import api from '../axios';
+import {FaUserCircle} from "react-icons/fa";
 
 const CommentPage = ({ boardId }) => {
     const [comments, setComments] = useState([]);
@@ -70,11 +71,11 @@ const CommentPage = ({ boardId }) => {
     const fetchLikedMembers = async (commentId) => {
         try {
             const response = await getCommentLikeMembers(commentId);
-
-            // 데이터를 객체 배열로 변환
-            const members = response.data.map((nickname, index) => ({
-                memberId: index, // 인덱스를 임시로 memberId로 사용
-                nickname: nickname,
+            
+            const members = response.data.map((member) => ({
+                memberId: Math.random(),
+                nickname: member.nickname,
+                image: member.image,
             }));
 
             setLikedMembers(members);
@@ -167,6 +168,10 @@ const CommentPage = ({ boardId }) => {
         }
     };
 
+    const isValidProfileImage = (image) => {
+        return image && !image.includes('null');
+    };
+
     const renderComments = (comments, level = 0) => {
         return comments.map((comment) => {
             const displayDate = comment.updatedAt
@@ -176,6 +181,21 @@ const CommentPage = ({ boardId }) => {
             return (
                 <div key={comment.commentId}>
                     <ListItem divider style={{ marginLeft: level * 20 }}>
+                        {isValidProfileImage(comment.profileImage) ? (
+                            <img
+                                src={comment.profileImage}
+                                alt="프로필"
+                                style={{
+                                    width: '30px',
+                                    height: '30px',
+                                    borderRadius: '50%',
+                                    objectFit: 'cover',
+                                    marginRight: '10px',
+                                }}
+                            />
+                        ) : (
+                            <FaUserCircle size={30} style={{ color: '#fff', marginRight: '10px' }} /> // 프로필 아이콘 표시
+                        )}
                         <ListItemText
                             primary={`${comment.nickname}: ${comment.content}`}
                             secondary={`작성일: ${displayDate}`}
@@ -275,6 +295,21 @@ const CommentPage = ({ boardId }) => {
                     <List>
                         {likedMembers.map((member) => (
                             <ListItem key={member.memberId}>
+                                {isValidProfileImage(member.image) ? (
+                                    <img
+                                        src={member.image}
+                                        alt="프로필"
+                                        style={{
+                                            width: '30px',
+                                            height: '30px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover',
+                                            marginRight: '10px',
+                                        }}
+                                    />
+                                ) : (
+                                    <FaUserCircle size={30} style={{ color: '#fff', marginRight: '10px' }} /> // 프로필 아이콘 표시
+                                )}
                                 <ListItemText primary={member.nickname} />
                             </ListItem>
                         ))}

@@ -1,5 +1,5 @@
 package com.hunmin.domain.entity;
 
 public enum NotificationType {
-    CHAT, COMMENT, FOLLOW
+    CHAT, COMMENT, FOLLOW, LIKE
 }

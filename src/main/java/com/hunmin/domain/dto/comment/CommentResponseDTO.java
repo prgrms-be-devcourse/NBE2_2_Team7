@@ -31,6 +31,7 @@ public class CommentResponseDTO {
     private LocalDateTime updatedAt;
 
     private String nickname;
+    private String profileImage;
     private List<CommentResponseDTO> children;
     private int likeCount;
 
@@ -42,6 +43,7 @@ public class CommentResponseDTO {
         this.createdAt = comment.getCreatedAt();
         this.updatedAt = comment.getUpdatedAt();
         this.nickname = comment.getMember().getNickname();
+        this.profileImage = comment.getMember().getImage();
         this.children = (comment.getChildren() != null) ? comment.getChildren().stream()
                 .sorted(Comparator.comparing(Comment::getCommentId))
                 .map(CommentResponseDTO::new)

@@ -12,6 +12,7 @@ import api from '../axios';
 import IconButton from '@mui/material/IconButton';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import {FaUserCircle} from "react-icons/fa";
 
 const BoardDetailPage = () => {
     const { boardId } = useParams();
@@ -199,6 +200,10 @@ const BoardDetailPage = () => {
         }
     };
 
+    const isValidProfileImage = (image) => {
+        return image && !image.includes('null');
+    };
+
     if (!board) {
         return <div>Loading...</div>;
     }
@@ -209,22 +214,59 @@ const BoardDetailPage = () => {
                 {isEditMode ? (
                     /* 수정 모드 UI */
                     <div>
-                        {/* 생략 */}
+                        <Typography variant="h5">게시글 수정</Typography>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="제목"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <BoardWrite
+                                    value={content}
+                                    onChange={setContent}
+                                    uploadImage={uploadImage} // 이미지 업로드 함수 전달
+                                    setImageUrls={setImageUrls} // 이미지 URL 상태 변경 함수 전달
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <KakaoMapSearch onLocationSelect={handleLocationSelect} />
+                                <Typography variant="subtitle1">수정 전 장소: {originalLocation?.name || '없음'}</Typography>
+                                <Typography variant="subtitle1">수정 후 장소: {location?.name || '선택된 장소 없음'}</Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Button variant="contained" color="primary" onClick={handleUpdate}>저장</Button>
+                                <Button variant="outlined" color="secondary" onClick={() => setIsEditMode(false)}>취소</Button>
+                            </Grid>
+                        </Grid>
                     </div>
                 ) : (
-                    /* 상세보기 모드 UI */
                     <div>
                         <Typography variant="h5">{board.title}</Typography>
                         <Typography variant="body1">
-                            <strong>작성자 :</strong>{' '}
-                            {/* 작성자 이름을 클릭하면 Popover 열림 */}
-                            <span
-                                onClick={handlePopoverOpen}
-                                style={{ cursor: 'pointer', color: '#007bff', textDecoration: 'underline' }}
-                            >
+                            {isValidProfileImage(board.profileImage) ? (
+                                <img
+                                    src={board.profileImage}
+                                    alt="프로필"
+                                    style={{
+                                        width: '30px',
+                                        height: '30px',
+                                        borderRadius: '50%',
+                                        objectFit: 'cover',
+                                    }}
+                                />
+                            ) : (
+                                <FaUserCircle size={30} style={{color: '#fff'}}/> // 프로필 아이콘 표시
+                            )} <span
+                            onClick={handlePopoverOpen}
+                            style={{cursor: 'pointer', color: '#007bff', textDecoration: 'underline'}}
+                        >
                                 {board.nickname}
                             </span>
-                            {/* Popover 구현 */}
                             <Popover
                                 open={open}
                                 anchorEl={anchorEl}
@@ -238,7 +280,7 @@ const BoardDetailPage = () => {
                                     horizontal: 'left',
                                 }}
                             >
-                                <div style={{ padding: '10px' }}>
+                                <div style={{padding: '10px'}}>
                                     <Typography variant="subtitle1">{board.nickname}</Typography>
                                     {memberId != originalMemberId && (
                                         <Button
@@ -252,28 +294,28 @@ const BoardDetailPage = () => {
                                     )}
                                 </div>
                             </Popover>
-                            <span style={{ margin: '0 8px' }} />
+                            <span style={{margin: '0 8px'}}/> {/* 공백 추가 */}
                             <strong>{board.updatedAt ? '수정일 :' : '작성일 :'}</strong> {formatDate(board.updatedAt || board.createdAt)}
-                            <span style={{ margin: '0 8px' }} />
+                            <span style={{margin: '0 8px'}}/>
                             {board.location && (
                                 <>
-                                    <LocationOnIcon style={{ marginRight: '4px' }} />
+                                    <LocationOnIcon style={{marginRight: '4px'}}/>
                                     {board.location}
                                 </>
                             )}
                             <IconButton onClick={toggleBookmark}>
                                 {isBookmarked ? (
-                                    <BookmarkIcon style={{ color: 'inherit' }} />
+                                    <BookmarkIcon style={{color: 'inherit'}}/>
                                 ) : (
-                                    <BookmarkBorderIcon style={{ color: 'inherit' }} />
+                                    <BookmarkBorderIcon style={{color: 'inherit'}}/>
                                 )}
                             </IconButton>
                         </Typography>
-                        <hr />
-                        <Typography variant="body1" dangerouslySetInnerHTML={{ __html: board.content }} />
+                        <hr/>
+                        <Typography variant="body1" dangerouslySetInnerHTML={{__html: board.content}}/>
                         <Grid item xs={12}>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                                {/* 수정 및 삭제 버튼 표시 조건 추가 */}
+                            <div style={{display: 'flex', justifyContent: 'flex-end', gap: '8px'}}>
+                            {/* 수정 및 삭제 버튼 표시 조건 추가 */}
                                 {memberId === originalMemberId && (
                                     <>
                                         <Button variant="contained" color="primary" onClick={() => setIsEditMode(true)}>수정</Button>

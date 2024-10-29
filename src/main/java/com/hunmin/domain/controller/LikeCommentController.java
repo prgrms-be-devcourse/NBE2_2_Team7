@@ -3,12 +3,12 @@ package com.hunmin.domain.controller;
 import com.hunmin.domain.repository.MemberRepository;
 import com.hunmin.domain.service.LikeCommentService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/likeComment")
@@ -43,8 +43,8 @@ public class LikeCommentController {
 
     //좋아요 누른 사용자 목록 조회
     @GetMapping("/{commentId}/members")
-    public ResponseEntity<List<String>> getLikeCommentMembers(@PathVariable Long commentId) {
-        List<String> members = likeCommentService.getLikeCommentMembers(commentId);
+    public ResponseEntity<List<Map<String, String>>> getLikeCommentMembers(@PathVariable Long commentId) {
+        List<Map<String, String>> members = likeCommentService.getLikeCommentMembers(commentId);
         return ResponseEntity.ok(members);
     }
 }

@@ -9,6 +9,7 @@ import com.hunmin.domain.entity.Board;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,11 +17,13 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
+@Log4j2
 public class BoardResponseDTO {
     private Long boardId;
     private Long memberId;
     private String title;
     private String nickname;
+    private String profileImage;
     private String content;
     private String location;
     private Double latitude;
@@ -42,6 +45,7 @@ public class BoardResponseDTO {
         this.memberId = board.getMember().getMemberId();
         this.title = board.getTitle();
         this.nickname = board.getNickname();
+        this.profileImage = board.getMember().getImage();
         this.content = board.getContent();
         this.location = board.getLocation();
         this.latitude = board.getLatitude();
