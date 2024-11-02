@@ -1,6 +1,5 @@
 package com.hunmin.domain.entity;
 
-import com.hunmin.domain.dto.chat.MessageType;
 import jakarta.persistence.*;
 import lombok.*;
 

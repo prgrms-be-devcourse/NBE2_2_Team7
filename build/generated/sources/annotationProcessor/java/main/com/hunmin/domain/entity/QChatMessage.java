@@ -35,7 +35,7 @@ public class QChatMessage extends EntityPathBase<ChatMessage> {
 
     public final StringPath message = createString("message");
 
-    public final EnumPath<com.hunmin.domain.dto.chat.MessageType> type = createEnum("type", com.hunmin.domain.dto.chat.MessageType.class);
+    public final EnumPath<MessageType> type = createEnum("type", MessageType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;

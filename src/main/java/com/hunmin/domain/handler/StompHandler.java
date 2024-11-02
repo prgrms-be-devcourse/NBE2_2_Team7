@@ -34,7 +34,7 @@ public class StompHandler implements ChannelInterceptor {
         //websocket 연결시
         if (StompCommand.CONNECT == accessor.getCommand()) {
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
-            if (jwtUtil.isExpired(jwtToken)){
+            if (!jwtUtil.isExpired(jwtToken)){
                 String role = jwtUtil.getRole(jwtToken);
                 ChatMessageDTO chatMessageDTO=(ChatMessageDTO)message.getPayload();
                 Member foundMember = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);

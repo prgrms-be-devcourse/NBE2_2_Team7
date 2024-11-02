@@ -18,13 +18,13 @@ public class EmbeddedRedisConfig {
     private RedisServer redisServer;
 
     @PostConstruct
-    public void redisServer() {
+    public void startRedisServer() {
         redisServer = new RedisServer(redisPort);
         redisServer.start();
     }
 
     @PreDestroy
-    public void stopRedis() {
+    public void stopRedisServer() {
         if (redisServer != null) {
             redisServer.stop();
         }
