@@ -32,7 +32,7 @@ public class FollowController {
     // 팔로이 수락 요청
     @GetMapping("/{memberId}")
     @Operation(summary = "팔로이 수락 요청", description = "팔로이 수락 요청 호출 API")
-    public ResponseEntity<FollowRequestDTO> AcceptFollower(@PathVariable Long memberId
+    public ResponseEntity<FollowRequestDTO> acceptFollower(@PathVariable Long memberId
                                                           ,Authentication authentication){
         String myEmail = authentication.getName();
         return ResponseEntity.ok(followService.registerAccept(myEmail, memberId));

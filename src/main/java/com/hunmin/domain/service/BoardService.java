@@ -280,10 +280,8 @@ public class BoardService {
 
     public Page<BoardResponseDTO> searchBoardByTitle(PageRequestDTO pageable, String title) {
         if(title == null) title = "";
-        log.info("title321: {}", title);
         try {
             Sort sort = Sort.by(Sort.Direction.DESC, "title");
-            log.info("pageable: {}", pageable.toString());
         return boardRepository.searchBoard(pageable.getPageable(sort), title);
         }catch (Exception e) {
             log.error(e.getMessage());

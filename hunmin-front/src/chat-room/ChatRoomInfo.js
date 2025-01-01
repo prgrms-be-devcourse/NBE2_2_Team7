@@ -9,6 +9,7 @@ const ChatRoomInfo = ({ chatRoomId, setNickname }) => {
         const fetchRoomDetails = async () => {
             try {
                 const response = await api.get(`/chat-room/${chatRoomId}`);
+                console.log("채팅방 정보 갖고오기 실행됨!")
                 setNickname(response.data.nickname); // 부모 컴포넌트의 setNickname 호출
             } catch (error) {
                 console.error('채팅방 정보를 불러오는 데 실패했습니다.', error);

@@ -88,7 +88,6 @@ public class NotificationService {
     public void send(NotificationSendDTO notificationSendDTO) {
         try {
             Member member = memberRepository.findById(notificationSendDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
-            log.info("member123123{}",member);
 
             Notification notification = Notification.builder()
                     .member(member)
@@ -97,14 +96,11 @@ public class NotificationService {
                     .url(notificationSendDTO.getUrl())
                     .isRead(false)
                     .build();
-            log.info("notification123123{}",notification.toString());
             notificationRepository.save(notification);
-            log.info("notification123123save{}",notification);
 
             String memberId = member.getMemberId() + "_";
             Map<String, SseEmitter> emitters = sseEmitters.findEmitter(memberId);
             NotificationResponseDTO notificationResponseDTO = new NotificationResponseDTO(notification);
-            log.info("emitters123123123{}",emitters);
             emitters.forEach((key, emitter) -> {
                 sendToClient(emitter, memberId, notificationResponseDTO);
             });

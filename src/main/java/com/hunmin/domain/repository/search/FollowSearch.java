@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface FollowSearch {
-    Page<FollowRequestDTO> getFollowPage(Long followId, Pageable pageable);
+    Page<FollowRequestDTO> getFollowPage(Long memberId, Pageable pageable);
 }

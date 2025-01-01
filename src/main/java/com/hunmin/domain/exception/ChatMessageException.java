@@ -3,6 +3,7 @@ package com.hunmin.domain.exception;
 public enum ChatMessageException {
     NOT_FOUND("NOT FOUND CHAT_MESSAGES", 400),
     MESSAGE_NOT_REGISTERED("CHAT_MESSAGES Not Registered", 400),
+    FAIL_SENDING_REDIS_TO_STOMP("FAILED TO DESERIALIEZE CHAT_MESSAGES", 500),
     NOT_FETCHED("CHAT_MESSAGES_LIST_PAGE NOT FETCHED", 400 );
 
     private final ChatMessageTaskException chatMessageTaskException;

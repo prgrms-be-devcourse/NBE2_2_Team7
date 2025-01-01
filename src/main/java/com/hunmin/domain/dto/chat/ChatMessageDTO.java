@@ -1,9 +1,9 @@
 package com.hunmin.domain.dto.chat;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hunmin.domain.entity.ChatMessage;
 import com.hunmin.domain.entity.ChatRoom;
 import com.hunmin.domain.entity.Member;
+import com.hunmin.domain.entity.MessageType;
 import lombok.*;
 
 import java.time.LocalDateTime;

@@ -35,14 +35,17 @@ public class StompHandler implements ChannelInterceptor {
         if (StompCommand.CONNECT == accessor.getCommand()) {
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
             if (jwtUtil.isExpired(jwtToken)){
-                String role = jwtUtil.getRole(jwtToken);
                 ChatMessageDTO chatMessageDTO=(ChatMessageDTO)message.getPayload();
                 Member foundMember = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
+
                 CustomUserDetails customUserDetails = new CustomUserDetails(foundMember);
 
                 Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null,
                         customUserDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                Object payload1 = message.getPayload();
+                log.info(" 검증 성공 {}", payload1.toString());
             }
         }
         return message;

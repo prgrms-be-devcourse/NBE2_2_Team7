@@ -81,6 +81,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/members/register").permitAll()
                         .requestMatchers("/api/members/login").permitAll()
                         .requestMatchers("/api/members/reissue").permitAll()
+                        .requestMatchers("/api/chat-room/**").permitAll()
+                        .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers("/api/members/admin").hasRole("ADMIN")
                         .requestMatchers("/api/members/password/**").permitAll()
                         .requestMatchers("/webjars/**", "/images/**", "/favicon.ico").permitAll()//웹 자원 경로 허용

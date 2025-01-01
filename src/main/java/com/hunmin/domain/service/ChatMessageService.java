@@ -12,6 +12,7 @@ import com.hunmin.domain.exception.ChatMessageException;
 import com.hunmin.domain.exception.ChatRoomException;
 import com.hunmin.domain.exception.MemberException;
 import com.hunmin.domain.handler.SseEmitters;
+import com.hunmin.domain.pubsub.RedisPublisher;
 import com.hunmin.domain.pubsub.RedisSubscriber;
 import com.hunmin.domain.repository.ChatMessageRepository;
 import com.hunmin.domain.repository.ChatRoomRepository;
@@ -38,11 +39,13 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final RedisSubscriber redisSubscriber;
+    private final RedisPublisher redisPublisher;
     private final NotificationService notificationService;
     private final SseEmitters sseEmitters;
 
     // 채팅방에 메시지 발송
     public void sendChatMessage(ChatMessageDTO chatMessageDTO) {
+        log.info("chatMessageDTO : {}", chatMessageDTO);
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessageDTO.getChatRoomId()).orElseThrow(ChatRoomException.NOT_FOUND::get);
         Member sender = memberRepository.findById(chatMessageDTO.getMemberId()).orElseThrow(MemberException.NOT_FOUND::get);
 
@@ -53,7 +56,14 @@ public class ChatMessageService {
                 .type(chatMessageDTO.getType())
                 .build();
         ChatMessage savedChatMessage = chatMessageRepository.save(chatMessage);
-        redisSubscriber.sendMessage(new ChatMessageDTO(savedChatMessage));
+
+        //전송될 메세지
+        ChatMessageDTO messageDTO = new ChatMessageDTO(savedChatMessage);
+
+        //레디스 메세지 전송
+        redisPublisher.publish(messageDTO);
+        //stomp 메세지 전송
+//        redisSubscriber.sendMessage(new ChatMessageDTO(savedChatMessage));
 
         // 알림
         Long senderId = sender.getMemberId();

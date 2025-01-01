@@ -2,7 +2,7 @@
 //
 //import com.hunmin.domain.dto.chat.ChatMessageDTO;
 //import com.hunmin.domain.dto.chat.ChatMessageListRequestDTO;
-//import com.hunmin.domain.dto.chat.MessageType;
+//import com.hunmin.domain.entity.MessageType;
 //import com.hunmin.domain.dto.page.ChatMessagePageRequestDTO;
 //import com.hunmin.domain.entity.ChatMessage;
 //import com.hunmin.domain.entity.ChatRoom;

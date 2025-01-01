@@ -5,9 +5,11 @@ import com.hunmin.domain.dto.chat.ChatRoomRequestDTO;
 import com.hunmin.domain.pubsub.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,27 +23,46 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @Log4j2
 public class RedisConfig {
-    @Bean
-    public ChannelTopic topicPattern() {
 
-        return new ChannelTopic("chatRoom");
-    }
-    //클라이언트로 부터 메세지 수신
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
+
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
     @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory(redisHost, redisPort);
+    }
+
+    @Bean
+    //Redis 채널명
+    public ChannelTopic topicPattern() {
+        return new ChannelTopic("chat_channel");
+    }
+    @Bean
+    //Redis 메세지 구독을 담당
     public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory
-                                                            ,MessageListenerAdapter listenerAdapter,
-                                                              ChannelTopic channelTopic) {
+                                                             ,MessageListenerAdapter listenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listenerAdapter, channelTopic);
+        container.setConnectionFactory(connectionFactory); //연결될 레디스 서버 주소, 포트 설정(매핑)
+        container.addMessageListener(listenerAdapter, topicPattern()); //연결될 레디스 채널명, 리스너 설정(매핑)
         return container;
     }
-    //클라이언트로 부터 메세지 수신
     @Bean
+    /**
+        <메세지의 흐름>
+        * messageService -> redisMessageListener -> listenerAdapter -> onMessage
+        : onMessage 실제 메세지 처리 로직 실행 (Stomp 메세지 전송)
+
+        * listenerAdapter : message 랩핑 + onMessage 향해 메세지 전달역할
+    */
     public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber, "sendMessage");
+        return new MessageListenerAdapter(subscriber, "onMessage");
     }
+
     @Bean(name = "redisTemplate")
+    //Redis 직렬화 방식 GenericJackson2 변경
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
@@ -58,11 +79,12 @@ public class RedisConfig {
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);
 
-        template.afterPropertiesSet();
+        template.afterPropertiesSet(); // 설정 완료 후 초기화
         return template;
     }
 
     @Bean(name = "roomStorage")
+    //RedisTemplate.opsForHash 커스텀
     public HashOperations<String, String, Object> hashOperations(RedisTemplate<String, Object> redisTemplate) {
         return redisTemplate.opsForHash();
     }

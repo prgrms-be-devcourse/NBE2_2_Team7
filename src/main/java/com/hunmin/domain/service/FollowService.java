@@ -193,7 +193,7 @@ public class FollowService {
     }
 
     public boolean isFollowing(Long memberId, Long followeeId) {
-        return followRepository.existsByFollower_MemberIdAndFollowee_MemberId(memberId, followeeId);
+        return followRepository.existsByFollowerMemberIdAndFolloweeMemberId(memberId, followeeId);
     }
 
 }
