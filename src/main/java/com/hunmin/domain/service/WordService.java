@@ -56,9 +56,6 @@ public class WordService {
     // 단어 수정
     public WordResponseDTO updateWord(WordRequestDTO wordRequestDTO, String title, String lang, String username) {
         Member member = getMember(username);
-        // title과 lang 조합으로 단어 조회
-//        Word word = wordRepository.findByTitleAndLang(title, lang)
-//                .orElseThrow(() -> new WordCustomException(WordException.WORD_NOT_FOUND));
 
         if (!member.getMemberRole().equals(MemberRole.ADMIN)) {
             throw WordException.MEMBER_NOT_VALID.get();

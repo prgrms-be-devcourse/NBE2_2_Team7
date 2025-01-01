@@ -1,10 +1,17 @@
 import React from 'react';
-import { Box, Container, Typography, List, ListItem, ListItemText } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Box, Container, Typography, List, ListItem, Button, ListItemText } from '@mui/material';
+import {Link, useNavigate} from 'react-router-dom';
 
 const WordManagementPage = () => {
+    const navigate = useNavigate();
     return (
         <Container maxWidth="md">
+            <Box sx={{ textAlign: 'right', marginBottom: 2 }}>
+                <Button variant="outlined" onClick={() => navigate('/word-learning')}>
+                    뒤로가기
+                </Button>
+            </Box>
+
             {/* 배너 영역 */}
             <Box sx={{
                 backgroundColor: '#007bff',

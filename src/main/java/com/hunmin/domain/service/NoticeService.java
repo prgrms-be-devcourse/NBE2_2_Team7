@@ -10,6 +10,7 @@ import com.hunmin.domain.repository.MemberRepository;
 import com.hunmin.domain.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -27,16 +28,14 @@ public class NoticeService {
     private final MemberRepository memberRepository;
 
     //공지사항 리스트 조회
-    public List<NoticeResponseDTO> getAllNotices(NoticePageRequestDTO pageRequestDTO){
+    public Page<NoticeResponseDTO> getAllNotices(NoticePageRequestDTO pageRequestDTO){
         try {
             Sort sort = Sort.by("noticeId").descending();
             Pageable pageable = pageRequestDTO.getPageable(sort);
-            List<Notice> notices = noticeRepository.findAllNoticesResponse(pageable);
+            Page<Notice> noticePage = noticeRepository.findAllNoticesResponse(pageable);
             List<NoticeResponseDTO> responseDTOs = new ArrayList<>();
-            for (Notice notice : notices) {
-                responseDTOs.add(new NoticeResponseDTO(notice));
-            }
-            return responseDTOs;
+            // Notice를 NoticeResponseDTO로 변환
+            return noticePage.map(NoticeResponseDTO::new);
         }catch (Exception e){
             log.error("getAllNotices error: {}",  e.getMessage());
             throw NoticeException.NOTICE_NOT_FOUND.get();

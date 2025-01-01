@@ -17,9 +17,11 @@ public class WordResponseDTO {
     private String definition;          // 정의
     private String translation;         // 번역(영어)
 
-    private String displayWord;         // 랜덤으로 보여줄 단어
-    private long displayTime;            // 보여줄 시간
-    private String displayTranslation;  // 표시할 번역
+    private String displayWord;
+    private long displayTime;
+    private String displayTranslation;
+
+
 
     public WordResponseDTO(Word word) {
         this.wordId = word.getWordId();

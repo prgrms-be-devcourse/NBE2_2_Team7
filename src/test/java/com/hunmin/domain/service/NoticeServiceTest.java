@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,7 +81,7 @@ class NoticeServiceTest {
         NoticePageRequestDTO pageRequestDTO = new NoticePageRequestDTO();
 
         //when
-        List<NoticeResponseDTO> notices = noticeService.getAllNotices(pageRequestDTO);
+        Page<NoticeResponseDTO> notices = noticeService.getAllNotices(pageRequestDTO);
         //then
         assertThat(notices).isNotEmpty(); //공지  유무 확인
         assertThat(notices).hasSizeLessThanOrEqualTo(savedNotices.size()); //공지 사이즈가 일치한지 확인

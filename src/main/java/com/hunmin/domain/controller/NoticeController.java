@@ -5,6 +5,7 @@ import com.hunmin.domain.service.NoticeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,9 +25,9 @@ public class NoticeController {
 
     @GetMapping("/list/{page}")
     @Operation(summary = "페이지 조회", description = "공지사항을 페이지로 조회할때 사용하는 API")
-    public ResponseEntity<List<NoticeResponseDTO>> getNoticeList(@Validated NoticePageRequestDTO noticePageRequestDTO, @PathVariable int page) {
+    public ResponseEntity<Page<NoticeResponseDTO>> getNoticeList(@Validated NoticePageRequestDTO noticePageRequestDTO, @PathVariable int page) {
         noticePageRequestDTO.setPage(page); // 페이지 번호 설정
-        List<NoticeResponseDTO> noticeList = noticeService.getAllNotices(noticePageRequestDTO);
+        Page<NoticeResponseDTO> noticeList = noticeService.getAllNotices(noticePageRequestDTO);
         return ResponseEntity.ok(noticeList);
     }
 

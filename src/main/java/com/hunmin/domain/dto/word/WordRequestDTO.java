@@ -28,6 +28,8 @@ public class WordRequestDTO {
     @NotEmpty(message = "언어는 필수 입력값입니다.")
     private String lang;
 
+    private Long testScore;
+
     public Word toEntity() {
         return Word.builder()
                 .wordId(wordId)

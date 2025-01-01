@@ -8,6 +8,8 @@ const WordListPage = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [words, setWords] = useState([]);
+    const [wordData, setWordData] = useState(null);
+    const [selectedWord, setSelectedWord] = useState(null);
 
     const location = useLocation();
 
@@ -16,7 +18,7 @@ const WordListPage = () => {
             const params = {
                 page: currentPage,
                 size: 10,
-                lang: selectedLang, // 선택된 언어를 여기 추가
+                lang: selectedLang,
             };
 
             const response = await api.get('/words', { params });
@@ -28,18 +30,33 @@ const WordListPage = () => {
     };
 
     useEffect(() => {
-        // URL 쿼리에서 언어를 가져옴
         const queryParams = new URLSearchParams(location.search);
         const language = queryParams.get('lang');
         if (language) {
             setLang(language);
-            fetchWords(language, page); // 언어가 결정되면 단어를 가져옴
+            fetchWords(language, page);
         }
     }, [location.search, page]);
 
+    const handleWordClick = async (word) => {
+        // 같은 단어를 다시 클릭하면 정보를 숨김
+        if (selectedWord === word.title) {
+            setSelectedWord(null);
+            setWordData(null);
+        } else {
+            setSelectedWord(word.title);
+            try {
+                const response = await api.get(`/words/join/${word.title}/${word.lang}`);
+                setWordData(response.data);
+            } catch (err) {
+                console.error('단어 정보를 가져오는 중 오류 발생:', err);
+            }
+        }
+    };
+
     const handlePageChange = (event, value) => {
         setPage(value);
-        fetchWords(lang, value); // 선택한 페이지의 단어를 새로 가져옴
+        fetchWords(lang, value);
     };
 
     return (
@@ -64,43 +81,40 @@ const WordListPage = () => {
             )}
 
             {lang && (
-                <Box
-                    sx={{
-                        backgroundColor: '#ffffff',
-                        padding: 3,
-                        borderRadius: 2,
-                        boxShadow: 3,
-                    }}
-                >
+                <Box sx={{
+                    backgroundColor: '#ffffff',
+                    padding: 3,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                }}>
                     <Typography variant="h5" color="primary" fontWeight="bold" gutterBottom>
                         단어 목록
                     </Typography>
 
                     <List>
                         {words.length > 0 ? words.map((word) => (
-                            <ListItem key={word.title}>
-                                <ListItemText
-                                    primary={<Link to={`/words/view?title=${word.title}&lang=${word.lang}`}>{word.title}</Link>}
-                                    secondary={word.translation}
-                                />
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    component={Link}
-                                    to={`/words/update/check?title=${word.title}&lang=${word.lang}`}
-                                    sx={{ marginRight: 1 }}
-                                >
-                                    수정
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    color="secondary"
-                                    component={Link}
-                                    to={`/words/delete/check?title=${word.title}&lang=${word.lang}`}
-                                >
-                                    삭제
-                                </Button>
-                            </ListItem>
+                            <div key={word.title}>
+                                <ListItem onClick={() => handleWordClick(word)} sx={{ cursor: 'pointer' }}>
+                                    <ListItemText
+                                        primary={word.title}
+                                        secondary={word.translation}
+                                    />
+                                </ListItem>
+
+                                {/* 클릭한 단어의 정보 표시 부분 */}
+                                {selectedWord === word.title && wordData && (
+                                    <Box sx={{ padding: 2, border: '1px solid #ccc', borderRadius: 2 }}>
+                                        <Typography variant="h5">{wordData.title}</Typography>
+                                        <Typography variant="body1">뜻: {wordData.translation}</Typography>
+                                        <Typography variant="body1">정의: {wordData.definition}</Typography>
+                                        <Typography variant="body1">언어: {wordData.lang}</Typography>
+                                        <Typography variant="body1">작성일: {new Date(wordData.createdAt).toLocaleDateString()}</Typography>
+                                        <Typography variant="body1">
+                                            수정일: {wordData.updatedAt ? new Date(wordData.updatedAt).toLocaleDateString() : ''}
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </div>
                         )) : (
                             <Typography variant="body1" color="textSecondary">
                                 해당 언어에 대한 단어가 없습니다.
@@ -127,6 +141,9 @@ const WordListPage = () => {
                 </Button>
                 <Button component={Link} to="/word-view" variant="outlined" sx={{ marginRight: 1 }}>
                     단어 검색
+                </Button>
+                <Button component={Link} to="/word-edit" variant="outlined" sx={{ marginLeft: 1, color: 'red' }}>
+                    단어 관리 (관리자 전용)
                 </Button>
             </Box>
         </Container>

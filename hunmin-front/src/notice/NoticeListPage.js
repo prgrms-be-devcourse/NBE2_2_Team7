@@ -7,6 +7,7 @@ import './NoticeListPage.css';
 const NoticeListPage = () => {
     const [notices, setNotices] = useState([]);
     const [page, setPage] = useState(1); // 초기 페이지 번호
+    const [totalPages, setTotalPages] = useState(0); // 총 페이지 수
 
     useEffect(() => {
         fetchNotices(page);
@@ -16,7 +17,8 @@ const NoticeListPage = () => {
         //axios.get(`/api/notices/list/${page}`)
         api.get(`/notices/list/${page}`)
             .then(response => {
-                setNotices(response.data);
+                setNotices(response.data.content);
+                setTotalPages(response.data.totalPages); // 총 페이지 수 설정
             })
             .catch(error => {
                 if (error.response && error.response.data) {
@@ -35,6 +37,26 @@ const NoticeListPage = () => {
         if (page > 1) {
             setPage(prevPage => prevPage - 1);
         }
+    };
+
+    const handlePageClick = (pageNumber) => {
+        setPage(pageNumber);
+    };
+
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        for (let i = 1; i <= totalPages; i++) {
+            pageNumbers.push(
+                <button
+                    key={i}
+                    onClick={() => handlePageClick(i)}
+                    className={page === i ? 'active' : ''}
+                >
+                    {i}
+                </button>
+            );
+        }
+        return pageNumbers;
     };
 
 
@@ -58,8 +80,8 @@ const NoticeListPage = () => {
             </ul>
             <div className="pagination">
                 <button onClick={handlePreviousPage} disabled={page === 1}>이전 페이지</button>
-                <span>{page}</span>
-                <button onClick={handleNextPage}>다음 페이지</button>
+                {renderPageNumbers()} {/* 페이지 번호 표시 */}
+                <button onClick={handleNextPage} disabled={page === totalPages}>다음 페이지</button>
             </div>
             <Link to="/create-notice" className="create-link">공지사항 생성</Link>
 

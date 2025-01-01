@@ -20,6 +20,7 @@ public class WordLearningService {
 
     public List<WordResponseDTO> getRandomWords(String lang, int level) {
         List<Word> words = wordRepository.findByLang(lang);
+        System.out.println("Words fetched: " + words.size()); // 추가된 로그
 
         // 랜덤으로 30개 단어 선택
         Collections.shuffle(words);

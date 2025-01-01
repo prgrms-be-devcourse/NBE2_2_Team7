@@ -28,7 +28,7 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="hunmin@hunmin-db.cjg8u0uqkeqj.us-east-1.rds.amazonaws.com" uuid="b2dafe83-e4f3-46b9-8330-7f6310f7db7a">
+    <data-source source="LOCAL" name="@hunmin-db.cjg8u0uqkeqj.us-east-1.rds.amazonaws.com" uuid="b2dafe83-e4f3-46b9-8330-7f6310f7db7a">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
